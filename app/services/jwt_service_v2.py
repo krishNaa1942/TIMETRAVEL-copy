@@ -48,8 +48,9 @@ class JWTConfig:
     def validate(cls):
         """Validate configuration"""
         if not cls.SECRET_KEY:
-            # Generate a stable secret for development
-            if os.environ.get("FLASK_ENV") == "development":
+            # Generate a stable secret for development / testing
+            env = os.environ.get("FLASK_ENV", "")
+            if env in ("development", "testing") or os.environ.get("TESTING"):
                 cls.SECRET_KEY = "dev-secret-key-change-in-production-min-32-chars!"
                 logger.warning("Using development JWT secret. Set JWT_SECRET_KEY in production!")
             else:
