@@ -68,10 +68,12 @@ class TestImagesStatus:
 
 class TestHeroImage:
     def test_hero_no_key(self, client, app):
-        """Without key, hero endpoint returns 503."""
+        """Without key, hero endpoint returns 200 with a fallback image."""
         app.config["UNSPLASH_ACCESS_KEY"] = ""
         resp = client.get("/api/images/hero/goa")
-        assert resp.status_code == 503
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["using_fallback"] is True
 
     @patch("app.services.unsplash_service.requests.get")
     def test_hero_success(self, mock_get, client, app):
