@@ -1,0 +1,36 @@
+# ──────────────────────────────────────────────────────────
+# Time Travel – Docker Compose
+# Spins up the full application stack with one command:
+#   docker compose up --build
+# ──────────────────────────────────────────────────────────
+
+services:
+  web:
+    build: .
+    container_name: timetravel-web
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - db-data:/app/instance
+      - ./data:/app/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5001/api/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  db-data:
+    driver: local

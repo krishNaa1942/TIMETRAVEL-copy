@@ -1,0 +1,439 @@
+/* =======================================================
+ * Notifications & Feedback Styling
+ * Toast messages, progress indicators, confirmations
+ * ======================================================= */
+
+/* ─────────────────────────────────────────────────────── */
+/* NOTIFICATION CONTAINER */
+/* ─────────────────────────────────────────────────────── */
+#notificationContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  top: auto;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: min(380px, calc(100vw - 32px));
+}
+
+@media (max-width: 640px) {
+  #notificationContainer {
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    top: auto;
+    max-width: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* TOAST NOTIFICATIONS */
+/* ─────────────────────────────────────────────────────── */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  background: color-mix(in srgb, var(--actual-bg, white) 88%, #f8fafc 12%);
+  border: 1px solid
+    color-mix(in srgb, var(--actual-border, #e2e8f0) 90%, #cbd5e1 10%);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(6px);
+  pointer-events: all;
+  cursor: pointer;
+  animation: toastSlideOut 0.3s ease forwards;
+  position: relative;
+  min-height: 48px;
+  color: var(--actual-text-primary, #0f172a);
+}
+
+.toast--visible {
+  animation: toastSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-message {
+  flex: 1;
+  word-wrap: break-word;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  margin: -4px -8px -4px 0;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+/* Toast Types */
+.toast--success {
+  background: linear-gradient(135deg, #f0fdf4, #f0feee);
+  border-color: #dcfce7;
+  color: #166534;
+}
+
+.toast--success .toast-icon {
+  color: #22c55e;
+}
+
+.toast--error {
+  background: linear-gradient(135deg, #fef2f2, #fdeeee);
+  border-color: #fee2e2;
+  color: #7f1d1d;
+}
+
+.toast--error .toast-icon {
+  color: #ef4444;
+}
+
+.toast--warning {
+  background: linear-gradient(135deg, #fffbeb, #fef8e7);
+  border-color: #fef3c7;
+  color: #78350f;
+}
+
+.toast--warning .toast-icon {
+  color: #f59e0b;
+}
+
+.toast--info {
+  background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+  border-color: #bfdbfe;
+  color: #0c2d6b;
+}
+
+.toast--info .toast-icon {
+  color: #3b82f6;
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* PROGRESS BAR */
+/* ─────────────────────────────────────────────────────── */
+.progress-bar-container {
+  position: relative;
+  height: 6px;
+  background: var(--bg-tertiary, #f3f4f6);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 12px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.progress-bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.progress-bar-container:hover .progress-bar-text {
+  opacity: 1;
+}
+
+.progress-bar-complete .progress-bar-fill {
+  background: linear-gradient(90deg, #22c55e, #10b981);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* CONFIRMATION DIALOG */
+/* ─────────────────────────────────────────────────────── */
+.confirmation-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  animation: dialogFadeOut 0.3s ease forwards;
+}
+
+.confirmation-dialog--visible {
+  opacity: 1;
+  pointer-events: all;
+  animation: dialogFadeIn 0.3s ease forwards;
+}
+
+.confirmation-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.confirmation-dialog-content {
+  position: relative;
+  background: var(--bg-primary, #fff);
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: dialogSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.confirmation-dialog--visible .confirmation-dialog-content {
+  animation: dialogSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.confirmation-dialog:not(.confirmation-dialog--visible)
+  .confirmation-dialog-content {
+  animation: dialogSlideDown 0.3s ease forwards;
+}
+
+.confirmation-dialog-message {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary, #1f2937);
+}
+
+.confirmation-dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirmation-dialog-actions .btn {
+  flex: 1;
+  min-height: 44px;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .confirmation-dialog-content {
+    margin: 0 16px;
+    max-width: none;
+  }
+
+  .confirmation-dialog-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* FORM INPUT FEEDBACK STATES */
+/* ─────────────────────────────────────────────────────── */
+.form-group {
+  position: relative;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  transition: all 0.2s ease;
+  border-color: var(--border-color, #d1d5db);
+}
+
+.form-group--focused input,
+.form-group--focused textarea,
+.form-group--focused select {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group--valid input,
+.form-group--valid textarea {
+  border-color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.02);
+}
+
+.form-group--valid input::after {
+  content: "✓";
+}
+
+.form-group--error input,
+.form-group--error textarea,
+.form-group--error select {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.02);
+}
+
+/* Feedback message */
+.form-group-feedback {
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-group--valid .form-group-feedback-valid,
+.form-group--error .form-group-feedback-error {
+  display: flex;
+}
+
+.form-group-feedback-valid {
+  color: #22c55e;
+}
+
+.form-group-feedback-error {
+  color: #ef4444;
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* BUTTON LOADING STATE */
+/* ─────────────────────────────────────────────────────── */
+.btn--loading {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.btn--loading .btn-text {
+  margin-right: 8px;
+}
+
+.btn-loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────────── */
+/* ANIMATIONS */
+/* ─────────────────────────────────────────────────────── */
+@keyframes toastSlideIn {
+  from {
+    transform: translateY(12px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(12px) scale(0.98);
+    opacity: 0;
+  }
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes dialogSlideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .toast {
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .toast-icon {
+    font-size: 16px;
+  }
+
+  .confirmation-dialog-content {
+    padding: 20px;
+  }
+}

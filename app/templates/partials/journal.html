@@ -1,0 +1,86 @@
+<!-- ═══════════════════════════════ TRAVEL JOURNAL ═══ -->
+<section id="journal" class="section-dark" data-reveal>
+  <div class="container">
+    <h2 class="section-title light">
+      <i class="fas fa-book-open"></i> Travel Journal
+    </h2>
+    <p class="section-desc light">
+      Document your travel memories, impressions & tips
+    </p>
+    <div class="journal-layout">
+      <div class="journal-form-card">
+        <div class="form-group">
+          <label for="journalDest"
+            ><i class="fas fa-map-marker-alt"></i> Destination</label
+          >
+          <select id="journalDest" data-dest-dropdown>
+            <option value="">Select destination</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="journalTitle"><i class="fas fa-heading"></i> Title</label>
+          <input
+            type="text"
+            id="journalTitle"
+            placeholder="A magical evening in Goa..."
+          />
+        </div>
+        <div class="form-group">
+          <label for="journalContent"
+            ><i class="fas fa-pen-fancy"></i> Your Story</label
+          >
+          <textarea
+            id="journalContent"
+            rows="5"
+            placeholder="Write about your experience..."
+          ></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="journalMood"><i class="fas fa-smile"></i> Mood</label>
+            <select id="journalMood">
+              <option value="">Select mood</option>
+              <option value="excited">🤩 Excited</option>
+              <option value="happy">😊 Happy</option>
+              <option value="relaxed">😌 Relaxed</option>
+              <option value="amazed">🤯 Amazed</option>
+              <option value="grateful">🙏 Grateful</option>
+              <option value="adventurous">🏔️ Adventurous</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="journalRating"
+              ><i class="fas fa-star"></i> Rating</label
+            >
+            <select id="journalRating">
+              <option value="">Rate trip</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+            </select>
+          </div>
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" id="journalPublic" /> Share with community
+        </label>
+        <button id="journalSaveBtn" class="btn btn-primary btn-full">
+          <i class="fas fa-save"></i> Save Note
+        </button>
+      </div>
+      <div class="journal-list-card">
+        <div class="journal-tabs">
+          <button class="journal-tab active" data-jtab="mine">My Notes</button>
+          <button class="journal-tab" data-jtab="community">Community</button>
+        </div>
+        <div id="journalList" class="journal-list">
+          <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <p>No journal entries yet. Share your travel story!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

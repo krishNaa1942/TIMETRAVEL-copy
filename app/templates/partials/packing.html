@@ -1,0 +1,58 @@
+<!-- ═══════════════════════════════ PACKING CHECKLIST ═══ -->
+<section id="packingChecklist" class="section-light" data-reveal>
+  <div class="container">
+    <h2 class="section-title">
+      <i class="fas fa-suitcase"></i> Smart Packing Checklist
+    </h2>
+    <p class="section-desc">
+      Weather-based packing suggestions — check items as you pack
+    </p>
+    <div class="packing-layout">
+      <div class="packing-controls">
+        <div class="form-group">
+          <label for="packDest"
+            ><i class="fas fa-map-marker-alt"></i> Destination</label
+          >
+          <select id="packDest" data-dest-dropdown>
+            <option value="">Select destination</option>
+          </select>
+        </div>
+        <button id="packGenBtn" class="btn btn-primary">
+          <i class="fas fa-magic"></i> Generate Checklist
+        </button>
+      </div>
+      <div
+        class="packing-progress-wrap"
+        id="packProgressWrap"
+        style="display: none"
+      >
+        <div class="packing-progress-bar">
+          <div class="packing-progress-fill" id="packProgressFill"></div>
+        </div>
+        <span class="packing-progress-text" id="packProgressText"
+          >0% packed</span
+        >
+      </div>
+      <div id="packList" class="packing-list">
+        <div class="empty-state" id="packEmpty">
+          <i class="fas fa-suitcase"></i>
+          <p>
+            Select a destination and click
+            <strong>Generate Checklist</strong> to get weather-based packing
+            suggestions.
+          </p>
+        </div>
+      </div>
+      <div class="packing-add-custom" id="packCustomWrap" style="display: none">
+        <input
+          type="text"
+          id="packCustomInput"
+          placeholder="Add custom item..."
+        />
+        <button id="packCustomBtn" class="btn btn-sm btn-outline">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

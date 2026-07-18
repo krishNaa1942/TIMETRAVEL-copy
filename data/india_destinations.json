@@ -1,0 +1,6824 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "total_destinations": 201,
+    "coverage": "All 28 states + 8 union territories",
+    "categories": [
+      "heritage",
+      "nature",
+      "beach",
+      "hill_station",
+      "wildlife",
+      "religious",
+      "adventure",
+      "urban",
+      "desert",
+      "backwaters",
+      "island"
+    ],
+    "last_updated": "2026-03-05"
+  },
+  "destinations": [
+    {
+      "id": "agartala",
+      "name": "Agartala",
+      "state": "Tripura",
+      "region": "Northeast",
+      "lat": 23.8315,
+      "lng": 91.2868,
+      "category": [
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 13,
+      "highlights": [
+        "Ujjayanta Palace",
+        "Neermahal Water Palace",
+        "Unakoti Sculptures",
+        "Jampui Hills",
+        "Heritage Park"
+      ],
+      "description": "Royal palaces and the mysterious cliff carvings of Unakoti — Tripura's hidden gems.",
+      "nearest_airport": "Maharaja Bir Bikram Airport (IXA)",
+      "languages": [
+        "Bengali",
+        "Kokborok"
+      ]
+    },
+    {
+      "id": "agra",
+      "name": "Agra",
+      "state": "Uttar Pradesh",
+      "region": "North",
+      "lat": 27.1767,
+      "lng": 78.0081,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 171,
+      "highlights": [
+        "Taj Mahal",
+        "Agra Fort",
+        "Fatehpur Sikri",
+        "Mehtab Bagh",
+        "Itimad-ud-Daulah"
+      ],
+      "description": "Home to the iconic Taj Mahal, Agra is a UNESCO World Heritage treasure trove on the banks of the Yamuna.",
+      "nearest_airport": "Agra Airport (AGR)",
+      "languages": [
+        "Hindi",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "ahmedabad",
+      "name": "Ahmedabad",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 23.0225,
+      "lng": 72.5714,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 53,
+      "highlights": [
+        "Sabarmati Ashram",
+        "Adalaj Stepwell",
+        "Sidi Saiyyed Mosque",
+        "Kankaria Lake",
+        "Calico Museum"
+      ],
+      "description": "India's first UNESCO World Heritage City, blending Gandhian history with vibrant street food culture.",
+      "nearest_airport": "Sardar Vallabhbhai Patel Intl (AMD)",
+      "languages": [
+        "Gujarati",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "aizawl",
+      "name": "Aizawl",
+      "state": "Mizoram",
+      "region": "Northeast",
+      "lat": 23.7271,
+      "lng": 92.7176,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1132,
+      "highlights": [
+        "Durtlang Hills",
+        "Solomon's Temple",
+        "Mizoram State Museum",
+        "Reiek Heritage Village",
+        "Tam Dil Lake"
+      ],
+      "description": "Clifftop capital of Mizoram — vibrant Mizo culture, bamboo forests, and dramatic hills.",
+      "nearest_airport": "Lengpui Airport (AJL)",
+      "languages": [
+        "Mizo",
+        "English"
+      ]
+    },
+    {
+      "id": "ajanta_ellora",
+      "name": "Ajanta & Ellora Caves",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 20.5519,
+      "lng": 75.7033,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 480,
+      "highlights": [
+        "Ajanta Caves",
+        "Ellora Caves",
+        "Kailasa Temple",
+        "Bibi Ka Maqbara",
+        "Daulatabad Fort"
+      ],
+      "description": "Rock-cut Buddhist, Hindu & Jain cave complexes spanning 2nd century BCE to 10th century CE.",
+      "nearest_airport": "Aurangabad Airport (IXU)",
+      "languages": [
+        "Marathi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "alleppey",
+      "name": "Alleppey (Alappuzha)",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 9.4981,
+      "lng": 76.3388,
+      "category": [
+        "backwaters",
+        "nature"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1,
+      "highlights": [
+        "Houseboat Cruise",
+        "Vembanad Lake",
+        "Alappuzha Beach",
+        "Nehru Trophy Boat Race",
+        "Marari Beach"
+      ],
+      "description": "Venice of the East — serene backwaters, palm-fringed canals, and traditional houseboats.",
+      "nearest_airport": "Cochin Intl Airport (COK)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "almora",
+      "name": "Almora",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.5971,
+      "lng": 79.6591,
+      "category": [
+        "hill_station",
+        "heritage"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1638,
+      "highlights": [
+        "Kasar Devi Temple",
+        "Bright End Corner",
+        "Deer Park",
+        "Chand-era Bazaars",
+        "Jageshwar Temples"
+      ],
+      "description": "Cultural heart of Kumaon — Chand dynasty heritage, Swami Vivekananda's meditation spot.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "amritsar",
+      "name": "Amritsar",
+      "state": "Punjab",
+      "region": "North",
+      "lat": 31.634,
+      "lng": 74.8723,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 234,
+      "highlights": [
+        "Golden Temple",
+        "Jallianwala Bagh",
+        "Wagah Border",
+        "Partition Museum",
+        "Gobindgarh Fort"
+      ],
+      "description": "Spiritual heart of Sikhism with the magnificent Golden Temple and rich Punjabi culture.",
+      "nearest_airport": "Sri Guru Ram Dass Jee Intl (ATQ)",
+      "languages": [
+        "Punjabi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "anandpur_sahib",
+      "name": "Anandpur Sahib",
+      "state": "Punjab",
+      "region": "North",
+      "lat": 31.2392,
+      "lng": 76.5032,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 350,
+      "highlights": [
+        "Takht Sri Kesgarh Sahib",
+        "Virasat-e-Khalsa",
+        "Hola Mohalla Festival",
+        "Naina Devi Temple",
+        "Bhakra Dam"
+      ],
+      "description": "Birthplace of the Khalsa — Virasat-e-Khalsa museum, Hola Mohalla warrior festival, and Bhakra Dam nearby.",
+      "nearest_airport": "Chandigarh Airport (IXC)",
+      "languages": [
+        "Punjabi"
+      ]
+    },
+    {
+      "id": "andaman",
+      "name": "Andaman & Nicobar Islands",
+      "state": "Andaman & Nicobar",
+      "region": "Islands",
+      "lat": 11.7401,
+      "lng": 92.6586,
+      "category": [
+        "island",
+        "beach",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Radhanagar Beach",
+        "Cellular Jail",
+        "Scuba Diving",
+        "Ross Island",
+        "Baratang Island"
+      ],
+      "description": "Pristine tropical islands with turquoise waters, coral reefs, and colonial history.",
+      "nearest_airport": "Veer Savarkar Intl Airport (IXZ)",
+      "languages": [
+        "Hindi",
+        "Bengali",
+        "Tamil"
+      ]
+    },
+    {
+      "id": "araku_valley",
+      "name": "Araku Valley",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 18.3273,
+      "lng": 82.8756,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 900,
+      "highlights": [
+        "Borra Caves",
+        "Coffee Plantations",
+        "Tribal Museum",
+        "Chaparai Waterfalls",
+        "Ananthagiri Hills"
+      ],
+      "description": "A lush hill station in the Eastern Ghats known for coffee plantations and tribal culture.",
+      "nearest_airport": "Visakhapatnam Airport (VTZ)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "auli",
+      "name": "Auli",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.5281,
+      "lng": 79.5663,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 2800,
+      "highlights": [
+        "Skiing",
+        "Auli Ropeway",
+        "Gorson Bugyal",
+        "Nanda Devi View",
+        "Joshimath"
+      ],
+      "description": "India's premier skiing destination with panoramic Himalayan views.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "aurangabad",
+      "name": "Aurangabad",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 19.8762,
+      "lng": 75.3433,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 568,
+      "highlights": [
+        "Bibi Ka Maqbara",
+        "Daulatabad Fort",
+        "Panchakki",
+        "Siddharth Garden",
+        "Sunheri Mahal"
+      ],
+      "description": "Gateway to Ajanta & Ellora, with its own Mughal-era monuments and silk weaving tradition.",
+      "nearest_airport": "Aurangabad Airport (IXU)",
+      "languages": [
+        "Marathi",
+        "Hindi",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "auroville",
+      "name": "Auroville",
+      "state": "Puducherry",
+      "region": "South",
+      "lat": 12.0065,
+      "lng": 79.8107,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 30,
+      "highlights": [
+        "Matrimandir",
+        "Auroville Beach",
+        "International Community",
+        "Craft Villages",
+        "Sri Aurobindo Ashram"
+      ],
+      "description": "Universal township experiment — the golden Matrimandir, sustainable living, and a 50-nation experimental community.",
+      "nearest_airport": "Chennai Airport (MAA)",
+      "languages": [
+        "Tamil",
+        "French",
+        "English"
+      ]
+    },
+    {
+      "id": "badami",
+      "name": "Badami",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 15.9185,
+      "lng": 75.6818,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 580,
+      "highlights": [
+        "Badami Caves",
+        "Agastya Lake",
+        "Bhutanatha Temple",
+        "Aihole",
+        "Pattadakal"
+      ],
+      "description": "Chalukya-era rock-cut cave temples and architectural marvels in northern Karnataka.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "bandhavgarh",
+      "name": "Bandhavgarh National Park",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 23.7245,
+      "lng": 80.9563,
+      "category": [
+        "wildlife"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "altitude_m": 446,
+      "highlights": [
+        "Tiger Safari",
+        "Bandhavgarh Fort",
+        "Shesh Shaiya",
+        "White Tiger Origin",
+        "Dense Sal Forest"
+      ],
+      "description": "Highest tiger density in India — the fort where white tigers were first discovered.",
+      "nearest_airport": "Jabalpur Airport (JLR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "bangalore",
+      "name": "Bengaluru (Bangalore)",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 12.9716,
+      "lng": 77.5946,
+      "category": [
+        "urban"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 920,
+      "highlights": [
+        "Lalbagh Garden",
+        "Cubbon Park",
+        "Bangalore Palace",
+        "ISKCON Temple",
+        "Nandi Hills"
+      ],
+      "description": "India's Silicon Valley — a cosmopolitan city with pleasant climate, parks, and craft breweries.",
+      "nearest_airport": "Kempegowda Intl Airport (BLR)",
+      "languages": [
+        "Kannada",
+        "English",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "barnawapara",
+      "name": "Barnawapara Wildlife Sanctuary",
+      "state": "Chhattisgarh",
+      "region": "Central",
+      "lat": 21.398,
+      "lng": 82.399,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 400,
+      "highlights": [
+        "Indian Bison",
+        "Flying Squirrel",
+        "Devdhari Waterfall",
+        "Tiger Sighting",
+        "Bird Watching"
+      ],
+      "description": "Dense sal and teak forests — Indian bison, leopards, and 150+ bird species in unspoilt central highlands.",
+      "nearest_airport": "Raipur Airport (RPR)",
+      "languages": [
+        "Hindi",
+        "Chhattisgarhi"
+      ]
+    },
+    {
+      "id": "bhimbetka",
+      "name": "Bhimbetka Rock Shelters",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 22.9373,
+      "lng": 77.612,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 600,
+      "highlights": [
+        "Prehistoric Rock Paintings",
+        "Auditorium Cave",
+        "Zoo Rock",
+        "UNESCO Site",
+        "Forest Trails"
+      ],
+      "description": "UNESCO site with 30,000-year-old cave paintings — evidence of the earliest human settlements in India.",
+      "nearest_airport": "Raja Bhoj Airport, Bhopal (BHO)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "bhitarkanika",
+      "name": "Bhitarkanika",
+      "state": "Odisha",
+      "region": "East",
+      "lat": 20.73,
+      "lng": 86.8762,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 2,
+      "highlights": [
+        "Saltwater Crocodiles",
+        "Mangrove Forests",
+        "Gahirmatha Beach",
+        "Olive Ridley Turtles",
+        "Bagagahana"
+      ],
+      "description": "India's second-largest mangrove ecosystem — giant saltwater crocs, Olive Ridley nesting, and rare kingfishers.",
+      "nearest_airport": "Bhubaneswar Airport (BBI)",
+      "languages": [
+        "Odia"
+      ]
+    },
+    {
+      "id": "bhopal",
+      "name": "Bhopal",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 23.2599,
+      "lng": 77.4126,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 527,
+      "highlights": [
+        "Upper Lake",
+        "Taj-ul-Masajid",
+        "Bharat Bhavan",
+        "Van Vihar National Park",
+        "Tribal Museum"
+      ],
+      "description": "City of Lakes — Mughal-era mosques, art centers, and gateway to Sanchi and Bhimbetka.",
+      "nearest_airport": "Raja Bhoj Airport (BHO)",
+      "languages": [
+        "Hindi",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "bhubaneswar",
+      "name": "Bhubaneswar",
+      "state": "Odisha",
+      "region": "East",
+      "lat": 20.2961,
+      "lng": 85.8245,
+      "category": [
+        "heritage",
+        "religious",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 45,
+      "highlights": [
+        "Lingaraj Temple",
+        "Udayagiri Caves",
+        "Rajarani Temple",
+        "Dhauli Shanti Stupa",
+        "Nandankanan Zoo"
+      ],
+      "description": "Temple City of India with over 700 temples showcasing Kalinga architecture.",
+      "nearest_airport": "Biju Patnaik Intl Airport (BBI)",
+      "languages": [
+        "Odia"
+      ]
+    },
+    {
+      "id": "bhuj",
+      "name": "Bhuj",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 23.242,
+      "lng": 69.6669,
+      "category": [
+        "heritage",
+        "desert",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 110,
+      "highlights": [
+        "Rann of Kutch",
+        "Aina Mahal",
+        "Prag Mahal",
+        "Kutch Museum",
+        "Mandvi Beach"
+      ],
+      "description": "Gateway to the Great Rann of Kutch, famous for the white salt desert and Rann Utsav festival.",
+      "nearest_airport": "Bhuj Airport (BHJ)",
+      "languages": [
+        "Gujarati",
+        "Kutchi"
+      ]
+    },
+    {
+      "id": "bikaner",
+      "name": "Bikaner",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 28.0229,
+      "lng": 73.3119,
+      "category": [
+        "heritage",
+        "desert"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 242,
+      "highlights": [
+        "Junagarh Fort",
+        "Karni Mata Temple",
+        "Lalgarh Palace",
+        "Camel Festival",
+        "National Camel Research Centre"
+      ],
+      "description": "Desert city known for its imposing fort, camel safaris, and spicy Bikaneri bhujia.",
+      "nearest_airport": "Jodhpur Airport (JDH)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "binsar",
+      "name": "Binsar",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.7091,
+      "lng": 79.7231,
+      "category": [
+        "nature",
+        "wildlife"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        10,
+        11
+      ],
+      "altitude_m": 2420,
+      "highlights": [
+        "Zero Point",
+        "Binsar Wildlife Sanctuary",
+        "300km Himalayan Panorama",
+        "Oak Forests",
+        "Birding"
+      ],
+      "description": "Oak and rhododendron forests with a 300km Himalayan panorama — a birdwatcher's paradise.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "bishnupur",
+      "name": "Bishnupur",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 23.073,
+      "lng": 87.3152,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 59,
+      "highlights": [
+        "Rasmancha",
+        "Jorbangla Temple",
+        "Radha Shyam Temple",
+        "Baluchari Sarees",
+        "Terracotta Temples"
+      ],
+      "description": "Terracotta temple town of the Malla kings — ornate brick temples and Baluchari silk weaving tradition.",
+      "nearest_airport": "Kolkata Airport (CCU)",
+      "languages": [
+        "Bengali"
+      ]
+    },
+    {
+      "id": "bodh_gaya",
+      "name": "Bodh Gaya",
+      "state": "Bihar",
+      "region": "East",
+      "lat": 24.6961,
+      "lng": 84.9911,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 113,
+      "highlights": [
+        "Mahabodhi Temple",
+        "Bodhi Tree",
+        "Great Buddha Statue",
+        "Thai Monastery",
+        "Dungeshwari Cave Temples"
+      ],
+      "description": "The place where Gautama Buddha attained enlightenment — one of Buddhism's holiest sites.",
+      "nearest_airport": "Gaya Airport (GAY)",
+      "languages": [
+        "Hindi",
+        "Magahi"
+      ]
+    },
+    {
+      "id": "bundi",
+      "name": "Bundi",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 25.4305,
+      "lng": 75.6499,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 268,
+      "highlights": [
+        "Taragarh Fort",
+        "Bundi Palace",
+        "Step Wells",
+        "Sukh Mahal",
+        "Nawal Sagar Lake"
+      ],
+      "description": "The unspoilt Rajput town of blue houses, exquisite miniature paintings, and 50+ step wells.",
+      "nearest_airport": "Jaipur Airport (JAI)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "chamba",
+      "name": "Chamba",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.5534,
+      "lng": 76.1258,
+      "category": [
+        "hill_station",
+        "heritage"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 996,
+      "highlights": [
+        "Chamba Palace",
+        "Lakshmi Narayan Temple",
+        "Khajjiar",
+        "Bhuri Singh Museum",
+        "Chamunda Devi Temple"
+      ],
+      "description": "Ancient hill town with 1000-year-old temples and the mini Switzerland of India — Khajjiar.",
+      "nearest_airport": "Pathankot Airport (IXP)",
+      "languages": [
+        "Hindi",
+        "Chambyali"
+      ]
+    },
+    {
+      "id": "champhai",
+      "name": "Champhai",
+      "state": "Mizoram",
+      "region": "Northeast",
+      "lat": 23.4567,
+      "lng": 93.3281,
+      "category": [
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1678,
+      "highlights": [
+        "Rih Dil Lake",
+        "Murlen National Park",
+        "Myanmar Border",
+        "Lianchhiari Lunglen Tlang",
+        "Mizo Villages"
+      ],
+      "description": "Rice bowl of Mizoram on the Myanmar border — heart-shaped Rih Dil lake and endless green mountain vistas.",
+      "nearest_airport": "Lengpui Airport, Aizawl (AJL)",
+      "languages": [
+        "Mizo"
+      ]
+    },
+    {
+      "id": "chandīgarh",
+      "name": "Chandigarh",
+      "state": "Chandigarh",
+      "region": "North",
+      "lat": 30.7333,
+      "lng": 76.7794,
+      "category": [
+        "urban"
+      ],
+      "best_months": [
+        2,
+        3,
+        4,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 321,
+      "highlights": [
+        "Rock Garden",
+        "Sukhna Lake",
+        "Rose Garden",
+        "Capitol Complex",
+        "Open Hand Monument"
+      ],
+      "description": "Le Corbusier's planned city — India's cleanest, with modernist architecture and gardens.",
+      "nearest_airport": "Chandigarh Airport (IXC)",
+      "languages": [
+        "Hindi",
+        "Punjabi"
+      ]
+    },
+    {
+      "id": "chennai",
+      "name": "Chennai",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 13.0827,
+      "lng": 80.2707,
+      "category": [
+        "urban",
+        "heritage",
+        "beach"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        11,
+        12
+      ],
+      "altitude_m": 6,
+      "highlights": [
+        "Marina Beach",
+        "Kapaleeshwarar Temple",
+        "Fort St. George",
+        "San Thome Cathedral",
+        "Mahabalipuram"
+      ],
+      "description": "Gateway to South India — temples, colonial heritage, Carnatic music, and Chettinad cuisine.",
+      "nearest_airport": "Chennai Intl Airport (MAA)",
+      "languages": [
+        "Tamil",
+        "English"
+      ]
+    },
+    {
+      "id": "cherrapunji",
+      "name": "Cherrapunji (Sohra)",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.2839,
+      "lng": 91.7329,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1484,
+      "highlights": [
+        "Living Root Bridges",
+        "Nohkalikai Falls",
+        "Mawsmai Cave",
+        "Seven Sisters Falls",
+        "Eco Park"
+      ],
+      "description": "Once the wettest place on earth — stunning waterfalls, living root bridges, and cloud forests.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi",
+        "English"
+      ]
+    },
+    {
+      "id": "chettinad",
+      "name": "Chettinad",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.2234,
+      "lng": 78.8251,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 85,
+      "highlights": [
+        "Nattukotai Mansions",
+        "Chettinad Palace",
+        "Athangudi Tiles",
+        "Pillayarpatti Temple",
+        "Chettinad Cuisine"
+      ],
+      "description": "Opulent merchant mansions of the Nattukottai Chettiars — Burmese teak, Italian marble, and legendary cuisine.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "chikmagalur",
+      "name": "Chikmagalur",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 13.3161,
+      "lng": 75.772,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1090,
+      "highlights": [
+        "Mullayanagiri Peak",
+        "Baba Budangiri",
+        "Coffee Plantations",
+        "Hebbe Falls",
+        "Bhadra Wildlife Sanctuary"
+      ],
+      "description": "Birthplace of Indian coffee, nestled in the Western Ghats with misty peaks and lush estates.",
+      "nearest_airport": "Mangalore Intl Airport (IXE)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "chitkul",
+      "name": "Chitkul",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.3516,
+      "lng": 78.4372,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        5,
+        6,
+        9,
+        10
+      ],
+      "altitude_m": 3450,
+      "highlights": [
+        "Last Indian Village",
+        "Baspa River",
+        "Chitkul Mathi Temple",
+        "Apple Orchards",
+        "Indo-Tibet Border"
+      ],
+      "description": "Last inhabited village on the Indo-Tibet border — slate-roofed houses, Baspa River, and raw Himalayan beauty.",
+      "nearest_airport": "Shimla Airport (SLV)",
+      "languages": [
+        "Hindi",
+        "Kinnauri"
+      ]
+    },
+    {
+      "id": "chittorgarh",
+      "name": "Chittorgarh",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 24.8887,
+      "lng": 74.6269,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 395,
+      "highlights": [
+        "Chittorgarh Fort",
+        "Vijay Stambh",
+        "Kirti Stambh",
+        "Rana Kumbha Palace",
+        "Padmini Palace"
+      ],
+      "description": "Largest fort in India — the legendary Rajput citadel of valor and sacrifice.",
+      "nearest_airport": "Udaipur Airport (UDR)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "chopta",
+      "name": "Chopta & Tungnath",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.4916,
+      "lng": 79.2254,
+      "category": [
+        "adventure",
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2680,
+      "highlights": [
+        "Tungnath Temple",
+        "Chandrashila Peak",
+        "Deoria Tal",
+        "Rohini Bugyal",
+        "Bugyals"
+      ],
+      "description": "Mini Switzerland of Uttarakhand — alpine meadows, highest Shiva temple, and panoramic Himalayan views.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "coimbatore",
+      "name": "Coimbatore",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "category": [
+        "urban",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 411,
+      "highlights": [
+        "Isha Yoga Center",
+        "Marudhamalai Temple",
+        "Siruvani Dam",
+        "VOC Park",
+        "Dhyanalinga"
+      ],
+      "description": "Manchester of South India — textile hub and gateway to the Nilgiri hills.",
+      "nearest_airport": "Coimbatore Intl Airport (CJB)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "coimbatore_nilgiris",
+      "name": "Coimbatore & Nilgiris",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "category": [
+        "nature",
+        "urban",
+        "hill_station"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 411,
+      "highlights": [
+        "Marudamalai Temple",
+        "VOC Park & Zoo",
+        "Siruvani Waterfalls",
+        "Nilgiri Mountain Railway",
+        "Doddabetta Peak"
+      ],
+      "description": "Gateway to the Nilgiris — textile capital with easy access to Ooty, Coonoor, and the Blue Mountains.",
+      "nearest_airport": "Coimbatore Intl Airport (CJB)",
+      "languages": [
+        "Tamil",
+        "English"
+      ]
+    },
+    {
+      "id": "coonoor",
+      "name": "Coonoor",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 11.353,
+      "lng": 76.7959,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1850,
+      "highlights": [
+        "Sim's Park",
+        "Dolphin's Nose",
+        "Lamb's Rock",
+        "Tea Estate Walk",
+        "Nilgiri Mountain Railway"
+      ],
+      "description": "Quieter Nilgiri gem — tea gardens, colonial bungalows, and the heritage toy train.",
+      "nearest_airport": "Coimbatore Intl Airport (CJB)",
+      "languages": [
+        "Tamil",
+        "English"
+      ]
+    },
+    {
+      "id": "coorg",
+      "name": "Coorg (Kodagu)",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 12.3375,
+      "lng": 75.8069,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1170,
+      "highlights": [
+        "Abbey Falls",
+        "Raja's Seat",
+        "Dubare Elephant Camp",
+        "Namdroling Monastery",
+        "Talacauvery"
+      ],
+      "description": "Scotland of India — mist-covered hills, coffee plantations, and Kodava warrior culture.",
+      "nearest_airport": "Mysore Airport (MYQ)",
+      "languages": [
+        "Kannada",
+        "Kodava"
+      ]
+    },
+    {
+      "id": "coorg_coffee",
+      "name": "Sakleshpur",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 12.9416,
+      "lng": 75.7868,
+      "category": [
+        "nature",
+        "hill_station"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 940,
+      "highlights": [
+        "Manjarabad Fort",
+        "Bisle Ghat",
+        "Railway Trek",
+        "Coffee Estates",
+        "Jenukal Gudda Peak"
+      ],
+      "description": "Western Ghats coffee country — abandoned railway treks, star-shaped fort, and misty plantations.",
+      "nearest_airport": "Mangalore Intl Airport (IXE)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "daman",
+      "name": "Daman",
+      "state": "Dadra & Nagar Haveli and Daman & Diu",
+      "region": "West",
+      "lat": 20.3974,
+      "lng": 72.8328,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Devka Beach",
+        "Fort of Moti Daman",
+        "Church of Bom Jesus",
+        "Jampore Beach",
+        "Nani Daman Fort"
+      ],
+      "description": "Quiet Portuguese-era coastal town with fort ruins, churches, and peaceful beaches.",
+      "nearest_airport": "Surat Airport (STV)",
+      "languages": [
+        "Gujarati",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "darjeeling",
+      "name": "Darjeeling",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 27.041,
+      "lng": 88.2663,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2042,
+      "highlights": [
+        "Tiger Hill Sunrise",
+        "Toy Train",
+        "Tea Gardens",
+        "Batasia Loop",
+        "Padmaja Naidu Zoo"
+      ],
+      "description": "Queen of the Hills — world-famous tea, colonial charm, and Kanchenjunga views.",
+      "nearest_airport": "Bagdogra Airport (IXB)",
+      "languages": [
+        "Nepali",
+        "Bengali",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "dawki",
+      "name": "Dawki",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.1862,
+      "lng": 92.0155,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 130,
+      "highlights": [
+        "Umngot River",
+        "Crystal Clear Waters",
+        "Boating",
+        "India-Bangladesh Border",
+        "Shnongpdeng"
+      ],
+      "description": "Crystal-clear Umngot River where boats appear to float in mid-air — India's cleanest river.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "dehradun",
+      "name": "Dehradun",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.3165,
+      "lng": 78.0322,
+      "category": [
+        "hill_station",
+        "urban"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 640,
+      "highlights": [
+        "Robber's Cave",
+        "Sahastradhara",
+        "Forest Research Institute",
+        "Tapkeshwar Temple",
+        "Mindrolling Monastery"
+      ],
+      "description": "Capital of Uttarakhand and gateway to Mussoorie, set in the Doon Valley.",
+      "nearest_airport": "Jolly Grant Airport (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "state": "Delhi",
+      "region": "North",
+      "lat": 28.7041,
+      "lng": 77.1025,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        2,
+        3
+      ],
+      "altitude_m": 216,
+      "highlights": [
+        "Red Fort",
+        "Qutub Minar",
+        "India Gate",
+        "Humayun's Tomb",
+        "Chandni Chowk",
+        "Lotus Temple",
+        "Akshardham"
+      ],
+      "description": "Capital city blending Mughal grandeur, British colonial architecture, and modern India.",
+      "nearest_airport": "Indira Gandhi Intl Airport (DEL)",
+      "languages": [
+        "Hindi",
+        "Urdu",
+        "Punjabi",
+        "English"
+      ]
+    },
+    {
+      "id": "deoghar",
+      "name": "Deoghar",
+      "state": "Jharkhand",
+      "region": "East",
+      "lat": 24.4855,
+      "lng": 86.6949,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 247,
+      "highlights": [
+        "Baidyanath Temple",
+        "Nandan Pahar",
+        "Trikut Hill",
+        "Rikhia Ashram",
+        "Ropeway"
+      ],
+      "description": "One of the 12 Jyotirlinga shrines — a major Shiva pilgrimage with Kanwar Yatra attracting millions.",
+      "nearest_airport": "Deoghar Airport (DGH)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "dhanaulti",
+      "name": "Dhanaulti",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.4324,
+      "lng": 78.2328,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 2286,
+      "highlights": [
+        "Eco Park",
+        "Surkanda Devi Temple",
+        "Dashavatar Temple",
+        "Apple Orchards",
+        "Snow Views"
+      ],
+      "description": "Quiet hill retreat near Mussoorie with deodar forests and Himalayan panoramas.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "dhanushkodi",
+      "name": "Dhanushkodi",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 9.1719,
+      "lng": 79.4283,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1,
+      "highlights": [
+        "Ghost Town Ruins",
+        "Confluence Point",
+        "Ram Setu View",
+        "Gulf of Mannar",
+        "Pilgrimage Trail"
+      ],
+      "description": "Abandoned ghost town at India's southeastern tip — where the Bay of Bengal meets the Indian Ocean.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "dharamshala",
+      "name": "Dharamshala & McLeod Ganj",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.219,
+      "lng": 76.3234,
+      "category": [
+        "hill_station",
+        "religious"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1457,
+      "highlights": [
+        "Dalai Lama Temple",
+        "Triund Trek",
+        "Bhagsu Waterfall",
+        "HPCA Stadium",
+        "Namgyal Monastery"
+      ],
+      "description": "Home of the Dalai Lama and Tibetan government-in-exile, with stunning Dhauladhar views.",
+      "nearest_airport": "Gaggal Airport (DHM)",
+      "languages": [
+        "Hindi",
+        "Tibetan"
+      ]
+    },
+    {
+      "id": "dimapur",
+      "name": "Dimapur",
+      "state": "Nagaland",
+      "region": "Northeast",
+      "lat": 25.9042,
+      "lng": 93.7266,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 260,
+      "highlights": [
+        "Kachari Ruins",
+        "Rangapahar Reserve Forest",
+        "Triple Falls",
+        "Nagaland Science Centre",
+        "Diezephe Craft Village"
+      ],
+      "description": "Nagaland's commercial hub with medieval Kachari ruins and gateway to Hornbill country.",
+      "nearest_airport": "Dimapur Airport (DMU)",
+      "languages": [
+        "English",
+        "Nagamese"
+      ]
+    },
+    {
+      "id": "diu",
+      "name": "Diu",
+      "state": "Dadra & Nagar Haveli and Daman & Diu",
+      "region": "West",
+      "lat": 20.7144,
+      "lng": 70.9874,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Diu Fort",
+        "Nagoa Beach",
+        "St. Paul's Church",
+        "Gangeshwar Temple",
+        "INS Khukri Memorial"
+      ],
+      "description": "Tiny coastal island with Portuguese colonial heritage, beaches, and a laid-back vibe.",
+      "nearest_airport": "Diu Airport (DIU)",
+      "languages": [
+        "Gujarati",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "dwarka",
+      "name": "Dwarka",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 22.2394,
+      "lng": 68.9678,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Dwarkadhish Temple",
+        "Nageshwar Jyotirlinga",
+        "Bet Dwarka",
+        "Rukmini Devi Temple",
+        "Beyt Dwarka Beach"
+      ],
+      "description": "One of the four Char Dhams — mythical kingdom of Lord Krishna on Gujarat's coast.",
+      "nearest_airport": "Jamnagar Airport (JGA)",
+      "languages": [
+        "Gujarati"
+      ]
+    },
+    {
+      "id": "dzukou",
+      "name": "Dzukou Valley",
+      "state": "Nagaland",
+      "region": "Northeast",
+      "lat": 25.5833,
+      "lng": 93.8833,
+      "category": [
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "altitude_m": 2438,
+      "highlights": [
+        "Valley of Flowers",
+        "Dzukou Lily",
+        "Trekking",
+        "Japfu Peak",
+        "Camping"
+      ],
+      "description": "Valley of Flowers of the Northeast — seasonal bloom of the rare Dzukou Lily amid rolling green highlands.",
+      "nearest_airport": "Dimapur Airport (DMU)",
+      "languages": [
+        "Angami",
+        "Nagamese"
+      ]
+    },
+    {
+      "id": "gandhinagar",
+      "name": "Gandhinagar",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 23.2156,
+      "lng": 72.6369,
+      "category": [
+        "urban",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 81,
+      "highlights": [
+        "Akshardham Temple",
+        "Adalaj Stepwell",
+        "Indroda Nature Park",
+        "Gift City",
+        "Sarita Udyan"
+      ],
+      "description": "Gujarat's green capital — one of India's best-planned cities centered around Akshardham.",
+      "nearest_airport": "Sardar Vallabhbhai Patel Intl, Ahmedabad (AMD)",
+      "languages": [
+        "Gujarati",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "gandikota",
+      "name": "Gandikota",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 15.2478,
+      "lng": 78.2897,
+      "category": [
+        "heritage",
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 290,
+      "highlights": [
+        "Grand Canyon of India",
+        "Pennar River Gorge",
+        "Gandikota Fort",
+        "Jamia Masjid",
+        "Camping"
+      ],
+      "description": "Grand Canyon of India — dramatic red gorge of the Pennar River with a medieval fort on the cliff edge.",
+      "nearest_airport": "Kurnool Airport (KJB)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "gangtok",
+      "name": "Gangtok",
+      "state": "Sikkim",
+      "region": "Northeast",
+      "lat": 27.3389,
+      "lng": 88.6065,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 1650,
+      "highlights": [
+        "Tsomgo Lake",
+        "Nathula Pass",
+        "Rumtek Monastery",
+        "MG Marg",
+        "Hanuman Tok"
+      ],
+      "description": "Capital of Sikkim with Kanchenjunga views, Buddhist monasteries, and Tibetan culture.",
+      "nearest_airport": "Pakyong Airport (PYG)",
+      "languages": [
+        "Nepali",
+        "Sikkimese",
+        "English"
+      ]
+    },
+    {
+      "id": "gir",
+      "name": "Gir National Park",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 21.1243,
+      "lng": 70.8242,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 162,
+      "highlights": [
+        "Asiatic Lions",
+        "Safari",
+        "Kamleshwar Dam",
+        "Devalia Safari Park",
+        "Tulsi Shyam Temple"
+      ],
+      "description": "Last refuge of the Asiatic lion — one of India's most important wildlife sanctuaries.",
+      "nearest_airport": "Rajkot Airport (RAJ)",
+      "languages": [
+        "Gujarati"
+      ]
+    },
+    {
+      "id": "goa",
+      "name": "Goa",
+      "state": "Goa",
+      "region": "West",
+      "lat": 15.2993,
+      "lng": 74.124,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Baga Beach",
+        "Old Goa Churches",
+        "Dudhsagar Falls",
+        "Fort Aguada",
+        "Anjuna Flea Market",
+        "Spice Plantations"
+      ],
+      "description": "India's beach paradise — Portuguese heritage, nightlife, seafood, and tropical vibes.",
+      "nearest_airport": "Manohar Intl Airport (GOX)",
+      "languages": [
+        "Konkani",
+        "English",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "gokarna",
+      "name": "Gokarna",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 14.5479,
+      "lng": 74.3188,
+      "category": [
+        "beach",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Om Beach",
+        "Kudle Beach",
+        "Half Moon Beach",
+        "Mahabaleshwar Temple",
+        "Mirjan Fort"
+      ],
+      "description": "Quieter cousin of Goa — pristine beaches, temple town, and trekking trails along the coast.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "gulmarg",
+      "name": "Gulmarg",
+      "state": "Jammu & Kashmir",
+      "region": "North",
+      "lat": 34.0484,
+      "lng": 74.3805,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        12
+      ],
+      "altitude_m": 2650,
+      "highlights": [
+        "Gulmarg Gondola",
+        "Skiing",
+        "Alpine Meadows",
+        "Strawberry Valley",
+        "Frozen Alpather Lake"
+      ],
+      "description": "Meadow of flowers — India's top ski resort with the world's second-highest cable car.",
+      "nearest_airport": "Srinagar Airport (SXR)",
+      "languages": [
+        "Kashmiri",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "gurez_valley",
+      "name": "Gurez Valley",
+      "state": "Jammu & Kashmir",
+      "region": "North",
+      "lat": 34.6333,
+      "lng": 74.8333,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 2400,
+      "highlights": [
+        "Habba Khatoon Peak",
+        "Kishanganga River",
+        "Dard Shin Tribe",
+        "Tulail Valley",
+        "Wular Lake View"
+      ],
+      "description": "Kashmir's most remote valley — Dard tribal culture, trout-filled rivers, and untouched alpine meadows.",
+      "nearest_airport": "Srinagar Airport (SXR)",
+      "languages": [
+        "Shina",
+        "Kashmiri"
+      ]
+    },
+    {
+      "id": "guwahati",
+      "name": "Guwahati",
+      "state": "Assam",
+      "region": "Northeast",
+      "lat": 26.1445,
+      "lng": 91.7362,
+      "category": [
+        "religious",
+        "urban",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 55,
+      "highlights": [
+        "Kamakhya Temple",
+        "Umananda Island",
+        "Assam State Museum",
+        "Pobitora Wildlife Sanctuary",
+        "River Cruise"
+      ],
+      "description": "Gateway to Northeast India on the banks of the Brahmaputra — temples, tea, and wildlife.",
+      "nearest_airport": "Lokpriya Gopinath Bordoloi Intl (GAU)",
+      "languages": [
+        "Assamese",
+        "Bengali"
+      ]
+    },
+    {
+      "id": "halebidu",
+      "name": "Halebidu & Belur",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 13.2135,
+      "lng": 75.9916,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 920,
+      "highlights": [
+        "Hoysaleswara Temple",
+        "Chennakeshava Temple",
+        "Kedareshwara Temple",
+        "Jain Temples",
+        "Stone Carvings"
+      ],
+      "description": "Hoysala dynasty masterpieces — intricate 12th-century temple carvings without peer.",
+      "nearest_airport": "Mysore Airport (MYQ)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "hampi",
+      "name": "Hampi",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 15.335,
+      "lng": 76.46,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 467,
+      "highlights": [
+        "Virupaksha Temple",
+        "Vittala Temple",
+        "Stone Chariot",
+        "Hemakuta Hill",
+        "Royal Enclosure"
+      ],
+      "description": "UNESCO ruins of the Vijayanagara Empire spread across a surreal boulder-strewn landscape.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "hampi_anegundi",
+      "name": "Anegundi",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 15.3547,
+      "lng": 76.493,
+      "category": [
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 468,
+      "highlights": [
+        "Anjanadri Hill",
+        "Pampa Sarovar",
+        "Coracle Ride",
+        "Prehistoric Paintings",
+        "Kishkindha"
+      ],
+      "description": "Mythical Kishkindha across the Tungabhadra — Hanuman's birthplace, coracle crossings, and Neolithic caves.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "hampta_pass",
+      "name": "Hampta Pass",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.3539,
+      "lng": 77.2853,
+      "category": [
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 4270,
+      "highlights": [
+        "Trek",
+        "Chandratal Lake",
+        "Alpine Meadows",
+        "Dramatic Cross-Over",
+        "Camping"
+      ],
+      "description": "Dramatic high-altitude trek crossing from lush Kullu valleys to barren Lahaul desert.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "haridwar",
+      "name": "Haridwar",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.9457,
+      "lng": 78.1642,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        2,
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 314,
+      "highlights": [
+        "Har Ki Pauri Ganga Aarti",
+        "Mansa Devi Temple",
+        "Chandi Devi",
+        "Rajaji National Park",
+        "Kumbh Mela"
+      ],
+      "description": "One of Hinduism's seven holiest cities — where the Ganga enters the plains.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "hogenakkal",
+      "name": "Hogenakkal",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 12.1153,
+      "lng": 77.7769,
+      "category": [
+        "nature"
+      ],
+      "best_months": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 273,
+      "highlights": [
+        "Waterfalls",
+        "Coracle Ride",
+        "Oil Bath",
+        "Kaveri River",
+        "Forest Trails"
+      ],
+      "description": "Niagara of India — Kaveri river cascading over carbonatite rocks in coracle-ride country.",
+      "nearest_airport": "Bengaluru Intl Airport (BLR)",
+      "languages": [
+        "Tamil",
+        "Kannada"
+      ]
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad",
+      "state": "Telangana",
+      "region": "South",
+      "lat": 17.385,
+      "lng": 78.4867,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 542,
+      "highlights": [
+        "Charminar",
+        "Golconda Fort",
+        "Hussain Sagar",
+        "Ramoji Film City",
+        "Biryani Trail"
+      ],
+      "description": "City of Nizams — Mughal-era monuments, pearl markets, and world-famous Hyderabadi biryani.",
+      "nearest_airport": "Rajiv Gandhi Intl Airport (HYD)",
+      "languages": [
+        "Telugu",
+        "Urdu",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "imphal",
+      "name": "Imphal",
+      "state": "Manipur",
+      "region": "Northeast",
+      "lat": 24.817,
+      "lng": 93.9368,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 786,
+      "highlights": [
+        "Loktak Lake",
+        "Kangla Fort",
+        "Ima Keithel",
+        "War Cemetery",
+        "Keibul Lamjao National Park"
+      ],
+      "description": "Valley city with floating islands, the world's only floating national park, and women's market.",
+      "nearest_airport": "Bir Tikendrajit Intl Airport (IMF)",
+      "languages": [
+        "Meitei",
+        "English"
+      ]
+    },
+    {
+      "id": "itanagar",
+      "name": "Itanagar",
+      "state": "Arunachal Pradesh",
+      "region": "Northeast",
+      "lat": 27.0844,
+      "lng": 93.6053,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 320,
+      "highlights": [
+        "Ita Fort",
+        "Ganga Lake",
+        "Jawaharlal Nehru Museum",
+        "Namdapha National Park",
+        "Gompa"
+      ],
+      "description": "Gateway to Arunachal — ancient brick fort ruins and gateway to pristine eastern Himalayas.",
+      "nearest_airport": "Hollongi Airport (HGI)",
+      "languages": [
+        "Hindi",
+        "Nyishi"
+      ]
+    },
+    {
+      "id": "jagdalpur",
+      "name": "Jagdalpur & Bastar",
+      "state": "Chhattisgarh",
+      "region": "Central",
+      "lat": 19.0792,
+      "lng": 82.021,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 553,
+      "highlights": [
+        "Chitrakote Falls",
+        "Tirathgarh Falls",
+        "Kanger Valley NP",
+        "Bastar Dussehra",
+        "Tribal Markets"
+      ],
+      "description": "Niagara of India — Chitrakote waterfall, limestone caves, and Bastar's living tribal culture.",
+      "nearest_airport": "Raipur Airport (RPR)",
+      "languages": [
+        "Hindi",
+        "Chhattisgarhi",
+        "Gondi"
+      ]
+    },
+    {
+      "id": "jaipur",
+      "name": "Jaipur",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 431,
+      "highlights": [
+        "Amber Fort",
+        "Hawa Mahal",
+        "City Palace",
+        "Jantar Mantar",
+        "Nahargarh Fort",
+        "Jal Mahal"
+      ],
+      "description": "The Pink City — Rajput royal grandeur, colorful bazaars, and magnificent forts.",
+      "nearest_airport": "Jaipur Intl Airport (JAI)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "jaisalmer",
+      "name": "Jaisalmer",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 26.9157,
+      "lng": 70.9083,
+      "category": [
+        "heritage",
+        "desert"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 229,
+      "highlights": [
+        "Jaisalmer Fort",
+        "Sam Sand Dunes",
+        "Patwon Ki Haveli",
+        "Gadisar Lake",
+        "Desert Safari"
+      ],
+      "description": "The Golden City rising from the Thar Desert — sandstone fort, havelis, and camel safaris.",
+      "nearest_airport": "Jaisalmer Airport (JSA)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "jammu",
+      "name": "Jammu",
+      "state": "Jammu & Kashmir",
+      "region": "North",
+      "lat": 32.7266,
+      "lng": 74.857,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 327,
+      "highlights": [
+        "Vaishno Devi",
+        "Raghunath Temple",
+        "Bahu Fort",
+        "Amar Mahal Palace",
+        "Patnitop"
+      ],
+      "description": "City of Temples and gateway to Vaishno Devi — pilgrimage center in the Shivalik foothills.",
+      "nearest_airport": "Jammu Airport (IXJ)",
+      "languages": [
+        "Dogri",
+        "Hindi",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "jawai",
+      "name": "Jawai Leopard Reserve",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 25.14,
+      "lng": 73.16,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 280,
+      "highlights": [
+        "Leopard Sightings",
+        "Jawai Dam",
+        "Granite Hills",
+        "Rabari Shepherds",
+        "Crocodile Spotting"
+      ],
+      "description": "India's best leopard safari — big cats on granite boulders, Rabari nomads, and Jawai Dam reflections.",
+      "nearest_airport": "Udaipur Airport (UDR)",
+      "languages": [
+        "Hindi",
+        "Marwari"
+      ]
+    },
+    {
+      "id": "jim_corbett",
+      "name": "Jim Corbett National Park",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.53,
+      "lng": 78.7747,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "altitude_m": 385,
+      "highlights": [
+        "Bengal Tiger Safari",
+        "Dhikala Zone",
+        "Corbett Falls",
+        "Bijrani Zone",
+        "Garjiya Devi Temple"
+      ],
+      "description": "India's oldest national park — premier tiger reserve in the Himalayan foothills.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "jodhpur",
+      "name": "Jodhpur",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 26.2389,
+      "lng": 73.0243,
+      "category": [
+        "heritage",
+        "desert"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 231,
+      "highlights": [
+        "Mehrangarh Fort",
+        "Umaid Bhawan Palace",
+        "Jaswant Thada",
+        "Clock Tower Market",
+        "Blue City Walk"
+      ],
+      "description": "The Blue City — towering Mehrangarh Fort overlooking a sea of indigo-painted houses.",
+      "nearest_airport": "Jodhpur Airport (JDH)",
+      "languages": [
+        "Hindi",
+        "Marwari"
+      ]
+    },
+    {
+      "id": "jog_falls",
+      "name": "Jog Falls",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 14.2295,
+      "lng": 74.8127,
+      "category": [
+        "nature"
+      ],
+      "best_months": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 488,
+      "highlights": [
+        "India's 2nd Highest Plunge Waterfall",
+        "Sharavathi River",
+        "Raja Fall",
+        "Roarer Fall",
+        "Linganamakki Dam"
+      ],
+      "description": "India's second-highest plunge waterfall at 253m — the Sharavathi cascades in four distinct streams.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "kalpa",
+      "name": "Kalpa",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.5342,
+      "lng": 78.2584,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2960,
+      "highlights": [
+        "Kinnaur Kailash View",
+        "Apple Orchards",
+        "Reckong Peo",
+        "Suicide Point",
+        "Sapni Fort"
+      ],
+      "description": "Kinnaur's jewel perched above the Sutlej — sacred Kinnaur Kailash views, apple orchards, and Buddhist art.",
+      "nearest_airport": "Shimla Airport (SLV)",
+      "languages": [
+        "Hindi",
+        "Kinnauri"
+      ]
+    },
+    {
+      "id": "kanchipuram",
+      "name": "Kanchipuram",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 12.8342,
+      "lng": 79.7036,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 83,
+      "highlights": [
+        "Kailasanathar Temple",
+        "Ekambareswarar Temple",
+        "Varadharaja Perumal Temple",
+        "Silk Weaving",
+        "Kanchi Kudil"
+      ],
+      "description": "City of Thousand Temples — one of India's seven sacred cities, famed for silk sarees.",
+      "nearest_airport": "Chennai Intl Airport (MAA)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "kangra",
+      "name": "Kangra Valley",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.0998,
+      "lng": 76.2691,
+      "category": [
+        "hill_station",
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 733,
+      "highlights": [
+        "Kangra Fort",
+        "Masroor Rock Temples",
+        "Bajreshwari Temple",
+        "Kangra Art Museum",
+        "Tea Gardens"
+      ],
+      "description": "Ancient valley with India's oldest dated fort, miniature paintings, and Kangra tea gardens.",
+      "nearest_airport": "Gaggal Airport (DHM)",
+      "languages": [
+        "Hindi",
+        "Kangri"
+      ]
+    },
+    {
+      "id": "kanha",
+      "name": "Kanha National Park",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 22.3357,
+      "lng": 80.6119,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "altitude_m": 600,
+      "highlights": [
+        "Tiger Safari",
+        "Bamni Dadar Sunset Point",
+        "Barasingha",
+        "Kanha Museum",
+        "Nature Trails"
+      ],
+      "description": "Kipling's jungle — one of India's finest tiger reserves and home of the hard-ground barasingha.",
+      "nearest_airport": "Jabalpur Airport (JLR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "kanyakumari",
+      "name": "Kanyakumari",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 8.0883,
+      "lng": 77.5385,
+      "category": [
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Vivekananda Rock Memorial",
+        "Thiruvalluvar Statue",
+        "Sunrise & Sunset Point",
+        "Padmanabhapuram Palace",
+        "Gandhi Memorial"
+      ],
+      "description": "Land's End of India — where three oceans meet at the southern tip of the subcontinent.",
+      "nearest_airport": "Trivandrum Intl Airport (TRV)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "kasol",
+      "name": "Kasol",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.0098,
+      "lng": 77.3142,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1640,
+      "highlights": [
+        "Kheerganga Trek",
+        "Parvati Valley",
+        "Manikaran Hot Springs",
+        "Tosh Village",
+        "Malana Village"
+      ],
+      "description": "Mini Israel of India — backpacker haven in the Parvati Valley with hot springs and treks.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "kavaratti",
+      "name": "Kavaratti",
+      "state": "Lakshadweep",
+      "region": "Islands",
+      "lat": 10.5626,
+      "lng": 72.6369,
+      "category": [
+        "island",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Marine Aquarium",
+        "Ujra Mosque",
+        "Glass-Bottom Boats",
+        "Water Sports",
+        "Coral Reefs"
+      ],
+      "description": "Capital of Lakshadweep — pristine lagoons, coral reefs, and traditional loom craft.",
+      "nearest_airport": "Agatti Airport (AGX)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "kaziranga",
+      "name": "Kaziranga National Park",
+      "state": "Assam",
+      "region": "Northeast",
+      "lat": 26.5775,
+      "lng": 93.1711,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 40,
+      "highlights": [
+        "One-Horned Rhino",
+        "Elephant Safari",
+        "Jeep Safari",
+        "Wild Elephants",
+        "Wild Water Buffalo"
+      ],
+      "description": "UNESCO World Heritage Site — home to two-thirds of the world's one-horned rhinoceros.",
+      "nearest_airport": "Jorhat Airport (JRH)",
+      "languages": [
+        "Assamese"
+      ]
+    },
+    {
+      "id": "khajuraho",
+      "name": "Khajuraho",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 24.8318,
+      "lng": 79.9199,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 283,
+      "highlights": [
+        "Western Group of Temples",
+        "Kandariya Mahadeva Temple",
+        "Light & Sound Show",
+        "Panna National Park",
+        "Raneh Falls"
+      ],
+      "description": "UNESCO temples with exquisite erotic sculptures — masterpieces of Chandela dynasty art.",
+      "nearest_airport": "Khajuraho Airport (HJR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "kochi",
+      "name": "Kochi (Cochin)",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 9.9312,
+      "lng": 76.2673,
+      "category": [
+        "heritage",
+        "urban",
+        "backwaters"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Chinese Fishing Nets",
+        "Fort Kochi",
+        "Jewish Synagogue",
+        "Mattancherry Palace",
+        "Kathakali Shows"
+      ],
+      "description": "Queen of the Arabian Sea — spice trade history, colonial Fort Kochi, and backwater gateway.",
+      "nearest_airport": "Cochin Intl Airport (COK)",
+      "languages": [
+        "Malayalam",
+        "English"
+      ]
+    },
+    {
+      "id": "kodaikanal",
+      "name": "Kodaikanal",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.2381,
+      "lng": 77.4892,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2133,
+      "highlights": [
+        "Kodaikanal Lake",
+        "Coaker's Walk",
+        "Pillar Rocks",
+        "Bryant Park",
+        "Dolphin's Nose"
+      ],
+      "description": "Princess of Hill Stations — star-shaped lake, pine forests, and misty Palani Hills.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "kohima",
+      "name": "Kohima",
+      "state": "Nagaland",
+      "region": "Northeast",
+      "lat": 25.6751,
+      "lng": 94.1086,
+      "category": [
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1444,
+      "highlights": [
+        "War Cemetery",
+        "Hornbill Festival",
+        "Kohima Cathedral",
+        "Heritage Village",
+        "Dzukou Valley"
+      ],
+      "description": "Land of the Nagas — WWII history, Hornbill Festival, and the stunning Dzukou Valley trek.",
+      "nearest_airport": "Dimapur Airport (DMU)",
+      "languages": [
+        "English",
+        "Nagamese"
+      ]
+    },
+    {
+      "id": "kolkata",
+      "name": "Kolkata",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 22.5726,
+      "lng": 88.3639,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 9,
+      "highlights": [
+        "Victoria Memorial",
+        "Howrah Bridge",
+        "Dakshineswar Temple",
+        "Park Street",
+        "Durga Puja"
+      ],
+      "description": "City of Joy — intellectual capital with colonial grandeur, Durga Puja, and street food.",
+      "nearest_airport": "Netaji Subhash Chandra Bose Intl (CCU)",
+      "languages": [
+        "Bengali",
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "konark",
+      "name": "Konark",
+      "state": "Odisha",
+      "region": "East",
+      "lat": 19.8876,
+      "lng": 86.0945,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Sun Temple",
+        "Konark Beach",
+        "Archaeological Museum",
+        "Chandrabhaga Beach",
+        "Dance Festival"
+      ],
+      "description": "13th-century UNESCO Sun Temple shaped as a giant chariot — peak of Kalinga architecture.",
+      "nearest_airport": "Biju Patnaik Intl Airport, Bhubaneswar (BBI)",
+      "languages": [
+        "Odia"
+      ]
+    },
+    {
+      "id": "kovalam",
+      "name": "Kovalam",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 8.3988,
+      "lng": 76.982,
+      "category": [
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Lighthouse Beach",
+        "Hawa Beach",
+        "Samudra Beach",
+        "Vizhinjam Marine Aquarium",
+        "Ayurveda Retreats"
+      ],
+      "description": "Kerala's most famous beach resort — crescent-shaped shores and Ayurvedic wellness.",
+      "nearest_airport": "Trivandrum Intl Airport (TRV)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "kufri",
+      "name": "Kufri",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.098,
+      "lng": 77.267,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12
+      ],
+      "altitude_m": 2622,
+      "highlights": [
+        "Himalayan Nature Park",
+        "Mahasu Peak",
+        "Skiing",
+        "Yak Rides",
+        "Apple Orchards"
+      ],
+      "description": "Snow-capped hill station near Shimla — skiing in winter, nature walks in summer.",
+      "nearest_airport": "Shimla Airport (SLV)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "kullu",
+      "name": "Kullu",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.9579,
+      "lng": 77.1095,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1220,
+      "highlights": [
+        "Raghunath Temple",
+        "Great Himalayan National Park",
+        "River Rafting",
+        "Dussehra Festival",
+        "Bijli Mahadev"
+      ],
+      "description": "Valley of Gods — adventure sports hub with the annual Kullu Dussehra festival.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi",
+        "Kulluvi"
+      ]
+    },
+    {
+      "id": "kumarakom",
+      "name": "Kumarakom",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 9.5916,
+      "lng": 76.4296,
+      "category": [
+        "backwaters",
+        "nature"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Vembanad Lake",
+        "Kumarakom Bird Sanctuary",
+        "Houseboat Stay",
+        "Pathiramanal Island",
+        "Aruvikkuzhi Waterfall"
+      ],
+      "description": "Backwater paradise on Vembanad Lake — luxurious houseboats and bird watching.",
+      "nearest_airport": "Cochin Intl Airport (COK)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "kumbakonam",
+      "name": "Kumbakonam",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.9617,
+      "lng": 79.3881,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 26,
+      "highlights": [
+        "Airavatesvara Temple",
+        "Sarangapani Temple",
+        "Mahamaham Tank",
+        "Darasuram",
+        "Navagraha Temples"
+      ],
+      "description": "Temple town of the Cauvery Delta — UNESCO Chola temples, Mahamaham festival, and filter coffee.",
+      "nearest_airport": "Tiruchirappalli Airport (TRZ)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "kurukshetra",
+      "name": "Kurukshetra",
+      "state": "Haryana",
+      "region": "North",
+      "lat": 29.9695,
+      "lng": 76.8783,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 247,
+      "highlights": [
+        "Brahma Sarovar",
+        "Jyotisar",
+        "Sri Krishna Museum",
+        "Sheikh Chilli Tomb",
+        "Bhadrakali Temple"
+      ],
+      "description": "Sacred land of the Mahabharata war — ancient tanks, temples, and the birthplace of the Bhagavad Gita.",
+      "nearest_airport": "Chandigarh Airport (IXC)",
+      "languages": [
+        "Hindi",
+        "Haryanvi"
+      ]
+    },
+    {
+      "id": "lachung",
+      "name": "Lachung & Yumthang",
+      "state": "Sikkim",
+      "region": "Northeast",
+      "lat": 27.6915,
+      "lng": 88.7437,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 2694,
+      "highlights": [
+        "Yumthang Valley of Flowers",
+        "Zero Point",
+        "Hot Springs",
+        "Shingba Rhododendron Sanctuary",
+        "Apple Orchards"
+      ],
+      "description": "Valley of Flowers of Sikkim — rhododendron blooms, snow at Zero Point, and Lepcha tribal heritage.",
+      "nearest_airport": "Bagdogra Airport (IXB)",
+      "languages": [
+        "Nepali",
+        "Bhutia",
+        "Lepcha"
+      ]
+    },
+    {
+      "id": "lakshadweep",
+      "name": "Lakshadweep Islands",
+      "state": "Lakshadweep",
+      "region": "Islands",
+      "lat": 10.5667,
+      "lng": 72.6417,
+      "category": [
+        "island",
+        "beach",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Agatti Island",
+        "Bangaram Island",
+        "Scuba Diving",
+        "Glass-Bottom Boats",
+        "Minicoy Island"
+      ],
+      "description": "India's smallest UT — coral atolls, lagoons, and untouched marine biodiversity.",
+      "nearest_airport": "Agatti Airport (AGX)",
+      "languages": [
+        "Malayalam",
+        "Mahl"
+      ]
+    },
+    {
+      "id": "lansdowne",
+      "name": "Lansdowne",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.8377,
+      "lng": 78.6871,
+      "category": [
+        "hill_station"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 1706,
+      "highlights": [
+        "Tip-N-Top",
+        "Bhulla Lake",
+        "Garhwal Rifles Museum",
+        "Tarkeshwar Temple",
+        "St. Mary's Church"
+      ],
+      "description": "Quiet cantonment hill station — Garhwal Rifles' home with pine forests and colonial charm.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "leh_ladakh",
+      "name": "Leh-Ladakh",
+      "state": "Ladakh",
+      "region": "North",
+      "lat": 34.1526,
+      "lng": 77.5771,
+      "category": [
+        "adventure",
+        "nature",
+        "religious"
+      ],
+      "best_months": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 3524,
+      "highlights": [
+        "Pangong Lake",
+        "Nubra Valley",
+        "Khardung La Pass",
+        "Magnetic Hill",
+        "Thiksey Monastery",
+        "Zanskar Valley"
+      ],
+      "description": "Land of high passes — otherworldly landscapes, Buddhist monasteries, and the highest motorable roads.",
+      "nearest_airport": "Kushok Bakula Rimpochee Airport (IXL)",
+      "languages": [
+        "Ladakhi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "lepakshi",
+      "name": "Lepakshi",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 15.5833,
+      "lng": 77.6064,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 497,
+      "highlights": [
+        "Hanging Pillar",
+        "Veerabhadra Temple",
+        "Nandi Bull",
+        "Mural Paintings",
+        "Nagalinga"
+      ],
+      "description": "Vijayanagara-era marvel — the mysterious hanging pillar, largest Nandi in India, and ceiling frescoes.",
+      "nearest_airport": "Bengaluru Airport (BLR)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "loktak",
+      "name": "Loktak Lake & Keibul Lamjao",
+      "state": "Manipur",
+      "region": "Northeast",
+      "lat": 24.5667,
+      "lng": 93.8,
+      "category": [
+        "nature",
+        "wildlife"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 768,
+      "highlights": [
+        "Floating Phumdis",
+        "Keibul Lamjao NP",
+        "Sangai Deer",
+        "Sendra Island",
+        "Ima Market"
+      ],
+      "description": "Northeast's largest freshwater lake with floating biomass islands — home to the endangered brow-antlered Sangai deer.",
+      "nearest_airport": "Imphal Airport (IMF)",
+      "languages": [
+        "Meitei",
+        "English"
+      ]
+    },
+    {
+      "id": "lonavala",
+      "name": "Lonavala & Khandala",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 18.7546,
+      "lng": 73.4062,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 625,
+      "highlights": [
+        "Tiger's Leap",
+        "Bhushi Dam",
+        "Karla Caves",
+        "Rajmachi Fort",
+        "Lion's Point"
+      ],
+      "description": "Twin hill stations near Mumbai and Pune — monsoon waterfalls and Western Ghat escarpments.",
+      "nearest_airport": "Pune Airport (PNQ)",
+      "languages": [
+        "Marathi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "lucknow",
+      "name": "Lucknow",
+      "state": "Uttar Pradesh",
+      "region": "North",
+      "lat": 26.8467,
+      "lng": 80.9462,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 123,
+      "highlights": [
+        "Bara Imambara",
+        "Rumi Darwaza",
+        "British Residency",
+        "Chota Imambara",
+        "Tunday Kababi"
+      ],
+      "description": "City of Nawabs — Mughal-era monuments, Lucknawi cuisine, and tehzeeb (etiquette).",
+      "nearest_airport": "Chaudhary Charan Singh Intl (LKO)",
+      "languages": [
+        "Hindi",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "madurai",
+      "name": "Madurai",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 101,
+      "highlights": [
+        "Meenakshi Amman Temple",
+        "Thirumalai Nayakkar Mahal",
+        "Gandhi Memorial Museum",
+        "Vaigai Dam",
+        "Koodal Azhagar Temple"
+      ],
+      "description": "One of the oldest continuously inhabited cities in the world — dominated by the towering Meenakshi Temple.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "mahabalipuram",
+      "name": "Mahabalipuram (Mamallapuram)",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 12.6172,
+      "lng": 80.1927,
+      "category": [
+        "heritage",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 12,
+      "highlights": [
+        "Shore Temple",
+        "Pancha Rathas",
+        "Arjuna's Penance",
+        "Krishna's Butterball",
+        "Tiger Cave"
+      ],
+      "description": "UNESCO World Heritage — 7th-century Pallava stone temples and rock-cut sculptures by the sea.",
+      "nearest_airport": "Chennai Intl Airport (MAA)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "maheshwar",
+      "name": "Maheshwar",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 22.1764,
+      "lng": 75.5889,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 180,
+      "highlights": [
+        "Ahilya Fort",
+        "Narmada Ghats",
+        "Maheshwari Sarees",
+        "Rajwada",
+        "Ek Mukhi Datta Temple"
+      ],
+      "description": "Narmada riverfront gem — Queen Ahilyabai's fort-palace, handloom sarees, and ancient ghats.",
+      "nearest_airport": "Indore Airport (IDR)",
+      "languages": [
+        "Hindi",
+        "Malwi"
+      ]
+    },
+    {
+      "id": "majuli",
+      "name": "Majuli Island",
+      "state": "Assam",
+      "region": "Northeast",
+      "lat": 26.95,
+      "lng": 94.1667,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 85,
+      "highlights": [
+        "Satras (Monasteries)",
+        "Mask Making",
+        "River Island",
+        "Mishing Tribe",
+        "Pottery"
+      ],
+      "description": "World's largest river island — Vaishnavite monasteries, tribal culture, and mask-making art.",
+      "nearest_airport": "Jorhat Airport (JRH)",
+      "languages": [
+        "Assamese",
+        "Mishing"
+      ]
+    },
+    {
+      "id": "manali",
+      "name": "Manali",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.2396,
+      "lng": 77.1887,
+      "category": [
+        "hill_station",
+        "adventure"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 2050,
+      "highlights": [
+        "Rohtang Pass",
+        "Solang Valley",
+        "Hadimba Temple",
+        "Old Manali",
+        "Jogini Waterfall"
+      ],
+      "description": "Himalayan adventure hub — snow, paragliding, hot springs, and apple orchards.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "mandu",
+      "name": "Mandu",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 22.3588,
+      "lng": 75.3946,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 633,
+      "highlights": [
+        "Jahaz Mahal",
+        "Hindola Mahal",
+        "Rani Roopmati Pavilion",
+        "Baz Bahadur Palace",
+        "Hoshang Shah's Tomb"
+      ],
+      "description": "City of Joy — Afghan-era ruins on a hilltop plateau, a monsoon paradise.",
+      "nearest_airport": "Devi Ahilyabai Holkar Airport, Indore (IDR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "mandvi",
+      "name": "Mandvi",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 22.8323,
+      "lng": 69.3491,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 3,
+      "highlights": [
+        "Mandvi Beach",
+        "Vijay Vilas Palace",
+        "Shipbuilding Yard",
+        "Wind Farm Beach",
+        "72 Jinalaya"
+      ],
+      "description": "Kutch's coastal gem — pristine beach, a Bollywood-famous palace, and 400-year-old wooden shipbuilding.",
+      "nearest_airport": "Bhuj Airport (BHJ)",
+      "languages": [
+        "Gujarati",
+        "Kutchi"
+      ]
+    },
+    {
+      "id": "mangalore",
+      "name": "Mangalore",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 12.9141,
+      "lng": 74.856,
+      "category": [
+        "beach",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 22,
+      "highlights": [
+        "Panambur Beach",
+        "Kadri Manjunath Temple",
+        "St. Aloysius Chapel",
+        "Tannirbhavi Beach",
+        "Pilikula Biological Park"
+      ],
+      "description": "Coastal Karnataka's port city — Mangalorean seafood, temple architecture, and tiled-roof heritage.",
+      "nearest_airport": "Mangalore Intl Airport (IXE)",
+      "languages": [
+        "Kannada",
+        "Tulu"
+      ]
+    },
+    {
+      "id": "mathura_vrindavan",
+      "name": "Mathura & Vrindavan",
+      "state": "Uttar Pradesh",
+      "region": "North",
+      "lat": 27.4924,
+      "lng": 77.6737,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 174,
+      "highlights": [
+        "Krishna Janmabhoomi",
+        "Banke Bihari Temple",
+        "Prem Mandir",
+        "ISKCON Vrindavan",
+        "Holi Celebrations"
+      ],
+      "description": "Birthplace of Lord Krishna — vibrant temple town, especially magical during Holi.",
+      "nearest_airport": "Agra Airport (AGR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "mawlynnong",
+      "name": "Mawlynnong",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.2,
+      "lng": 91.9167,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 1200,
+      "highlights": [
+        "Asia's Cleanest Village",
+        "Living Root Bridge",
+        "Sky Walk",
+        "Bangladesh Views",
+        "Balancing Rock"
+      ],
+      "description": "Asia's cleanest village — spotless Khasi hamlet with living root bridges and a bamboo sky walk.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi"
+      ]
+    },
+    {
+      "id": "mawphlang",
+      "name": "Mawphlang Sacred Forest",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.4488,
+      "lng": 91.7522,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 1870,
+      "highlights": [
+        "Sacred Grove",
+        "Ancient Megaliths",
+        "Biodiversity Walk",
+        "Khasi Culture",
+        "Orchids"
+      ],
+      "description": "800-year-old sacred Khasi grove — untouched by human hands, with monoliths, rare orchids, and ancient rituals.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi",
+        "English"
+      ]
+    },
+    {
+      "id": "mechuka",
+      "name": "Mechuka",
+      "state": "Arunachal Pradesh",
+      "region": "Northeast",
+      "lat": 28.6103,
+      "lng": 94.1389,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1829,
+      "highlights": [
+        "Siyom River",
+        "Samten Yongcha Monastery",
+        "Dorjeeling Village",
+        "Yarlung Valley",
+        "Suspension Bridges"
+      ],
+      "description": "Hidden Shangri-La of eastern Himalayas — Tibetan Buddhist villages, braided rivers, and zero mobile signal.",
+      "nearest_airport": "Dibrugarh Airport (DIB)",
+      "languages": [
+        "Adi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "meghalaya_nongriat",
+      "name": "Nongriat (Double Decker Root Bridge)",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.2676,
+      "lng": 91.7323,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 800,
+      "highlights": [
+        "Double Decker Living Root Bridge",
+        "Rainbow Falls",
+        "Natural Swimming Pool",
+        "Trek",
+        "Khasi Village"
+      ],
+      "description": "Trek through Khasi Hills to the world-famous double-decker living root bridge.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi"
+      ]
+    },
+    {
+      "id": "mehrauli",
+      "name": "Mehrauli Archaeological Park",
+      "state": "Delhi",
+      "region": "North",
+      "lat": 28.5245,
+      "lng": 77.1855,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 216,
+      "highlights": [
+        "Qutub Minar Complex",
+        "Jamali Kamali Mosque",
+        "Balban's Tomb",
+        "Rajon Ki Baoli",
+        "Metcalfe's Folly"
+      ],
+      "description": "Delhi's most layered heritage zone — 1,000 years of monuments from Sultanate to British era in one park.",
+      "nearest_airport": "Indira Gandhi Intl Airport (DEL)",
+      "languages": [
+        "Hindi",
+        "Urdu",
+        "English"
+      ]
+    },
+    {
+      "id": "minicoy",
+      "name": "Minicoy Island",
+      "state": "Lakshadweep",
+      "region": "Islands",
+      "lat": 8.2833,
+      "lng": 73.05,
+      "category": [
+        "island",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 1,
+      "highlights": [
+        "Lighthouse",
+        "Tuna Canning",
+        "Lagoon",
+        "Juma Masjid",
+        "Viringili Island"
+      ],
+      "description": "Southernmost atoll of Lakshadweep — Maldives-like turquoise lagoon, century-old lighthouse, and Mahal culture.",
+      "nearest_airport": "Agatti Airport (AGX)",
+      "languages": [
+        "Mahl",
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "mount_abu",
+      "name": "Mount Abu",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 24.5926,
+      "lng": 72.7156,
+      "category": [
+        "hill_station",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 1220,
+      "highlights": [
+        "Dilwara Temples",
+        "Nakki Lake",
+        "Guru Shikhar",
+        "Sunset Point",
+        "Wildlife Sanctuary"
+      ],
+      "description": "Rajasthan's only hill station — exquisite Jain marble temples and Aravalli scenery.",
+      "nearest_airport": "Udaipur Airport (UDR)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "mukteshwar",
+      "name": "Mukteshwar",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.474,
+      "lng": 79.6498,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2286,
+      "highlights": [
+        "Chauli Ki Jali",
+        "Mukteshwar Temple",
+        "Methodist Church",
+        "Himalayan Views",
+        "Orchards"
+      ],
+      "description": "Tranquil Kumaon hilltop with 350-degree Himalayan views and Chris Bonington's climbing cliff.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "category": [
+        "urban",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 14,
+      "highlights": [
+        "Gateway of India",
+        "Marine Drive",
+        "Elephanta Caves",
+        "CST Station",
+        "Dharavi",
+        "Bollywood Tours"
+      ],
+      "description": "Maximum City — India's financial capital, Bollywood, street food, and colonial architecture.",
+      "nearest_airport": "Chhatrapati Shivaji Maharaj Intl (BOM)",
+      "languages": [
+        "Marathi",
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "munnar",
+      "name": "Munnar",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 10.0889,
+      "lng": 77.0595,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 1532,
+      "highlights": [
+        "Tea Plantations",
+        "Eravikulam National Park",
+        "Nilgiri Tahr",
+        "Mattupetty Dam",
+        "Top Station"
+      ],
+      "description": "Emerald tea country — rolling hills carpeted in tea estates with cool misty mornings.",
+      "nearest_airport": "Cochin Intl Airport (COK)",
+      "languages": [
+        "Malayalam",
+        "Tamil"
+      ]
+    },
+    {
+      "id": "munsiyari",
+      "name": "Munsiyari",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.0669,
+      "lng": 80.2384,
+      "category": [
+        "hill_station",
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        4,
+        5,
+        6,
+        9,
+        10
+      ],
+      "altitude_m": 2200,
+      "highlights": [
+        "Panchachuli Peaks",
+        "Khaliya Top",
+        "Birthi Falls",
+        "Maheshwari Kund",
+        "Darkot Village"
+      ],
+      "description": "Remote Kumaon hamlet with front-row views of the Panchachuli — gateway to Milam Glacier.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "murudeshwar",
+      "name": "Murudeshwar",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 14.0944,
+      "lng": 74.4842,
+      "category": [
+        "religious",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 5,
+      "highlights": [
+        "World's 2nd Tallest Shiva Statue",
+        "Murudeshwar Temple",
+        "Netrani Island",
+        "Scuba Diving",
+        "Sunset Point"
+      ],
+      "description": "Arabian Sea temple town — a 123-ft Shiva statue, island scuba diving, and the gopura elevator ride.",
+      "nearest_airport": "Hubli Airport (HBX)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "mussoorie",
+      "name": "Mussoorie",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.4598,
+      "lng": 78.0644,
+      "category": [
+        "hill_station"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 2005,
+      "highlights": [
+        "Kempty Falls",
+        "Gun Hill",
+        "Mall Road",
+        "Lal Tibba",
+        "Company Garden"
+      ],
+      "description": "Queen of the Hills — colonial-era charm, Himalayan views, and pleasant walks.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "mysore",
+      "name": "Mysore (Mysuru)",
+      "state": "Karnataka",
+      "region": "South",
+      "lat": 12.2958,
+      "lng": 76.6394,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 770,
+      "highlights": [
+        "Mysore Palace",
+        "Chamundi Hills",
+        "Brindavan Gardens",
+        "St. Philomena's Church",
+        "Dasara Festival"
+      ],
+      "description": "City of Palaces — royal heritage, sandalwood, silk sarees, and the grand Dasara festival.",
+      "nearest_airport": "Mysore Airport (MYQ)",
+      "languages": [
+        "Kannada"
+      ]
+    },
+    {
+      "id": "nagarjunasagar",
+      "name": "Nagarjuna Sagar",
+      "state": "Telangana",
+      "region": "South",
+      "lat": 16.5727,
+      "lng": 79.3092,
+      "category": [
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 210,
+      "highlights": [
+        "Nagarjuna Sagar Dam",
+        "Nagarjunakonda Island Museum",
+        "Buddhist Stupas",
+        "Tiger Reserve",
+        "Ethipothala Falls"
+      ],
+      "description": "Krishna River dam with an island museum of 2nd-century Buddhist relics — Sri Lanka-linked Buddhist civilization.",
+      "nearest_airport": "Rajiv Gandhi Intl Airport, Hyderabad (HYD)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "nainital",
+      "name": "Nainital",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.3803,
+      "lng": 79.4636,
+      "category": [
+        "hill_station"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1938,
+      "highlights": [
+        "Naini Lake",
+        "Naina Devi Temple",
+        "Snow View Point",
+        "Eco Cave Garden",
+        "Mall Road"
+      ],
+      "description": "Lake District of India — pear-shaped lake surrounded by Kumaon hills.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "nashik",
+      "name": "Nashik",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 19.9975,
+      "lng": 73.7898,
+      "category": [
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 584,
+      "highlights": [
+        "Trimbakeshwar Temple",
+        "Sula Vineyards",
+        "Pandavleni Caves",
+        "Ramkund",
+        "Coin Museum"
+      ],
+      "description": "Wine capital of India and Kumbh Mela city — vineyards, ancient temples, and riverside ghats.",
+      "nearest_airport": "Nashik Airport (ISK)",
+      "languages": [
+        "Marathi"
+      ]
+    },
+    {
+      "id": "netarhat",
+      "name": "Netarhat",
+      "state": "Jharkhand",
+      "region": "East",
+      "lat": 23.48,
+      "lng": 84.27,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 1128,
+      "highlights": [
+        "Magnolia Point Sunrise",
+        "Koel View Point",
+        "Upper Ghagri Falls",
+        "Sal Forests",
+        "Lodh Falls"
+      ],
+      "description": "Queen of Chotanagpur — spectacular sunrises over the Koel Valley and pristine tribal forests.",
+      "nearest_airport": "Ranchi Airport (IXR)",
+      "languages": [
+        "Hindi",
+        "Mundari"
+      ]
+    },
+    {
+      "id": "nubra_turtuk",
+      "name": "Turtuk",
+      "state": "Ladakh",
+      "region": "North",
+      "lat": 34.8478,
+      "lng": 76.8209,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 2900,
+      "highlights": [
+        "Balti Village",
+        "Apricot Orchards",
+        "Shyok River",
+        "India's Last Village",
+        "Royal House of Yabgo"
+      ],
+      "description": "India's northernmost village — Balti Muslim culture, apricot orchards, and the Shyok River gorge.",
+      "nearest_airport": "Kushok Bakula Airport, Leh (IXL)",
+      "languages": [
+        "Balti",
+        "Ladakhi"
+      ]
+    },
+    {
+      "id": "nubra_valley",
+      "name": "Nubra Valley",
+      "state": "Ladakh",
+      "region": "North",
+      "lat": 34.687,
+      "lng": 77.577,
+      "category": [
+        "adventure",
+        "nature",
+        "desert"
+      ],
+      "best_months": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 3048,
+      "highlights": [
+        "Diskit Monastery",
+        "Hunder Sand Dunes",
+        "Bactrian Camels",
+        "Samstanling Monastery",
+        "Panamik Hot Springs"
+      ],
+      "description": "Valley of flowers in the Himalayas — double-humped camels on cold-desert sand dunes.",
+      "nearest_airport": "Kushok Bakula Rimpochee Airport, Leh (IXL)",
+      "languages": [
+        "Ladakhi"
+      ]
+    },
+    {
+      "id": "old_goa",
+      "name": "Old Goa & Hinterland",
+      "state": "Goa",
+      "region": "West",
+      "lat": 15.501,
+      "lng": 73.9116,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 8,
+      "highlights": [
+        "Basilica of Bom Jesus",
+        "Se Cathedral",
+        "Dudhsagar Falls",
+        "Spice Plantations",
+        "Mangueshi Temple"
+      ],
+      "description": "UNESCO Portuguese-era churches, Dudhsagar's milky cascade, and spice plantations in Goa's green interior.",
+      "nearest_airport": "Dabolim Airport (GOI)",
+      "languages": [
+        "Konkani",
+        "Marathi"
+      ]
+    },
+    {
+      "id": "ooty",
+      "name": "Ooty (Udhagamandalam)",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 11.4102,
+      "lng": 76.695,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 2240,
+      "highlights": [
+        "Botanical Gardens",
+        "Ooty Lake",
+        "Nilgiri Mountain Railway",
+        "Doddabetta Peak",
+        "Tea Museum"
+      ],
+      "description": "Queen of Nilgiris — colonial-era hill station with tea gardens and the famous toy train.",
+      "nearest_airport": "Coimbatore Intl Airport (CJB)",
+      "languages": [
+        "Tamil",
+        "English"
+      ]
+    },
+    {
+      "id": "orchha",
+      "name": "Orchha",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 25.3519,
+      "lng": 78.6419,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 257,
+      "highlights": [
+        "Orchha Fort Complex",
+        "Jahangir Mahal",
+        "Raja Mahal",
+        "Chaturbhuj Temple",
+        "Cenotaphs"
+      ],
+      "description": "Frozen-in-time Bundela capital — magnificent medieval forts and temples on an island.",
+      "nearest_airport": "Gwalior Airport (GWL)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "pachmarhi",
+      "name": "Pachmarhi",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 22.4675,
+      "lng": 78.4341,
+      "category": [
+        "hill_station",
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 1067,
+      "highlights": [
+        "Bee Falls",
+        "Pandav Caves",
+        "Jata Shankar",
+        "Dhoopgarh Sunset",
+        "Satpura Tiger Reserve"
+      ],
+      "description": "Queen of Satpura — MP's only hill station with prehistoric rock art, waterfalls, and sal forests.",
+      "nearest_airport": "Bhopal Airport (BHO)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "pahalgam",
+      "name": "Pahalgam",
+      "state": "Jammu & Kashmir",
+      "region": "North",
+      "lat": 34.0161,
+      "lng": 75.315,
+      "category": [
+        "hill_station",
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "altitude_m": 2130,
+      "highlights": [
+        "Betaab Valley",
+        "Aru Valley",
+        "Chandanwari",
+        "Lidder River",
+        "Baisaran Meadow"
+      ],
+      "description": "Valley of Shepherds — base camp for Amarnath Yatra with alpine meadows and pine forests.",
+      "nearest_airport": "Srinagar Airport (SXR)",
+      "languages": [
+        "Kashmiri",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "panchkula",
+      "name": "Morni Hills & Panchkula",
+      "state": "Haryana",
+      "region": "North",
+      "lat": 30.6942,
+      "lng": 77.092,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1220,
+      "highlights": [
+        "Morni Hills",
+        "Tikkar Taal",
+        "Adventure Park",
+        "Bir Shikargah Sanctuary",
+        "Pinjore Gardens"
+      ],
+      "description": "Haryana's only hill station — twin lakes, Shivalik forests, and paragliding.",
+      "nearest_airport": "Chandigarh Airport (IXC)",
+      "languages": [
+        "Hindi",
+        "Haryanvi"
+      ]
+    },
+    {
+      "id": "patna",
+      "name": "Patna",
+      "state": "Bihar",
+      "region": "East",
+      "lat": 25.6093,
+      "lng": 85.1376,
+      "category": [
+        "heritage",
+        "religious",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 53,
+      "highlights": [
+        "Golghar",
+        "Patna Museum",
+        "Takht Sri Patna Sahib",
+        "Nalanda Ruins",
+        "Kumhrar Park"
+      ],
+      "description": "One of the world's oldest continuously inhabited cities — ancient Pataliputra and Sikh heritage.",
+      "nearest_airport": "Jay Prakash Narayan Intl Airport (PAT)",
+      "languages": [
+        "Hindi",
+        "Bhojpuri"
+      ]
+    },
+    {
+      "id": "pelling",
+      "name": "Pelling",
+      "state": "Sikkim",
+      "region": "Northeast",
+      "lat": 27.3,
+      "lng": 88.2333,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 2150,
+      "highlights": [
+        "Kanchenjunga View",
+        "Pemayangtse Monastery",
+        "Rabdentse Ruins",
+        "Kecheopalri Lake",
+        "Skywalk"
+      ],
+      "description": "Panoramic Kanchenjunga views, ancient monasteries, and Sikkim's newest glass skywalk.",
+      "nearest_airport": "Bagdogra Airport (IXB)",
+      "languages": [
+        "Nepali",
+        "Sikkimese"
+      ]
+    },
+    {
+      "id": "periyar",
+      "name": "Periyar (Thekkady)",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 9.4681,
+      "lng": 77.2359,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 1200,
+      "highlights": [
+        "Periyar Lake",
+        "Tiger Reserve",
+        "Nature Walk",
+        "Tribal Heritage",
+        "Spice Trail"
+      ],
+      "description": "Protected tiger reserve centered around a beautiful artificial lake in the Cardamom Hills.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Malayalam",
+        "Tamil"
+      ]
+    },
+    {
+      "id": "pondicherry",
+      "name": "Pondicherry (Puducherry)",
+      "state": "Puducherry",
+      "region": "South",
+      "lat": 11.9416,
+      "lng": 79.8083,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Promenade Beach",
+        "Auroville",
+        "French Quarter",
+        "Paradise Beach",
+        "Sri Aurobindo Ashram"
+      ],
+      "description": "French Riviera of the East — pastel-colored colonial streets, Auroville, and coastal tranquility.",
+      "nearest_airport": "Chennai Intl Airport (MAA)",
+      "languages": [
+        "Tamil",
+        "French",
+        "English"
+      ]
+    },
+    {
+      "id": "port_blair",
+      "name": "Port Blair",
+      "state": "Andaman & Nicobar",
+      "region": "Islands",
+      "lat": 11.6234,
+      "lng": 92.7265,
+      "category": [
+        "island",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 16,
+      "highlights": [
+        "Cellular Jail",
+        "Corbyn's Cove Beach",
+        "Ross Island",
+        "Anthropological Museum",
+        "Samudrika Museum"
+      ],
+      "description": "Capital of Andaman — colonial prison history combining with tropical island beauty.",
+      "nearest_airport": "Veer Savarkar Intl Airport (IXZ)",
+      "languages": [
+        "Hindi",
+        "Bengali",
+        "Tamil"
+      ]
+    },
+    {
+      "id": "pune",
+      "name": "Pune",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 18.5204,
+      "lng": 73.8567,
+      "category": [
+        "heritage",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 560,
+      "highlights": [
+        "Shaniwar Wada",
+        "Aga Khan Palace",
+        "Sinhagad Fort",
+        "Dagdusheth Ganpati",
+        "Osho Ashram"
+      ],
+      "description": "Oxford of the East — Maratha heritage, IT hub, and gateway to Western Ghat forts.",
+      "nearest_airport": "Pune Airport (PNQ)",
+      "languages": [
+        "Marathi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "puri",
+      "name": "Puri",
+      "state": "Odisha",
+      "region": "East",
+      "lat": 19.7983,
+      "lng": 85.8249,
+      "category": [
+        "religious",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Jagannath Temple",
+        "Puri Beach",
+        "Rath Yatra",
+        "Chilika Lake",
+        "Raghurajpur Art Village"
+      ],
+      "description": "One of the four Char Dhams — Jagannath Temple, Rath Yatra, and golden beach sands.",
+      "nearest_airport": "Biju Patnaik Intl Airport, Bhubaneswar (BBI)",
+      "languages": [
+        "Odia"
+      ]
+    },
+    {
+      "id": "pushkar",
+      "name": "Pushkar",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 26.4897,
+      "lng": 74.5511,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 510,
+      "highlights": [
+        "Brahma Temple",
+        "Pushkar Lake",
+        "Pushkar Camel Fair",
+        "Savitri Temple",
+        "Rose Garden"
+      ],
+      "description": "Only city in the world with a dedicated Brahma temple — holy lake, ghats, and the camel fair.",
+      "nearest_airport": "Jaipur Intl Airport (JAI)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "raipur",
+      "name": "Raipur & Chhattisgarh",
+      "state": "Chhattisgarh",
+      "region": "Central",
+      "lat": 21.2514,
+      "lng": 81.6296,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 298,
+      "highlights": [
+        "Barnawapara Wildlife Sanctuary",
+        "Chitrakote Falls",
+        "Tirathgarh Falls",
+        "Marine Drive Tank",
+        "Purkhauti Muktangan"
+      ],
+      "description": "Gateway to undiscovered Chhattisgarh — India's Niagara Falls (Chitrakote) and tribal art.",
+      "nearest_airport": "Swami Vivekananda Airport (RPR)",
+      "languages": [
+        "Hindi",
+        "Chhattisgarhi"
+      ]
+    },
+    {
+      "id": "rajgir",
+      "name": "Rajgir",
+      "state": "Bihar",
+      "region": "East",
+      "lat": 25.0285,
+      "lng": 85.4209,
+      "category": [
+        "religious",
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 73,
+      "highlights": [
+        "Vishwa Shanti Stupa",
+        "Griddhakuta Hill",
+        "Hot Springs",
+        "Nalanda Ruins",
+        "Cyclopean Wall"
+      ],
+      "description": "Ancient capital of Magadha — where Buddha and Mahavira taught, with hot springs and Japan-built peace pagoda.",
+      "nearest_airport": "Gaya Airport (GAY)",
+      "languages": [
+        "Hindi",
+        "Magahi"
+      ]
+    },
+    {
+      "id": "rameswaram",
+      "name": "Rameswaram",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 9.2876,
+      "lng": 79.3129,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Ramanathaswamy Temple",
+        "Pamban Bridge",
+        "Dhanushkodi",
+        "Gandhamadhana Parvatham",
+        "Adam's Bridge"
+      ],
+      "description": "One of the four Char Dhams — island temple with the world's longest temple corridor.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "ranchi",
+      "name": "Ranchi",
+      "state": "Jharkhand",
+      "region": "East",
+      "lat": 23.3441,
+      "lng": 85.3096,
+      "category": [
+        "nature",
+        "urban"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 651,
+      "highlights": [
+        "Hundru Falls",
+        "Jonha Falls",
+        "Rock Garden",
+        "Tagore Hill",
+        "Pahari Mandir"
+      ],
+      "description": "City of Waterfalls — Chotanagpur plateau capital with forested hills and cascading falls.",
+      "nearest_airport": "Birsa Munda Airport (IXR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "ranikhet",
+      "name": "Ranikhet",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 29.644,
+      "lng": 79.4329,
+      "category": [
+        "hill_station"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1869,
+      "highlights": [
+        "Jhula Devi Temple",
+        "Chaubatia Gardens",
+        "Golf Course",
+        "Upat & Kalika",
+        "Kumaon Regiment Museum"
+      ],
+      "description": "Queen's Meadow — Kumaon Regimental town with apple orchards and undisturbed Himalayan views.",
+      "nearest_airport": "Pantnagar Airport (PGH)",
+      "languages": [
+        "Hindi",
+        "Kumaoni"
+      ]
+    },
+    {
+      "id": "rann_of_kutch",
+      "name": "Rann of Kutch",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 23.7337,
+      "lng": 69.8597,
+      "category": [
+        "desert",
+        "nature"
+      ],
+      "best_months": [
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "White Desert",
+        "Rann Utsav",
+        "Full Moon Night",
+        "Kalo Dungar",
+        "Wild Ass Sanctuary"
+      ],
+      "description": "Surreal white salt desert that stretches to the horizon — magical under the full moon.",
+      "nearest_airport": "Bhuj Airport (BHJ)",
+      "languages": [
+        "Gujarati",
+        "Kutchi"
+      ]
+    },
+    {
+      "id": "ranthambore",
+      "name": "Ranthambore National Park",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 26.0173,
+      "lng": 76.5026,
+      "category": [
+        "wildlife"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "altitude_m": 392,
+      "highlights": [
+        "Tiger Safari",
+        "Ranthambore Fort",
+        "Padam Talao",
+        "Jogi Mahal",
+        "Ganesh Temple"
+      ],
+      "description": "Where tigers roam among ancient ruins — one of India's best tiger-spotting destinations.",
+      "nearest_airport": "Jaipur Intl Airport (JAI)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "ratnagiri",
+      "name": "Ratnagiri",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 16.9902,
+      "lng": 73.312,
+      "category": [
+        "beach",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 12,
+      "highlights": [
+        "Ratnadurg Fort",
+        "Ganpatipule Beach",
+        "Thibaw Palace",
+        "Jaigad Fort",
+        "Pawas Swami Swaroopanand"
+      ],
+      "description": "Konkan coast paradise — Alphonso mango country with pristine beaches and historic sea forts.",
+      "nearest_airport": "Ratnagiri Airport (RTC)",
+      "languages": [
+        "Marathi",
+        "Konkani"
+      ]
+    },
+    {
+      "id": "rishikesh",
+      "name": "Rishikesh",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.0869,
+      "lng": 78.2676,
+      "category": [
+        "religious",
+        "adventure"
+      ],
+      "best_months": [
+        2,
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 372,
+      "highlights": [
+        "Laxman Jhula",
+        "River Rafting",
+        "Beatles Ashram",
+        "Triveni Ghat Aarti",
+        "Bungee Jumping"
+      ],
+      "description": "Yoga Capital of the World — where spirituality meets adrenaline on the Ganges.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "sambalpur",
+      "name": "Sambalpur & Hirakud",
+      "state": "Odisha",
+      "region": "East",
+      "lat": 21.4669,
+      "lng": 83.9812,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2
+      ],
+      "altitude_m": 155,
+      "highlights": [
+        "Hirakud Dam",
+        "Debrigarh Sanctuary",
+        "Samaleswari Temple",
+        "Sambalpuri Textiles",
+        "Ushakothi Falls"
+      ],
+      "description": "World's longest earthen dam across the Mahanadi — tribal culture, handloom ikat, and wildlife sanctuary.",
+      "nearest_airport": "Jharsuguda Airport (JRG)",
+      "languages": [
+        "Odia",
+        "Sambalpuri"
+      ]
+    },
+    {
+      "id": "sanchi",
+      "name": "Sanchi",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 23.4793,
+      "lng": 77.7396,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 434,
+      "highlights": [
+        "Great Stupa",
+        "Ashoka Pillar",
+        "Archaeological Museum",
+        "Monastery Ruins",
+        "Stupa 2 & 3"
+      ],
+      "description": "UNESCO World Heritage — Buddhist stupas dating to the 3rd century BCE, commissioned by Ashoka.",
+      "nearest_airport": "Raja Bhoj Airport, Bhopal (BHO)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "sandakphu",
+      "name": "Sandakphu",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 27.1024,
+      "lng": 88.0013,
+      "category": [
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 3636,
+      "highlights": [
+        "Sleeping Buddha View",
+        "Four Highest Peaks",
+        "Kanchenjunga",
+        "Everest View",
+        "Rhododendron Trail"
+      ],
+      "description": "West Bengal's highest point — panoramic views of Everest, Kanchenjunga, Lhotse, and Makalu in one frame.",
+      "nearest_airport": "Bagdogra Airport (IXB)",
+      "languages": [
+        "Nepali",
+        "Bengali"
+      ]
+    },
+    {
+      "id": "sasan_gir",
+      "name": "Somnath",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 20.888,
+      "lng": 70.4013,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Somnath Temple",
+        "Bhalka Tirth",
+        "Triveni Sangam",
+        "Somnath Beach",
+        "Prabhas Patan Museum"
+      ],
+      "description": "First among 12 Jyotirlingas — ancient seaside temple rebuilt after multiple destructions.",
+      "nearest_airport": "Rajkot Airport (RAJ)",
+      "languages": [
+        "Gujarati"
+      ]
+    },
+    {
+      "id": "sasaram",
+      "name": "Sasaram",
+      "state": "Bihar",
+      "region": "East",
+      "lat": 24.9533,
+      "lng": 84.0369,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 72,
+      "highlights": [
+        "Sher Shah Suri Tomb",
+        "Rohtasgarh Fort",
+        "Son River Gorge",
+        "Gupta Dham",
+        "Tarachandi Temple"
+      ],
+      "description": "Sher Shah Suri's octagonal tomb — India's tallest dome before the Taj, plus the massive Rohtas fort.",
+      "nearest_airport": "Varanasi Airport (VNS)",
+      "languages": [
+        "Hindi",
+        "Bhojpuri"
+      ]
+    },
+    {
+      "id": "shantiniketan",
+      "name": "Shantiniketan",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 23.6788,
+      "lng": 87.6854,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 56,
+      "highlights": [
+        "Visva-Bharati University",
+        "Kala Bhavana",
+        "Tagore Museum",
+        "Sonajhuri Forest",
+        "Poush Mela"
+      ],
+      "description": "Tagore's open-air university campus — Nobel laureate's ashram, Baul music, and the annual Poush Mela fair.",
+      "nearest_airport": "Kolkata Airport (CCU)",
+      "languages": [
+        "Bengali"
+      ]
+    },
+    {
+      "id": "shekhawati",
+      "name": "Shekhawati Region",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 28.095,
+      "lng": 75.3775,
+      "category": [
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 380,
+      "highlights": [
+        "Painted Havelis",
+        "Mandawa Fort",
+        "Nawalgarh Havelis",
+        "Fatehpur",
+        "Dundlod Castle"
+      ],
+      "description": "Open-air art gallery of Rajasthan — merchant havelis with stunning frescoes spanning centuries.",
+      "nearest_airport": "Jaipur Airport (JAI)",
+      "languages": [
+        "Hindi",
+        "Rajasthani"
+      ]
+    },
+    {
+      "id": "shillong",
+      "name": "Shillong",
+      "state": "Meghalaya",
+      "region": "Northeast",
+      "lat": 25.5788,
+      "lng": 91.8933,
+      "category": [
+        "hill_station",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1496,
+      "highlights": [
+        "Shillong Peak",
+        "Ward's Lake",
+        "Don Bosco Museum",
+        "Elephant Falls",
+        "Umiam Lake"
+      ],
+      "description": "Scotland of the East — rolling hills, waterfalls, rock music culture, and Khasi heritage.",
+      "nearest_airport": "Shillong Airport (SHL)",
+      "languages": [
+        "Khasi",
+        "English",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "shimla",
+      "name": "Shimla",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.1048,
+      "lng": 77.1734,
+      "category": [
+        "hill_station"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 2276,
+      "highlights": [
+        "Mall Road",
+        "Ridge",
+        "Christ Church",
+        "Jakhoo Temple",
+        "Toy Train",
+        "Indian Institute of Advanced Study"
+      ],
+      "description": "Queen of Hills — former British summer capital with colonial architecture and pine forests.",
+      "nearest_airport": "Shimla Airport (SLV)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "shirdi",
+      "name": "Shirdi",
+      "state": "Maharashtra",
+      "region": "West",
+      "lat": 19.7668,
+      "lng": 74.4783,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 585,
+      "highlights": [
+        "Sai Baba Temple",
+        "Dwarkamai",
+        "Chavadi",
+        "Lendi Baug",
+        "Shani Shingnapur"
+      ],
+      "description": "Pilgrimage center for Sai Baba devotees — among the most visited temples in India.",
+      "nearest_airport": "Shirdi Airport (SAG)",
+      "languages": [
+        "Marathi"
+      ]
+    },
+    {
+      "id": "silvassa",
+      "name": "Silvassa",
+      "state": "Dadra & Nagar Haveli and Daman & Diu",
+      "region": "West",
+      "lat": 20.276,
+      "lng": 73.0169,
+      "category": [
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 55,
+      "highlights": [
+        "Vanganga Lake & Garden",
+        "Tribal Museum",
+        "Hirwa Van Garden",
+        "Lion Safari",
+        "Satmaliya Deer Park"
+      ],
+      "description": "Small green UT with tribal culture, lakes, and lush gardens near Gujarat's coast.",
+      "nearest_airport": "Surat Airport (STV)",
+      "languages": [
+        "Gujarati",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "spiti_valley",
+      "name": "Spiti Valley",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 32.246,
+      "lng": 78.0188,
+      "category": [
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 3800,
+      "highlights": [
+        "Key Monastery",
+        "Chandratal Lake",
+        "Dhankar Monastery",
+        "Kibber Village",
+        "Pin Valley"
+      ],
+      "description": "Middle Land between India and Tibet — a cold desert with ancient monasteries and fossil sites.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi",
+        "Spitian"
+      ]
+    },
+    {
+      "id": "srinagar",
+      "name": "Srinagar",
+      "state": "Jammu & Kashmir",
+      "region": "North",
+      "lat": 34.0837,
+      "lng": 74.7973,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1585,
+      "highlights": [
+        "Dal Lake Shikaras",
+        "Mughal Gardens",
+        "Shankaracharya Temple",
+        "Nigeen Lake",
+        "Zero Bridge"
+      ],
+      "description": "Paradise on Earth — houseboats on Dal Lake, Mughal gardens, and saffron fields.",
+      "nearest_airport": "Srinagar Airport (SXR)",
+      "languages": [
+        "Kashmiri",
+        "Urdu"
+      ]
+    },
+    {
+      "id": "srisailam",
+      "name": "Srisailam",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 15.8505,
+      "lng": 78.8689,
+      "category": [
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 476,
+      "highlights": [
+        "Mallikarjuna Temple",
+        "Srisailam Dam",
+        "Pataalaganga",
+        "Akkamahadevi Caves",
+        "Nallamala Hills"
+      ],
+      "description": "One of the 12 Jyotirlingas nestled in the Nallamala forests along the Krishna river.",
+      "nearest_airport": "Rajiv Gandhi Intl Airport, Hyderabad (HYD)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "sukhna_rock_garden",
+      "name": "Chandigarh Heritage Walk",
+      "state": "Chandigarh",
+      "region": "North",
+      "lat": 30.75,
+      "lng": 76.787,
+      "category": [
+        "urban",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 321,
+      "highlights": [
+        "Rock Garden",
+        "Sukhna Lake",
+        "Capitol Complex",
+        "Le Corbusier Centre",
+        "Rose Garden"
+      ],
+      "description": "Le Corbusier's planned city — UNESCO Capitol Complex, Nek Chand's recycled Rock Garden, and Sukhna sunsets.",
+      "nearest_airport": "Chandigarh Airport (IXC)",
+      "languages": [
+        "Hindi",
+        "Punjabi"
+      ]
+    },
+    {
+      "id": "sultanpur_bird",
+      "name": "Sultanpur Bird Sanctuary",
+      "state": "Haryana",
+      "region": "North",
+      "lat": 28.4712,
+      "lng": 76.8903,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 213,
+      "highlights": [
+        "Migratory Birds",
+        "Nature Trails",
+        "Watchtower",
+        "Flamingos",
+        "Siberian Cranes"
+      ],
+      "description": "Wetland paradise near Delhi — 250+ bird species including rare migratory visitors from Siberia.",
+      "nearest_airport": "Indira Gandhi Intl Airport, Delhi (DEL)",
+      "languages": [
+        "Hindi",
+        "Haryanvi"
+      ]
+    },
+    {
+      "id": "sunderban",
+      "name": "Sundarbans",
+      "state": "West Bengal",
+      "region": "East",
+      "lat": 21.9497,
+      "lng": 89.1833,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Royal Bengal Tiger",
+        "Mangrove Forest",
+        "Boat Safari",
+        "Sajnekhali Watchtower",
+        "Sudhanyakhali"
+      ],
+      "description": "UNESCO World Heritage — the largest mangrove forest and home of the swimming Bengal tiger.",
+      "nearest_airport": "Netaji Subhash Chandra Bose Intl, Kolkata (CCU)",
+      "languages": [
+        "Bengali"
+      ]
+    },
+    {
+      "id": "tawang",
+      "name": "Tawang",
+      "state": "Arunachal Pradesh",
+      "region": "Northeast",
+      "lat": 27.586,
+      "lng": 91.8597,
+      "category": [
+        "hill_station",
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 3048,
+      "highlights": [
+        "Tawang Monastery",
+        "Sela Pass",
+        "Madhuri Lake",
+        "War Memorial",
+        "Nuranang Falls"
+      ],
+      "description": "India's largest Buddhist monastery in a stunning Himalayan valley near the Tibetan border.",
+      "nearest_airport": "Tezpur Airport (TEZ)",
+      "languages": [
+        "Monpa",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "thanjavur",
+      "name": "Thanjavur (Tanjore)",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 57,
+      "highlights": [
+        "Brihadeeswarar Temple",
+        "Thanjavur Palace",
+        "Art Gallery",
+        "Saraswathi Mahal Library",
+        "Raja Raja Chola Museum"
+      ],
+      "description": "Chola dynasty capital — the magnificent UNESCO Brihadeeswarar Temple and Tanjore paintings.",
+      "nearest_airport": "Tiruchirappalli Airport (TRZ)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "thekkady",
+      "name": "Thekkady (Periyar)",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 9.6005,
+      "lng": 77.161,
+      "category": [
+        "wildlife",
+        "nature"
+      ],
+      "best_months": [
+        9,
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "altitude_m": 930,
+      "highlights": [
+        "Periyar Tiger Reserve",
+        "Boat Cruise",
+        "Bamboo Rafting",
+        "Spice Plantations",
+        "Elephant Camp"
+      ],
+      "description": "Periyar Wildlife Sanctuary — boat rides through tiger country amid cardamom and pepper plantations.",
+      "nearest_airport": "Madurai Airport (IXM)",
+      "languages": [
+        "Malayalam",
+        "Tamil"
+      ]
+    },
+    {
+      "id": "thiruvananthapuram",
+      "name": "Thiruvananthapuram (Trivandrum)",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 8.5241,
+      "lng": 76.9366,
+      "category": [
+        "urban",
+        "heritage",
+        "beach"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 10,
+      "highlights": [
+        "Padmanabhaswamy Temple",
+        "Napier Museum",
+        "Priyadarsini Planetarium",
+        "Veli Beach",
+        "Kuthiramalika Palace"
+      ],
+      "description": "Kerala's capital — ancient temple with secret vaults, museums, and nearby Kovalam beaches.",
+      "nearest_airport": "Trivandrum Intl Airport (TRV)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "tirthan_great_himalayan",
+      "name": "Great Himalayan National Park",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.76,
+      "lng": 77.45,
+      "category": [
+        "wildlife",
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        4,
+        5,
+        6,
+        9,
+        10
+      ],
+      "altitude_m": 2320,
+      "highlights": [
+        "UNESCO World Heritage",
+        "Western Tragopan",
+        "Snow Leopard",
+        "Tirthan River",
+        "Alpine Treks"
+      ],
+      "description": "UNESCO-listed wilderness — pristine biodiversity hotspot with 375+ fauna species in the western Himalayas.",
+      "nearest_airport": "Bhuntar Airport, Kullu (KUU)",
+      "languages": [
+        "Hindi",
+        "Pahari"
+      ]
+    },
+    {
+      "id": "tirthan_valley",
+      "name": "Tirthan Valley",
+      "state": "Himachal Pradesh",
+      "region": "North",
+      "lat": 31.633,
+      "lng": 77.444,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1600,
+      "highlights": [
+        "Great Himalayan National Park",
+        "Trout Fishing",
+        "Jalori Pass",
+        "Serloskar Lake",
+        "Tirthan River"
+      ],
+      "description": "Gateway to the Great Himalayan National Park — pristine river valley, trout fishing, and solitude.",
+      "nearest_airport": "Bhuntar Airport (KUU)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "tirupati",
+      "name": "Tirupati & Tirumala",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 13.6288,
+      "lng": 79.4192,
+      "category": [
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 853,
+      "highlights": [
+        "Tirumala Venkateswara Temple",
+        "Sri Vari Museum",
+        "Silathoranam",
+        "Talakona Waterfall",
+        "Chandragiri Fort"
+      ],
+      "description": "Richest temple in the world — Tirumala attracts 50,000+ pilgrims daily.",
+      "nearest_airport": "Tirupati Airport (TIR)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "trichy",
+      "name": "Tiruchirappalli (Trichy)",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 88,
+      "highlights": [
+        "Rockfort Temple",
+        "Sri Ranganathaswamy Temple",
+        "Jambukeswarar Temple",
+        "Kallanai Dam",
+        "Mukkombu"
+      ],
+      "description": "Rocky fortress city — one of Tamil Nadu's most ancient temple towns on the Kaveri.",
+      "nearest_airport": "Tiruchirappalli Intl Airport (TRZ)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "udaipur",
+      "name": "Udaipur",
+      "state": "Rajasthan",
+      "region": "North",
+      "lat": 24.5854,
+      "lng": 73.7125,
+      "category": [
+        "heritage",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 598,
+      "highlights": [
+        "City Palace",
+        "Lake Pichola",
+        "Jag Mandir",
+        "Saheliyon-ki-Bari",
+        "Monsoon Palace"
+      ],
+      "description": "Venice of the East — lake palaces, Aravalli sunsets, and Rajput romance.",
+      "nearest_airport": "Maharana Pratap Airport (UDR)",
+      "languages": [
+        "Hindi",
+        "Mewari"
+      ]
+    },
+    {
+      "id": "ujjain",
+      "name": "Ujjain",
+      "state": "Madhya Pradesh",
+      "region": "Central",
+      "lat": 23.1765,
+      "lng": 75.7885,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 494,
+      "highlights": [
+        "Mahakaleshwar Jyotirlinga",
+        "Ram Ghat",
+        "Vedha Shala Observatory",
+        "Kal Bhairav Temple",
+        "Simhasth Kumbh"
+      ],
+      "description": "One of the seven Moksha-puris — home of the Mahakaleshwar Jyotirlinga and Kumbh Mela.",
+      "nearest_airport": "Devi Ahilyabai Holkar Airport, Indore (IDR)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "unakoti",
+      "name": "Unakoti",
+      "state": "Tripura",
+      "region": "Northeast",
+      "lat": 24.3167,
+      "lng": 92.0833,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 400,
+      "highlights": [
+        "Rock-cut Sculptures",
+        "Unakotiswara Kal Bhairava",
+        "Waterfall",
+        "7th-century Art",
+        "Shiva Reliefs"
+      ],
+      "description": "One less than a crore — massive 7th-century rock-carved Shiva heads hidden in forested Tripura hills.",
+      "nearest_airport": "Agartala Airport (IXA)",
+      "languages": [
+        "Bengali",
+        "Kokborok"
+      ]
+    },
+    {
+      "id": "valley_of_flowers",
+      "name": "Valley of Flowers",
+      "state": "Uttarakhand",
+      "region": "North",
+      "lat": 30.7283,
+      "lng": 79.6056,
+      "category": [
+        "nature",
+        "adventure"
+      ],
+      "best_months": [
+        7,
+        8,
+        9
+      ],
+      "altitude_m": 3658,
+      "highlights": [
+        "Alpine Flowers",
+        "Hemkund Sahib",
+        "Trek",
+        "Rare Flora",
+        "Himalayan Views"
+      ],
+      "description": "UNESCO World Heritage — a stunning Himalayan meadow bursting with 600+ species of wildflowers.",
+      "nearest_airport": "Jolly Grant Airport, Dehradun (DED)",
+      "languages": [
+        "Hindi",
+        "Garhwali"
+      ]
+    },
+    {
+      "id": "valparai",
+      "name": "Valparai",
+      "state": "Tamil Nadu",
+      "region": "South",
+      "lat": 10.3271,
+      "lng": 76.9544,
+      "category": [
+        "hill_station",
+        "nature",
+        "wildlife"
+      ],
+      "best_months": [
+        1,
+        2,
+        3,
+        9,
+        10,
+        11,
+        12
+      ],
+      "altitude_m": 1100,
+      "highlights": [
+        "Sholayar Dam",
+        "Monkey Falls",
+        "Nallamudi View Point",
+        "Tea Plantations",
+        "Lion-Tailed Macaque"
+      ],
+      "description": "Anamalai Hills tea town — 40 hairpin bends, cloud forests, lion-tailed macaques, and emerald plantations.",
+      "nearest_airport": "Coimbatore Airport (CJB)",
+      "languages": [
+        "Tamil"
+      ]
+    },
+    {
+      "id": "varanasi",
+      "name": "Varanasi (Banaras)",
+      "state": "Uttar Pradesh",
+      "region": "North",
+      "lat": 25.3176,
+      "lng": 83.0064,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 81,
+      "highlights": [
+        "Dashashwamedh Ghat Aarti",
+        "Kashi Vishwanath Temple",
+        "Sarnath",
+        "Boat Ride at Sunrise",
+        "Ramnagar Fort"
+      ],
+      "description": "Oldest living city in the world — ghats, Ganga aarti, and 3000 years of spiritual heritage.",
+      "nearest_airport": "Lal Bahadur Shastri Intl Airport (VNS)",
+      "languages": [
+        "Hindi",
+        "Bhojpuri"
+      ]
+    },
+    {
+      "id": "varanasi_sarnath",
+      "name": "Sarnath",
+      "state": "Uttar Pradesh",
+      "region": "North",
+      "lat": 25.3813,
+      "lng": 83.0229,
+      "category": [
+        "religious",
+        "heritage"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 82,
+      "highlights": [
+        "Dhamek Stupa",
+        "Ashoka Pillar",
+        "Sarnath Museum",
+        "Mulagandha Kuti Vihar",
+        "Deer Park"
+      ],
+      "description": "Where Buddha gave his first sermon — ancient stupas, museums, and the lion capital of Ashoka.",
+      "nearest_airport": "Lal Bahadur Shastri Intl Airport, Varanasi (VNS)",
+      "languages": [
+        "Hindi"
+      ]
+    },
+    {
+      "id": "varkala",
+      "name": "Varkala",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 8.7379,
+      "lng": 76.7163,
+      "category": [
+        "beach",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Varkala Cliff",
+        "Papanasam Beach",
+        "Janardhana Swami Temple",
+        "Kappil Lake",
+        "Sivagiri Mutt"
+      ],
+      "description": "Dramatic cliff-top beach overlooking the Arabian Sea — Kerala's alternative to Kovalam.",
+      "nearest_airport": "Trivandrum Intl Airport (TRV)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "veraval",
+      "name": "Veraval & Junagadh",
+      "state": "Gujarat",
+      "region": "West",
+      "lat": 21.5222,
+      "lng": 70.3627,
+      "category": [
+        "heritage",
+        "religious",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 107,
+      "highlights": [
+        "Girnar Hill",
+        "Uparkot Fort",
+        "Buddhist Caves",
+        "Mahabat Maqbara",
+        "Ashoka's Edicts"
+      ],
+      "description": "Ancient fort city with Girnar pilgrimage peak and Mughal-Gothic mausoleum.",
+      "nearest_airport": "Rajkot Airport (RAJ)",
+      "languages": [
+        "Gujarati"
+      ]
+    },
+    {
+      "id": "visakhapatnam",
+      "name": "Visakhapatnam (Vizag)",
+      "state": "Andhra Pradesh",
+      "region": "South",
+      "lat": 17.6868,
+      "lng": 83.2185,
+      "category": [
+        "beach",
+        "urban",
+        "nature"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 0,
+      "highlights": [
+        "Rushikonda Beach",
+        "Kailasagiri",
+        "Submarine Museum",
+        "Araku Valley",
+        "Yarada Beach"
+      ],
+      "description": "City of Destiny — hilltop views, submarine museum, and gateway to Araku Valley.",
+      "nearest_airport": "Visakhapatnam Airport (VTZ)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "warangal",
+      "name": "Warangal",
+      "state": "Telangana",
+      "region": "South",
+      "lat": 17.9784,
+      "lng": 79.5941,
+      "category": [
+        "heritage",
+        "religious"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 302,
+      "highlights": [
+        "Kakatiya Thoranam",
+        "Thousand Pillar Temple",
+        "Warangal Fort",
+        "Ramappa Temple",
+        "Bhadrakali Temple"
+      ],
+      "description": "Kakatiya dynasty capital — UNESCO Ramappa temple, iconic gateways, and intricate stone carvings.",
+      "nearest_airport": "Rajiv Gandhi Intl Airport, Hyderabad (HYD)",
+      "languages": [
+        "Telugu"
+      ]
+    },
+    {
+      "id": "wayanad",
+      "name": "Wayanad",
+      "state": "Kerala",
+      "region": "South",
+      "lat": 11.6854,
+      "lng": 76.132,
+      "category": [
+        "nature",
+        "wildlife",
+        "hill_station"
+      ],
+      "best_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3
+      ],
+      "altitude_m": 780,
+      "highlights": [
+        "Edakkal Caves",
+        "Banasura Dam",
+        "Chembra Peak",
+        "Wildlife Sanctuary",
+        "Soochipara Falls"
+      ],
+      "description": "Green paradise of the Western Ghats — ancient petroglyphs, spice trails, and tribal heritage.",
+      "nearest_airport": "Calicut Intl Airport (CCJ)",
+      "languages": [
+        "Malayalam"
+      ]
+    },
+    {
+      "id": "ziro",
+      "name": "Ziro Valley",
+      "state": "Arunachal Pradesh",
+      "region": "Northeast",
+      "lat": 27.5448,
+      "lng": 93.8231,
+      "category": [
+        "nature",
+        "heritage"
+      ],
+      "best_months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "altitude_m": 1572,
+      "highlights": [
+        "Apatani Tribes",
+        "Rice Fields",
+        "Ziro Music Festival",
+        "Talley Valley",
+        "Meghna Cave Temple"
+      ],
+      "description": "UNESCO tentative site — emerald rice paddies, Apatani tribal culture, and an iconic music festival.",
+      "nearest_airport": "Lilabari Airport (IXI)",
+      "languages": [
+        "Apatani",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "zuluk",
+      "name": "Zuluk (Dzuluk)",
+      "state": "Sikkim",
+      "region": "Northeast",
+      "lat": 27.2333,
+      "lng": 88.7667,
+      "category": [
+        "adventure",
+        "nature"
+      ],
+      "best_months": [
+        4,
+        5,
+        10,
+        11
+      ],
+      "altitude_m": 2865,
+      "highlights": [
+        "Zigzag Road",
+        "Thambi View Point",
+        "Old Silk Route",
+        "Lungthung",
+        "Kanchenjunga Views"
+      ],
+      "description": "32-hairpin-bend old Silk Route through East Sikkim — Kanchenjunga viewpoints and Tibetan borderland.",
+      "nearest_airport": "Bagdogra Airport (IXB)",
+      "languages": [
+        "Nepali",
+        "Bhutia"
+      ]
+    }
+  ]
+}

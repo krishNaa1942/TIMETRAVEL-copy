@@ -1,0 +1,254 @@
+<!-- ═══════════════════════════════════════════════ CHATBOT ══ -->
+<section id="chatbot" class="section-dark chat-section" data-reveal>
+  <div class="container">
+    <div class="chat-section-header">
+      <span class="chat-eyebrow"
+        ><i class="fas fa-sparkles"></i> Powered by Google Gemini AI</span
+      >
+      <h2 class="chat-section-title">
+        Your AI Travel <span class="chat-title-gradient">Companion</span>
+      </h2>
+      <p class="chat-section-desc">
+        Plan trips, get budgets, check safety, compare destinations — all
+        through natural conversation
+      </p>
+      <div class="chat-api-strip">
+        <span class="chat-api-chip"
+          ><i class="fas fa-brain"></i> Gemini 2.5 Flash</span
+        >
+        <span class="chat-api-chip"
+          ><i class="fas fa-route"></i> Trip Planning</span
+        >
+        <span class="chat-api-chip"
+          ><i class="fas fa-wallet"></i> Budget Estimates</span
+        >
+        <span class="chat-api-chip"
+          ><i class="fas fa-shield-alt"></i> Safety Intel</span
+        >
+        <span class="chat-api-chip"
+          ><i class="fas fa-cloud-sun"></i> Weather</span
+        >
+        <span class="chat-api-chip"
+          ><i class="fas fa-history"></i> Multi-turn Context</span
+        >
+      </div>
+    </div>
+
+    <div
+      class="chat-container"
+      role="region"
+      aria-label="AI Travel Chat Assistant"
+    >
+      <!-- Chat Header Bar -->
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-avatar-pulse">
+            <i class="fas fa-robot"></i>
+            <span class="chat-status-dot" id="chatStatusDot"></span>
+          </div>
+          <div class="chat-header-info">
+            <span class="chat-header-name">Travel AI</span>
+            <span class="chat-header-status" id="chatHeaderStatus"
+              >Checking status…</span
+            >
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <!-- Context indicator — shown when user is exploring a destination -->
+          <span
+            class="chat-context-badge"
+            id="chatContextBadge"
+            style="display: none"
+            title="Destination context active"
+          >
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="chatContextLabel"></span>
+            <button
+              class="chat-context-clear"
+              id="chatContextClear"
+              title="Clear context"
+            >
+              &times;
+            </button>
+          </span>
+          <span
+            class="chat-msg-counter"
+            id="chatMsgCounter"
+            title="Messages in session"
+            >0 msgs</span
+          >
+          <button
+            class="chat-action-btn"
+            id="chatClearBtn"
+            title="Clear chat"
+            aria-label="Clear chat history"
+          >
+            <i class="fas fa-broom"></i>
+          </button>
+          <button
+            class="chat-action-btn"
+            id="chatExportBtn"
+            title="Export chat"
+            aria-label="Export chat as text file"
+          >
+            <i class="fas fa-download"></i>
+          </button>
+          <button
+            class="chat-action-btn"
+            id="chatScrollBottomBtn"
+            title="Scroll to bottom"
+            style="display: none"
+            aria-label="Scroll to latest message"
+          >
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-agent-plan" id="chatAgentPlan" style="display: none">
+        <div class="chat-agent-plan-head">
+          <div class="chat-agent-plan-title">
+            <i class="fas fa-diagram-project"></i>
+            <span>Agent Plan</span>
+          </div>
+          <div class="chat-agent-plan-actions">
+            <button class="chat-plan-btn run" id="chatPlanRunBtn" type="button">
+              <i class="fas fa-play"></i>
+              <span>Run</span>
+            </button>
+            <button class="chat-plan-btn" id="chatPlanPauseBtn" type="button">
+              <i class="fas fa-pause"></i>
+              <span>Pause</span>
+            </button>
+            <button class="chat-plan-btn" id="chatPlanClearBtn" type="button">
+              <i class="fas fa-trash"></i>
+              <span>Clear</span>
+            </button>
+          </div>
+        </div>
+        <ul class="chat-agent-plan-list" id="chatAgentPlanList"></ul>
+        <p class="chat-agent-plan-hint" id="chatAgentPlanHint">
+          Reorder or skip steps before execution. Auto-run starts shortly.
+        </p>
+      </div>
+
+      <!-- Chat Messages -->
+      <div
+        class="chat-messages"
+        id="chatMessages"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat conversation"
+      >
+        <!-- Welcome message rendered by JS -->
+      </div>
+
+      <!-- Quick Actions (context-aware, categorized) -->
+      <div class="chat-quick-actions" id="chatQuickActions">
+        <button
+          class="chat-quick-chip"
+          data-msg="Plan a 5-day family trip to Goa under ₹30,000"
+          data-category="planning"
+        >
+          <i class="fas fa-umbrella-beach"></i> Goa family trip
+        </button>
+        <button
+          class="chat-quick-chip"
+          data-msg="What are the best hidden gems in Rajasthan?"
+          data-category="explore"
+        >
+          <i class="fas fa-landmark"></i> Rajasthan gems
+        </button>
+        <button
+          class="chat-quick-chip"
+          data-msg="Is Manali safe for solo female travelers?"
+          data-category="safety"
+        >
+          <i class="fas fa-shield-alt"></i> Manali safety
+        </button>
+        <button
+          class="chat-quick-chip"
+          data-msg="Compare Munnar vs Goa for a honeymoon trip"
+          data-category="compare"
+        >
+          <i class="fas fa-balance-scale"></i> Munnar vs Goa
+        </button>
+        <button
+          class="chat-quick-chip"
+          data-msg="What should I pack for Ladakh in winter?"
+          data-category="packing"
+        >
+          <i class="fas fa-suitcase"></i> Ladakh packing
+        </button>
+        <button
+          class="chat-quick-chip"
+          data-msg="Suggest a budget itinerary for Varanasi"
+          data-category="budget"
+        >
+          <i class="fas fa-wallet"></i> Varanasi budget
+        </button>
+      </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <div class="chat-input-wrap">
+          <textarea
+            id="chatInput"
+            rows="1"
+            placeholder="Ask anything about travel…"
+            autocomplete="off"
+            maxlength="500"
+            aria-label="Type your travel question"
+          ></textarea>
+          <span class="chat-char-count" id="chatCharCount">0 / 500</span>
+        </div>
+        <button
+          id="chatSend"
+          class="chat-send-btn"
+          title="Send (Enter)"
+          aria-label="Send message"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="chat-bottom-cta">
+      <p class="chat-cta-hint">
+        <i class="fas fa-lightbulb"></i>
+        Tip: Ask follow-up questions — the AI remembers your conversation
+        context
+      </p>
+      <div class="chat-cta-links">
+        <a href="#smart-hub" data-action="open-smart-hub" class="chat-cta-link">
+          <i class="fas fa-compass"></i> Explore Destinations
+        </a>
+        <a
+          href="#itinerary"
+          data-action="scroll-to"
+          data-target="itinerary"
+          class="chat-cta-link"
+        >
+          <i class="fas fa-route"></i> Plan Itinerary
+        </a>
+        <a
+          href="#budget"
+          data-action="scroll-to"
+          data-target="budget"
+          class="chat-cta-link"
+        >
+          <i class="fas fa-wallet"></i> Budget Calculator
+        </a>
+        <a
+          href="#safety"
+          data-action="scroll-to"
+          data-target="safety"
+          class="chat-cta-link"
+        >
+          <i class="fas fa-shield-alt"></i> Safety Check
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

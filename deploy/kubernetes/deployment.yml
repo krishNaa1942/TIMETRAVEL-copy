@@ -1,0 +1,316 @@
+# ──────────────────────────────────────────────────────────
+# Time Travel AI - Kubernetes Deployment
+# ──────────────────────────────────────────────────────────
+# Production-ready deployment with auto-scaling
+# ──────────────────────────────────────────────────────────
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: timetravel
+---
+# ──────────────────────────────────────────────────────────
+# ConfigMap for Application Settings
+# ──────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timetravel-config
+  namespace: timetravel
+data:
+  FLASK_ENV: "production"
+  DATABASE_HOST: "postgres-service"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "timetravel"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+---
+# ──────────────────────────────────────────────────────────
+# Secret for Sensitive Data
+# ──────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Secret
+metadata:
+  name: timetravel-secrets
+  namespace: timetravel
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://user:password@postgres-service:5432/timetravel"
+  REDIS_URL: "redis://redis-service:6379/0"
+  SECRET_KEY: "CHANGE_ME_IN_PRODUCTION"
+  JWT_SECRET_KEY: "CHANGE_ME_IN_PRODUCTION"
+---
+# ──────────────────────────────────────────────────────────
+# API Deployment
+# ──────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timetravel-api
+  namespace: timetravel
+  labels:
+    app: timetravel
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: timetravel
+      component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: timetravel
+        component: api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/your-org/timetravel-api:latest
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - configMapRef:
+                name: timetravel-config
+            - secretRef:
+                name: timetravel-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - timetravel
+                topologyKey: kubernetes.io/hostname
+---
+# ──────────────────────────────────────────────────────────
+# Horizontal Pod Autoscaler
+# ──────────────────────────────────────────────────────────
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: timetravel-api-hpa
+  namespace: timetravel
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: timetravel-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+# ──────────────────────────────────────────────────────────
+# API Service
+# ──────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: timetravel-api-service
+  namespace: timetravel
+spec:
+  selector:
+    app: timetravel
+    component: api
+  ports:
+    - port: 80
+      targetPort: 5001
+  type: ClusterIP
+---
+# ──────────────────────────────────────────────────────────
+# Ingress (with SSL)
+# ──────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: timetravel-ingress
+  namespace: timetravel
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - api.timetravel.app
+      secretName: timetravel-tls
+  rules:
+    - host: api.timetravel.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: timetravel-api-service
+                port:
+                  number: 80
+---
+# ──────────────────────────────────────────────────────────
+# PostgreSQL StatefulSet
+# ──────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: timetravel
+spec:
+  serviceName: postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timetravel
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: timetravel
+        component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: timetravel
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: timetravel-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: timetravel-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: timetravel
+spec:
+  selector:
+    app: timetravel
+    component: postgres
+  ports:
+    - port: 5432
+  clusterIP: None
+---
+# ──────────────────────────────────────────────────────────
+# Redis Deployment
+# ──────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: timetravel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timetravel
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: timetravel
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: redis-storage
+          emptyDir: {}
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: timetravel
+spec:
+  selector:
+    app: timetravel
+    component: redis
+  ports:
+    - port: 6379

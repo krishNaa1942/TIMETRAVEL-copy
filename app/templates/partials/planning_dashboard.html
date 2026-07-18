@@ -1,0 +1,118 @@
+<!-- ═══════════════════════════════════ PLANNING DASHBOARD ═══ -->
+<section id="planningDashboard" class="planning-dashboard" data-reveal>
+	<div class="planning-shell">
+		<aside class="planning-sidebar" aria-label="Planning navigation">
+			<div class="planning-brand">
+				<h2>Planning Dashboard</h2>
+				<p>A structured workspace for one destination at a time.</p>
+			</div>
+
+			<nav class="planning-nav">
+				<a href="#planningDashboard" class="planning-nav-link is-active">
+					<i class="fas fa-house"></i> Overview
+				</a>
+				<a href="#itinerary" class="planning-nav-link" data-module="itinerary">
+					<i class="fas fa-route"></i> Itinerary
+					<span class="planning-nav-status" data-module-status="itinerary">Not started | --</span>
+				</a>
+				<a href="#budget" class="planning-nav-link" data-module="budget">
+					<i class="fas fa-wallet"></i> Budget
+					<span class="planning-nav-status" data-module-status="budget">Not started | --</span>
+				</a>
+				<a href="#safety" class="planning-nav-link" data-module="safety">
+					<i class="fas fa-shield-alt"></i> Safety
+					<span class="planning-nav-status" data-module-status="safety">Not started | --</span>
+				</a>
+				<a href="#weather" class="planning-nav-link" data-module="weather">
+					<i class="fas fa-cloud-sun"></i> Weather
+					<span class="planning-nav-status" data-module-status="weather">Not started | --</span>
+				</a>
+				<a href="#maps" class="planning-nav-link" data-module="maps">
+					<i class="fas fa-map-marked-alt"></i> Places & Maps
+					<span class="planning-nav-status" data-module-status="maps">Not started | --</span>
+				</a>
+				<a href="#packingChecklist" class="planning-nav-link" data-module="packing">
+					<i class="fas fa-suitcase"></i> Packing
+					<span class="planning-nav-status" data-module-status="packing">Not started | --</span>
+				</a>
+				<a href="#expenses" class="planning-nav-link" data-module="expenses">
+					<i class="fas fa-receipt"></i> Expenses
+					<span class="planning-nav-status" data-module-status="expenses">Not started | --</span>
+				</a>
+				<a href="#journal" class="planning-nav-link" data-module="journal">
+					<i class="fas fa-book-open"></i> Journal
+					<span class="planning-nav-status" data-module-status="journal">Not started | --</span>
+				</a>
+			</nav>
+		</aside>
+
+		<div class="planning-main">
+			<header class="planning-topbar">
+				<div>
+					<h3>Build your trip plan with confidence</h3>
+					<p>Complete modules step by step and track progress in real time.</p>
+				</div>
+				<div class="planning-topbar-actions">
+					<input
+						id="plannerDestinationInput"
+						class="planning-destination-input"
+						type="text"
+						placeholder="Destination context"
+						aria-label="Selected destination"
+					/>
+					<button id="plannerStartBtn" class="planning-start-btn" type="button">
+						Start with Itinerary
+					</button>
+				</div>
+			</header>
+
+			<section class="planning-cards" aria-label="Planning modules overview">
+				<article class="planning-card planning-card--wide">
+					<h4>Overview</h4>
+					<p>
+						Keep exploration and execution separate. Use this dashboard for itinerary, budget,
+						weather, safety, map planning, packing, expenses, and journal tracking.
+					</p>
+					<div class="planning-progress" aria-label="Planning completion">
+						<div class="planning-progress-head">
+							<span>Progress</span>
+							<strong id="plannerProgressText">0 / 8 completed</strong>
+						</div>
+						<div class="planning-progress-track">
+							<div class="planning-progress-fill" id="plannerProgressFill" style="width: 0%"></div>
+						</div>
+					</div>
+				</article>
+
+				<article class="planning-card">
+					<h4>Trip Foundation</h4>
+					<p>Set the plan baseline with itinerary, budget, and safety.</p>
+					<div class="planning-chip-row">
+						<a href="#itinerary">Itinerary</a><span class="planning-chip-status" data-module-status="itinerary">Not started | --</span>
+						<a href="#budget">Budget</a><span class="planning-chip-status" data-module-status="budget">Not started | --</span>
+						<a href="#safety">Safety</a><span class="planning-chip-status" data-module-status="safety">Not started | --</span>
+					</div>
+				</article>
+
+				<article class="planning-card">
+					<h4>Live Context</h4>
+					<p>Refine route and timing with weather and maps data.</p>
+					<div class="planning-chip-row">
+						<a href="#weather">Weather</a><span class="planning-chip-status" data-module-status="weather">Not started | --</span>
+						<a href="#maps">Places & Maps</a><span class="planning-chip-status" data-module-status="maps">Not started | --</span>
+					</div>
+				</article>
+
+				<article class="planning-card">
+					<h4>Execution</h4>
+					<p>Close planning loops with packing, expenses, and journal notes.</p>
+					<div class="planning-chip-row">
+						<a href="#packingChecklist">Packing</a><span class="planning-chip-status" data-module-status="packing">Not started | --</span>
+						<a href="#expenses">Expenses</a><span class="planning-chip-status" data-module-status="expenses">Not started | --</span>
+						<a href="#journal">Journal</a><span class="planning-chip-status" data-module-status="journal">Not started | --</span>
+					</div>
+				</article>
+			</section>
+		</div>
+	</div>
+</section>

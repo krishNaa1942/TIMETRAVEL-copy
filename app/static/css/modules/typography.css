@@ -1,0 +1,379 @@
+/* =======================================================
+ * Typography Enhancement Module
+ * Elegant fonts, accents, hierarchy, and readability
+ * ======================================================= */
+
+/* ──────────────────────────────────────────────────────
+   SERIF ACCENTS – Elegant display text
+ ────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────
+   SERIF ACCENTS – Elegant display text
+ ────────────────────────────────────────────────────────── */
+.serif,
+.text-serif {
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.serif-display {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.light-mode .serif-display {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ──────────────────────────────────────────────────────
+   FONT FAMILIES – Contextual usage
+ ────────────────────────────────────────────────────── */
+.font-sans {
+  font-family: var(--font);
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+}
+
+.font-accent {
+  font-family: var(--font-accent);
+  font-weight: var(--fw-semibold);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+body.light-mode .font-mono {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ──────────────────────────────────────────────────────
+   FONT WEIGHTS – Creative emphasis
+ ────────────────────────────────────────────────────── */
+.fw-light {
+  font-weight: var(--fw-light);
+  opacity: 0.85;
+}
+
+.fw-normal {
+  font-weight: var(--fw-normal);
+}
+
+.fw-medium {
+  font-weight: var(--fw-medium);
+}
+
+.fw-semibold {
+  font-weight: var(--fw-semibold);
+}
+
+.fw-bold {
+  font-weight: var(--fw-bold);
+}
+
+.fw-extra-bold {
+  font-weight: var(--fw-extra-bold);
+  letter-spacing: -0.02em;
+}
+
+.fw-black {
+  font-weight: var(--fw-black);
+  letter-spacing: -0.03em;
+}
+
+/* ──────────────────────────────────────────────────────
+   TEXT SIZING – Semantic, responsive
+ ────────────────────────────────────────────────────── */
+.text-xs {
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+}
+
+.text-sm {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  letter-spacing: 0.25px;
+}
+
+.text-base {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: 0.3px;
+}
+
+.text-lg {
+  font-size: var(--fs-lg);
+  line-height: 1.6;
+  letter-spacing: 0.25px;
+}
+
+.text-xl {
+  font-size: var(--fs-xl);
+  line-height: var(--lh-tight);
+  letter-spacing: 0.2px;
+  font-weight: var(--fw-semibold);
+}
+
+.text-2xl {
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-tight);
+  letter-spacing: 0;
+  font-weight: var(--fw-bold);
+}
+
+/* ──────────────────────────────────────────────────────
+   TEXT COLORS – Semantic palette
+ ────────────────────────────────────────────────────── */
+.text-primary {
+  color: var(--primary);
+  font-weight: var(--fw-semibold);
+}
+
+.text-accent {
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+}
+
+.text-subtle {
+  color: var(--text-muted-contrast);
+  opacity: 0.8;
+}
+
+.text-muted {
+  color: var(--text-muted-contrast);
+  opacity: 0.7;
+}
+
+.text-contrast {
+  color: var(--text-heading-contrast);
+  font-weight: var(--fw-bold);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: var(--fw-bold);
+}
+
+/* ──────────────────────────────────────────────────────
+   TEXT STYLING – Decorative & emphasis
+ ────────────────────────────────────────────────────── */
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: var(--fw-semibold);
+}
+
+.text-italic {
+  font-style: italic;
+  font-family: var(--font-elegant);
+}
+
+.text-underline {
+  text-decoration: underline;
+  text-decoration-color: var(--primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.text-strikethrough {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ──────────────────────────────────────────────────────
+   LINES & SPACING – Better readability
+ ────────────────────────────────────────────────────── */
+.lh-tight {
+  line-height: var(--lh-tight);
+}
+
+.lh-normal {
+  line-height: var(--lh-body);
+}
+
+.lh-relaxed {
+  line-height: var(--lh-relaxed);
+}
+
+/* Letter spacing utilities */
+.ls-tight {
+  letter-spacing: -0.03em;
+}
+
+.ls-normal {
+  letter-spacing: normal;
+}
+
+.ls-wide {
+  letter-spacing: 0.05em;
+}
+
+.ls-widest {
+  letter-spacing: 0.1em;
+}
+
+/* ──────────────────────────────────────────────────────
+   ELEGANT ACCENTS – Highlight & decoration
+ ────────────────────────────────────────────────────── */
+.accent-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.accent-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+}
+
+.accent-highlight {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    120deg,
+    rgba(77, 168, 218, 0.2),
+    rgba(255, 126, 95, 0.2)
+  );
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: var(--fw-semibold);
+}
+
+body.light-mode .accent-highlight {
+  background: linear-gradient(
+    120deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(124, 58, 237, 0.15)
+  );
+}
+
+/* Soft highlight (background only) */
+.accent-soft {
+  background: var(--domain-accent-soft);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: var(--fw-medium);
+}
+
+/* Bold accent text */
+.accent-bold {
+  color: var(--primary);
+  font-weight: var(--fw-bold);
+  text-shadow: 0 0 12px rgba(77, 168, 218, 0.2);
+}
+
+body.light-mode .accent-bold {
+  color: var(--primary);
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.1);
+}
+
+/* ──────────────────────────────────────────────────────
+   TRUNCATION & OVERFLOW
+ ────────────────────────────────────────────────────── */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ──────────────────────────────────────────────────────
+   KERNING & POLISH
+ ────────────────────────────────────────────────────── */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Small caps for elegant typography */
+.small-caps {
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+}
+
+/* ──────────────────────────────────────────────────────
+   LINK STYLING – Contextual with underlines
+ ────────────────────────────────────────────────────── */
+a {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+a:not(.btn):not(.nav-link):not(.logo) {
+  color: var(--primary);
+  font-weight: var(--fw-medium);
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--primary), var(--accent)) 0 0 1 0;
+  border-image-slice: 1;
+}
+
+a:not(.btn):not(.nav-link):not(.logo):hover {
+  border-bottom-color: var(--primary);
+  opacity: 0.8;
+}
+
+body.light-mode a:not(.btn):not(.nav-link):not(.logo) {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .serif-display {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+  }
+
+  .text-2xl {
+    font-size: var(--fs-xl);
+  }
+
+  .section-title {
+    font-size: var(--fs-section-title);
+  }
+}

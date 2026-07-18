@@ -1,0 +1,273 @@
+<!-- ═══════════════════════ SMART DESTINATION HUB ═════════ -->
+<div
+  class="smart-hub-overlay"
+  id="smartHubOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Smart Destination Hub"
+>
+  <div class="smart-hub" id="smartHub">
+    <!-- Header with search -->
+    <div class="smart-hub-header">
+      <div class="smart-hub-search-wrap">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          id="smartHubInput"
+          class="smart-hub-input"
+          placeholder="Search any destination…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="smart-hub-ac" id="smartHubAc"></div>
+      </div>
+      <button
+        class="smart-hub-go"
+        id="smartHubGo"
+        aria-label="Explore destination"
+      >
+        <i class="fas fa-compass"></i> Explore
+      </button>
+      <button class="smart-hub-close" id="smartHubClose" aria-label="Close hub">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="smart-hub-body" id="smartHubBody">
+      <!-- Pre-search intro -->
+      <div class="smart-hub-intro" id="smartHubIntro">
+        <div class="smart-hub-intro-icon">🌍</div>
+        <h3>Smart Destination Hub</h3>
+        <p>
+          Type any destination — get weather, safety, budget, top places, news
+          &amp; AI insights in seconds.
+        </p>
+        <div class="smart-hub-recent" id="smartHubRecent" style="display: none">
+          <span class="shub-section-label">Recent</span>
+          <div class="smart-hub-chips" id="smartHubRecentChips"></div>
+        </div>
+        <div class="smart-hub-popular-section">
+          <span class="shub-section-label">Trending</span>
+          <div class="smart-hub-chips">
+            <button class="smart-hub-chip" data-dest="Goa">
+              <span class="chip-emoji">🏖️</span>Goa
+            </button>
+            <button class="smart-hub-chip" data-dest="Jaipur">
+              <span class="chip-emoji">🏰</span>Jaipur
+            </button>
+            <button class="smart-hub-chip" data-dest="Manali">
+              <span class="chip-emoji">🏔️</span>Manali
+            </button>
+            <button class="smart-hub-chip" data-dest="Munnar">
+              <span class="chip-emoji">🌿</span>Munnar
+            </button>
+            <button class="smart-hub-chip" data-dest="Varanasi">
+              <span class="chip-emoji">🕉️</span>Varanasi
+            </button>
+            <button class="smart-hub-chip" data-dest="Udaipur">
+              <span class="chip-emoji">🏛️</span>Udaipur
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div class="smart-hub-loading" id="smartHubLoading" style="display: none">
+        <div class="smart-hub-loader">
+          <div class="smart-hub-loader-ring"></div>
+          <p>Analyzing <strong id="smartHubLoadDest"></strong></p>
+        </div>
+        <div class="smart-hub-load-steps" id="smartHubLoadSteps">
+          <div class="load-step" data-step="weather">
+            <i class="fas fa-cloud-sun"></i> Weather
+          </div>
+          <div class="load-step" data-step="safety">
+            <i class="fas fa-shield-alt"></i> Safety
+          </div>
+          <div class="load-step" data-step="budget">
+            <i class="fas fa-wallet"></i> Budget
+          </div>
+          <div class="load-step" data-step="places">
+            <i class="fas fa-map-pin"></i> Places
+          </div>
+          <div class="load-step" data-step="news">
+            <i class="fas fa-newspaper"></i> News
+          </div>
+          <div class="load-step" data-step="ai">
+            <i class="fas fa-brain"></i> AI
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="smart-hub-results" id="smartHubResults" style="display: none">
+        <!-- Photo banner -->
+        <div class="shub-photo-banner" id="shubPhotoBanner">
+          <img id="shubBannerImg" src="" alt="" class="shub-banner-img" />
+          <div class="shub-banner-overlay"></div>
+          <div class="shub-banner-content">
+            <h2 id="shubBannerDest">—</h2>
+            <p id="shubBannerSub"></p>
+          </div>
+          <div class="shub-banner-meta" id="shubBannerMeta"></div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="shub-ai-summary" id="shubAiSummary" style="display: none">
+          <div class="shub-ai-icon"><i class="fas fa-sparkles"></i></div>
+          <div class="shub-ai-text" id="shubAiText"></div>
+        </div>
+
+        <div class="smart-hub-grid">
+          <!-- Weather -->
+          <div
+            class="shub-card shub-weather"
+            id="shubWeather"
+            data-card-idx="0"
+          >
+            <div class="shub-card-header">
+              <i class="fas fa-cloud-sun"></i>
+              <h4>Weather</h4>
+              <a
+                href="#weather"
+                class="shub-card-link"
+                data-action="close-smart-hub"
+                >Details →</a
+              >
+            </div>
+            <div class="shub-card-body" id="shubWeatherBody">
+              <div class="shub-skeleton">
+                <div class="sk-line sk-60"></div>
+                <div class="sk-line sk-80"></div>
+                <div class="sk-line sk-40"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Safety -->
+          <div class="shub-card shub-safety" id="shubSafety" data-card-idx="1">
+            <div class="shub-card-header">
+              <i class="fas fa-shield-alt"></i>
+              <h4>Safety</h4>
+              <a
+                href="#safety"
+                class="shub-card-link"
+                data-action="close-smart-hub"
+                >Details →</a
+              >
+            </div>
+            <div class="shub-card-body" id="shubSafetyBody">
+              <div class="shub-skeleton">
+                <div class="sk-line sk-50"></div>
+                <div class="sk-line sk-90"></div>
+                <div class="sk-line sk-60"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Budget -->
+          <div class="shub-card shub-budget" id="shubBudget" data-card-idx="2">
+            <div class="shub-card-header">
+              <i class="fas fa-wallet"></i>
+              <h4>Budget</h4>
+              <a
+                href="#budget"
+                class="shub-card-link"
+                data-action="close-smart-hub"
+                >Details →</a
+              >
+            </div>
+            <div class="shub-card-body" id="shubBudgetBody">
+              <div class="shub-skeleton">
+                <div class="sk-line sk-70"></div>
+                <div class="sk-line sk-50"></div>
+                <div class="sk-line sk-80"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Places -->
+          <div class="shub-card shub-places" id="shubPlaces" data-card-idx="3">
+            <div class="shub-card-header">
+              <i class="fas fa-map-pin"></i>
+              <h4>Top Places</h4>
+              <a
+                href="#places"
+                class="shub-card-link"
+                data-action="close-smart-hub"
+                >Details →</a
+              >
+            </div>
+            <div class="shub-card-body" id="shubPlacesBody">
+              <div class="shub-skeleton">
+                <div class="sk-line sk-80"></div>
+                <div class="sk-line sk-60"></div>
+                <div class="sk-line sk-70"></div>
+              </div>
+            </div>
+          </div>
+          <!-- News -->
+          <div class="shub-card shub-news" id="shubNews" data-card-idx="4">
+            <div class="shub-card-header">
+              <i class="fas fa-newspaper"></i>
+              <h4>News</h4>
+              <a
+                href="#news"
+                class="shub-card-link"
+                data-action="close-smart-hub"
+                >Details →</a
+              >
+            </div>
+            <div class="shub-card-body" id="shubNewsBody">
+              <div class="shub-skeleton">
+                <div class="sk-line sk-90"></div>
+                <div class="sk-line sk-60"></div>
+                <div class="sk-line sk-75"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Quick Actions -->
+          <div class="shub-card shub-actions" data-card-idx="5">
+            <div class="shub-card-header">
+              <i class="fas fa-bolt"></i>
+              <h4>Quick Actions</h4>
+            </div>
+            <div class="shub-card-body shub-actions-grid">
+              <button
+                class="shub-action-btn"
+                data-section="chatbot"
+                data-input="chatInput"
+              >
+                <i class="fas fa-robot"></i> Ask AI
+              </button>
+              <button
+                class="shub-action-btn"
+                data-section="itinerary"
+                data-input="itinDest"
+              >
+                <i class="fas fa-route"></i> Itinerary
+              </button>
+              <button
+                class="shub-action-btn"
+                data-section="compare"
+                data-input="cmpDest1"
+              >
+                <i class="fas fa-columns"></i> Compare
+              </button>
+              <button
+                class="shub-action-btn"
+                data-section="maps"
+                data-input="mapDest"
+              >
+                <i class="fas fa-map-marked-alt"></i> Map
+              </button>
+              <button class="shub-action-btn" data-section="tripDashboard">
+                <i class="fas fa-suitcase-rolling"></i> Trip
+              </button>
+              <button class="shub-action-btn" data-section="currency">
+                <i class="fas fa-exchange-alt"></i> Currency
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

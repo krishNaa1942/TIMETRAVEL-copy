@@ -1,0 +1,1416 @@
+{
+  "agartala": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "agra": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "ahmedabad": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "aizawl": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "ajanta_ellora": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "alleppey": {
+    "accommodation": 2200.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 450.0
+  },
+  "almora": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "amritsar": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "anandpur_sahib": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "andaman": {
+    "accommodation": 2500.0,
+    "activities": 1200.0,
+    "food": 700.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "araku_valley": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "auli": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "aurangabad": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "auroville": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "badami": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "bandhavgarh": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 600.0
+  },
+  "bangalore": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "barnawapara": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "bhimbetka": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "bhitarkanika": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "bhopal": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "bhubaneswar": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "bhuj": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "bikaner": {
+    "accommodation": 1500.0,
+    "activities": 800.0,
+    "food": 450.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "binsar": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "bishnupur": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "bodh_gaya": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "bundi": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "chamba": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "champhai": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "chandīgarh": {
+    "accommodation": 2000.0,
+    "activities": 600.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 400.0
+  },
+  "chennai": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "cherrapunji": {
+    "accommodation": 1600.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "chettinad": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "chikmagalur": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "chitkul": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "chittorgarh": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "chopta": {
+    "accommodation": 2000.0,
+    "activities": 1200.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "coimbatore": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "coimbatore_nilgiris": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "coonoor": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "coorg": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 400.0
+  },
+  "coorg_coffee": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "daman": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "darjeeling": {
+    "accommodation": 1400.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 500.0
+  },
+  "dawki": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "dehradun": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "delhi": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "deoghar": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "dhanaulti": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "dhanushkodi": {
+    "accommodation": 2000.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "dharamshala": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "dimapur": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "diu": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "dwarka": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "dzukou": {
+    "accommodation": 2000.0,
+    "activities": 1200.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "gandhinagar": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "gandikota": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "gangtok": {
+    "accommodation": 1600.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "gir": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "goa": {
+    "accommodation": 2000.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "gokarna": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "gulmarg": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "gurez_valley": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "guwahati": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "halebidu": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "hampi": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "hampi_anegundi": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "hampta_pass": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "haridwar": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "hogenakkal": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "hyderabad": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "imphal": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "itanagar": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "jagdalpur": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "jaipur": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "jaisalmer": {
+    "accommodation": 1500.0,
+    "activities": 800.0,
+    "food": 450.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "jammu": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "jawai": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "jim_corbett": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 600.0
+  },
+  "jodhpur": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "jog_falls": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "kalpa": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "kanchipuram": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "kangra": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "kanha": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "kanyakumari": {
+    "accommodation": 1000.0,
+    "activities": 250.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "kasol": {
+    "accommodation": 1500.0,
+    "activities": 700.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "kavaratti": {
+    "accommodation": 3000.0,
+    "activities": 1500.0,
+    "food": 750.0,
+    "miscellaneous": 450.0,
+    "transport": 900.0
+  },
+  "kaziranga": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 600.0
+  },
+  "kerala": {
+    "accommodation": 2200.0,
+    "activities": 900.0,
+    "food": 650.0,
+    "miscellaneous": 350.0,
+    "transport": 550.0
+  },
+  "khajuraho": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "kochi": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 550.0,
+    "miscellaneous": 280.0,
+    "transport": 400.0
+  },
+  "kodaikanal": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "kohima": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "kolkata": {
+    "accommodation": 2000.0,
+    "activities": 600.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 400.0
+  },
+  "konark": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "kovalam": {
+    "accommodation": 1600.0,
+    "activities": 600.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "kufri": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "kullu": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "kumarakom": {
+    "accommodation": 2200.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 450.0
+  },
+  "kumbakonam": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "kurukshetra": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "lachung": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "lakshadweep": {
+    "accommodation": 3000.0,
+    "activities": 1500.0,
+    "food": 750.0,
+    "miscellaneous": 450.0,
+    "transport": 900.0
+  },
+  "lansdowne": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "leh_ladakh": {
+    "accommodation": 2800.0,
+    "activities": 1500.0,
+    "food": 700.0,
+    "miscellaneous": 500.0,
+    "transport": 1000.0
+  },
+  "lepakshi": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "loktak": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "lonavala": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "lucknow": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "madurai": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "mahabalipuram": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "maheshwar": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "majuli": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "manali": {
+    "accommodation": 1800.0,
+    "activities": 700.0,
+    "food": 550.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "mandu": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "mandvi": {
+    "accommodation": 2000.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "mangalore": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "mathura_vrindavan": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "mawlynnong": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "mawphlang": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "mechuka": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "meghalaya_nongriat": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "mehrauli": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "minicoy": {
+    "accommodation": 3000.0,
+    "activities": 1500.0,
+    "food": 800.0,
+    "miscellaneous": 500.0,
+    "transport": 1000.0
+  },
+  "mount_abu": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "mukteshwar": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "mumbai": {
+    "accommodation": 3000.0,
+    "activities": 1000.0,
+    "food": 800.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "munnar": {
+    "accommodation": 1600.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "munsiyari": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "murudeshwar": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "mussoorie": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 550.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "mysore": {
+    "accommodation": 1400.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "nagarjunasagar": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "nainital": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "nashik": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "netarhat": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "nubra_turtuk": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "nubra_valley": {
+    "accommodation": 2800.0,
+    "activities": 1500.0,
+    "food": 700.0,
+    "miscellaneous": 500.0,
+    "transport": 1000.0
+  },
+  "old_goa": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "ooty": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 450.0
+  },
+  "orchha": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "pachmarhi": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "pahalgam": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "panchkula": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "patna": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "pelling": {
+    "accommodation": 1600.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "periyar": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "pondicherry": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 550.0,
+    "miscellaneous": 300.0,
+    "transport": 400.0
+  },
+  "port_blair": {
+    "accommodation": 2500.0,
+    "activities": 1200.0,
+    "food": 700.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "pune": {
+    "accommodation": 2000.0,
+    "activities": 600.0,
+    "food": 600.0,
+    "miscellaneous": 300.0,
+    "transport": 400.0
+  },
+  "puri": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "pushkar": {
+    "accommodation": 1000.0,
+    "activities": 250.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "raipur": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "rajgir": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "rameswaram": {
+    "accommodation": 1000.0,
+    "activities": 250.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "ranchi": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "ranikhet": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 600.0
+  },
+  "rann_of_kutch": {
+    "accommodation": 1500.0,
+    "activities": 800.0,
+    "food": 450.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "ranthambore": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 600.0
+  },
+  "ratnagiri": {
+    "accommodation": 2000.0,
+    "activities": 800.0,
+    "food": 600.0,
+    "miscellaneous": 350.0,
+    "transport": 500.0
+  },
+  "rishikesh": {
+    "accommodation": 1200.0,
+    "activities": 800.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "sambalpur": {
+    "accommodation": 1500.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "sanchi": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "sandakphu": {
+    "accommodation": 2000.0,
+    "activities": 1200.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "sasan_gir": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "sasaram": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "shantiniketan": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "shekhawati": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "shillong": {
+    "accommodation": 1600.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "shimla": {
+    "accommodation": 1600.0,
+    "activities": 400.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 500.0
+  },
+  "shirdi": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "silvassa": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "spiti_valley": {
+    "accommodation": 2800.0,
+    "activities": 1500.0,
+    "food": 700.0,
+    "miscellaneous": 500.0,
+    "transport": 1000.0
+  },
+  "srinagar": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "srisailam": {
+    "accommodation": 1000.0,
+    "activities": 250.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "sukhna_rock_garden": {
+    "accommodation": 2500.0,
+    "activities": 800.0,
+    "food": 700.0,
+    "miscellaneous": 400.0,
+    "transport": 500.0
+  },
+  "sultanpur_bird": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "sunderban": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "tawang": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "thanjavur": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "thekkady": {
+    "accommodation": 1800.0,
+    "activities": 1000.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 500.0
+  },
+  "thiruvananthapuram": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "tirthan_great_himalayan": {
+    "accommodation": 2500.0,
+    "activities": 1500.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 600.0
+  },
+  "tirthan_valley": {
+    "accommodation": 1500.0,
+    "activities": 700.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 600.0
+  },
+  "tirupati": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "trichy": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "udaipur": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 550.0,
+    "miscellaneous": 300.0,
+    "transport": 450.0
+  },
+  "ujjain": {
+    "accommodation": 1000.0,
+    "activities": 250.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "unakoti": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "valley_of_flowers": {
+    "accommodation": 2000.0,
+    "activities": 1000.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  },
+  "valparai": {
+    "accommodation": 1800.0,
+    "activities": 500.0,
+    "food": 500.0,
+    "miscellaneous": 300.0,
+    "transport": 700.0
+  },
+  "varanasi": {
+    "accommodation": 1000.0,
+    "activities": 350.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 300.0
+  },
+  "varanasi_sarnath": {
+    "accommodation": 1200.0,
+    "activities": 300.0,
+    "food": 400.0,
+    "miscellaneous": 200.0,
+    "transport": 350.0
+  },
+  "varkala": {
+    "accommodation": 1600.0,
+    "activities": 600.0,
+    "food": 500.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "veraval": {
+    "accommodation": 1000.0,
+    "activities": 300.0,
+    "food": 350.0,
+    "miscellaneous": 180.0,
+    "transport": 300.0
+  },
+  "visakhapatnam": {
+    "accommodation": 1500.0,
+    "activities": 400.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 350.0
+  },
+  "warangal": {
+    "accommodation": 1200.0,
+    "activities": 500.0,
+    "food": 450.0,
+    "miscellaneous": 250.0,
+    "transport": 400.0
+  },
+  "wayanad": {
+    "accommodation": 1800.0,
+    "activities": 600.0,
+    "food": 550.0,
+    "miscellaneous": 280.0,
+    "transport": 400.0
+  },
+  "ziro": {
+    "accommodation": 1200.0,
+    "activities": 400.0,
+    "food": 400.0,
+    "miscellaneous": 250.0,
+    "transport": 700.0
+  },
+  "zuluk": {
+    "accommodation": 2000.0,
+    "activities": 1200.0,
+    "food": 600.0,
+    "miscellaneous": 400.0,
+    "transport": 800.0
+  }
+}

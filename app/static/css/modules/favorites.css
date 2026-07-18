@@ -1,0 +1,166 @@
+/* =======================================================
+ * Time Travel – Favorites / wishlist – bookmark heart, wishlist section
+ * ======================================================= */
+
+/* ═══════════════════════════════════════════════════════════
+   Favorites / Wishlist
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Bookmark heart on gallery dest-cards ── */
+.dest-fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s;
+  backdrop-filter: blur(4px);
+}
+.dest-fav-btn:hover {
+  background: rgba(236, 72, 153, 0.7);
+  transform: scale(1.15);
+}
+.dest-fav-btn.active {
+  color: #ec4899;
+  background: rgba(255, 255, 255, 0.9);
+}
+.dest-fav-btn.active:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* ── Wishlist section ── */
+.wishlist-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.wl-filter {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wl-filter:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.wl-filter.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.wl-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  position: relative;
+}
+.wl-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+.wl-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.wl-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.wl-card-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.wl-card-type.destination {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+.wl-card-type.place {
+  background: rgba(236, 72, 153, 0.12);
+  color: var(--accent);
+}
+.wl-card-notes {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.wl-card-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.wl-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.wl-card-actions button {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.wl-card-actions button:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.wl-card-actions .wl-remove-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

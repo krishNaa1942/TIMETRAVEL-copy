@@ -1,0 +1,115 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hi",
+        "hi there",
+        "hello",
+        "hey",
+        "hey there",
+        "good morning",
+        "good evening",
+        "what's up",
+        "namaste",
+        "howdy",
+        "hola"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["bye", "goodbye", "see you", "take care", "cya", "later"]
+    },
+    {
+      "tag": "budget",
+      "patterns": [
+        "how much will it cost",
+        "budget for trip",
+        "estimate trip cost",
+        "trip budget",
+        "how expensive is",
+        "cost of travel to",
+        "cheap trip to",
+        "affordable trip",
+        "family trip cost",
+        "what is the budget for",
+        "how much money do I need"
+      ]
+    },
+    {
+      "tag": "safety",
+      "patterns": [
+        "is it safe to travel",
+        "safety of",
+        "how safe is",
+        "travel advisory",
+        "crime rate in",
+        "is it dangerous",
+        "safety score",
+        "safe for families",
+        "safe destination"
+      ]
+    },
+    {
+      "tag": "weather",
+      "patterns": [
+        "what is the weather",
+        "weather in",
+        "temperature in",
+        "is it raining",
+        "will it snow",
+        "climate of",
+        "how hot is",
+        "how cold is",
+        "weather forecast"
+      ]
+    },
+    {
+      "tag": "packing",
+      "patterns": [
+        "what should I pack",
+        "packing list",
+        "what to wear",
+        "clothing suggestions",
+        "do I need a jacket",
+        "what clothes to carry",
+        "packing tips"
+      ]
+    },
+    {
+      "tag": "destination_info",
+      "patterns": [
+        "tell me about",
+        "info about",
+        "what to do in",
+        "tourist attractions in",
+        "places to visit in",
+        "best time to visit",
+        "things to see in"
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "thanks",
+        "thank you",
+        "that's helpful",
+        "appreciate it",
+        "thanks a lot",
+        "thank you so much"
+      ]
+    },
+    {
+      "tag": "help",
+      "patterns": [
+        "help",
+        "what can you do",
+        "how do I use this",
+        "features",
+        "options",
+        "capabilities",
+        "menu"
+      ]
+    }
+  ]
+}

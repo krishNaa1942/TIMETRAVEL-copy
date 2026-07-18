@@ -1,0 +1,1214 @@
+{
+  "agartala": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "agra": {
+    "crime_score": 6.0,
+    "health_score": 6.0,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.5
+  },
+  "ahmedabad": {
+    "crime_score": 6.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.0,
+    "tourist_friendliness": 7.0
+  },
+  "aizawl": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "ajanta_ellora": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "alleppey": {
+    "crime_score": 8.5,
+    "health_score": 7.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 9.0
+  },
+  "almora": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "amritsar": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 9.0
+  },
+  "anandpur_sahib": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "andaman": {
+    "crime_score": 9.0,
+    "health_score": 6.5,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "araku_valley": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "auli": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "aurangabad": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "auroville": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "badami": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "bandhavgarh": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "bangalore": {
+    "crime_score": 6.5,
+    "health_score": 8.0,
+    "infrastructure_score": 8.5,
+    "tourist_friendliness": 7.5
+  },
+  "barnawapara": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "bhimbetka": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "bhitarkanika": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "bhopal": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "bhubaneswar": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "bhuj": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "bikaner": {
+    "crime_score": 8.0,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 9.0
+  },
+  "binsar": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "bishnupur": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "bodh_gaya": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "bundi": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "chamba": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "champhai": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "chandīgarh": {
+    "crime_score": 6.5,
+    "health_score": 8.0,
+    "infrastructure_score": 8.5,
+    "tourist_friendliness": 7.5
+  },
+  "chennai": {
+    "crime_score": 6.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.0,
+    "tourist_friendliness": 7.0
+  },
+  "cherrapunji": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "chettinad": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "chikmagalur": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "chitkul": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "chittorgarh": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "chopta": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "coimbatore": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "coimbatore_nilgiris": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "coonoor": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "coorg": {
+    "crime_score": 8.5,
+    "health_score": 7.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "coorg_coffee": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "daman": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "darjeeling": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "dawki": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "dehradun": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "delhi": {
+    "crime_score": 5.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.5,
+    "tourist_friendliness": 7.0
+  },
+  "deoghar": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "dhanaulti": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "dhanushkodi": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "dharamshala": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "dimapur": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "diu": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "dwarka": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "dzukou": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "gandhinagar": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "gandikota": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "gangtok": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "gir": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "goa": {
+    "crime_score": 7.5,
+    "health_score": 7.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 9.0
+  },
+  "gokarna": {
+    "crime_score": 8.0,
+    "health_score": 7.0,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.5
+  },
+  "gulmarg": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "gurez_valley": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "guwahati": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "halebidu": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "hampi": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "hampi_anegundi": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "hampta_pass": {
+    "crime_score": 9.0,
+    "health_score": 5.0,
+    "infrastructure_score": 4.0,
+    "tourist_friendliness": 8.0
+  },
+  "haridwar": {
+    "crime_score": 6.5,
+    "health_score": 6.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "hogenakkal": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.0
+  },
+  "hyderabad": {
+    "crime_score": 6.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.0,
+    "tourist_friendliness": 7.0
+  },
+  "imphal": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "itanagar": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "jagdalpur": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "jaipur": {
+    "crime_score": 7.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "jaisalmer": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 9.0
+  },
+  "jammu": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "jawai": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "jim_corbett": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "jodhpur": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "jog_falls": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "kalpa": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "kanchipuram": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "kangra": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "kanha": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "kanyakumari": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "kasol": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "kavaratti": {
+    "crime_score": 9.0,
+    "health_score": 6.0,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 8.0
+  },
+  "kaziranga": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "kerala": {
+    "crime_score": 8.5,
+    "health_score": 8.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 9.0
+  },
+  "khajuraho": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "kochi": {
+    "crime_score": 8.5,
+    "health_score": 8.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 9.0
+  },
+  "kodaikanal": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "kohima": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "kolkata": {
+    "crime_score": 6.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.0,
+    "tourist_friendliness": 7.0
+  },
+  "konark": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "kovalam": {
+    "crime_score": 8.0,
+    "health_score": 7.0,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.5
+  },
+  "kufri": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "kullu": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "kumarakom": {
+    "crime_score": 8.5,
+    "health_score": 7.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 9.0
+  },
+  "kumbakonam": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "kurukshetra": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "lachung": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "lakshadweep": {
+    "crime_score": 9.0,
+    "health_score": 6.0,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 8.0
+  },
+  "lansdowne": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "leh_ladakh": {
+    "crime_score": 9.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 8.5
+  },
+  "lepakshi": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "loktak": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "lonavala": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "lucknow": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "madurai": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "mahabalipuram": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "maheshwar": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "majuli": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "manali": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "mandu": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "mandvi": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 8.0
+  },
+  "mangalore": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "mathura_vrindavan": {
+    "crime_score": 6.5,
+    "health_score": 6.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "mawlynnong": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "mawphlang": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "mechuka": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "meghalaya_nongriat": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "mehrauli": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "minicoy": {
+    "crime_score": 9.0,
+    "health_score": 6.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 8.0
+  },
+  "mount_abu": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "mukteshwar": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "mumbai": {
+    "crime_score": 6.0,
+    "health_score": 7.0,
+    "infrastructure_score": 8.0,
+    "tourist_friendliness": 7.5
+  },
+  "munnar": {
+    "crime_score": 8.5,
+    "health_score": 7.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "munsiyari": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "murudeshwar": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "mussoorie": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "mysore": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 8.5
+  },
+  "nagarjunasagar": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "nainital": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "nashik": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "netarhat": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "nubra_turtuk": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "nubra_valley": {
+    "crime_score": 9.0,
+    "health_score": 5.0,
+    "infrastructure_score": 4.0,
+    "tourist_friendliness": 8.0
+  },
+  "old_goa": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 8.0
+  },
+  "ooty": {
+    "crime_score": 8.5,
+    "health_score": 7.5,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "orchha": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "pachmarhi": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "pahalgam": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "panchkula": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "patna": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "pelling": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "periyar": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "pondicherry": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "port_blair": {
+    "crime_score": 9.0,
+    "health_score": 6.0,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 8.0
+  },
+  "pune": {
+    "crime_score": 6.5,
+    "health_score": 8.0,
+    "infrastructure_score": 8.5,
+    "tourist_friendliness": 7.5
+  },
+  "puri": {
+    "crime_score": 6.5,
+    "health_score": 6.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "pushkar": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "raipur": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "rajgir": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "rameswaram": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "ranchi": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "ranikhet": {
+    "crime_score": 8.5,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "rann_of_kutch": {
+    "crime_score": 8.0,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 9.0
+  },
+  "ranthambore": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "ratnagiri": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 8.0
+  },
+  "rishikesh": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "sambalpur": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "sanchi": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.5
+  },
+  "sandakphu": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "sasan_gir": {
+    "crime_score": 8.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "sasaram": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "shantiniketan": {
+    "crime_score": 7.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 7.0
+  },
+  "shekhawati": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "shillong": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "shimla": {
+    "crime_score": 8.5,
+    "health_score": 7.0,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.0
+  },
+  "shirdi": {
+    "crime_score": 6.5,
+    "health_score": 6.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "silvassa": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.0
+  },
+  "spiti_valley": {
+    "crime_score": 9.0,
+    "health_score": 5.0,
+    "infrastructure_score": 4.0,
+    "tourist_friendliness": 8.0
+  },
+  "srinagar": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "srisailam": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "sukhna_rock_garden": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "sultanpur_bird": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "sunderban": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "tawang": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "thanjavur": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "thekkady": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.0
+  },
+  "thiruvananthapuram": {
+    "crime_score": 8.5,
+    "health_score": 8.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 9.0
+  },
+  "tirthan_great_himalayan": {
+    "crime_score": 7.0,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 7.5
+  },
+  "tirthan_valley": {
+    "crime_score": 8.5,
+    "health_score": 6.0,
+    "infrastructure_score": 5.5,
+    "tourist_friendliness": 8.5
+  },
+  "tirupati": {
+    "crime_score": 6.5,
+    "health_score": 6.0,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.0
+  },
+  "trichy": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "udaipur": {
+    "crime_score": 8.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 9.0
+  },
+  "ujjain": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "unakoti": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "valley_of_flowers": {
+    "crime_score": 9.0,
+    "health_score": 5.0,
+    "infrastructure_score": 4.0,
+    "tourist_friendliness": 8.0
+  },
+  "valparai": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "varanasi": {
+    "crime_score": 6.0,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.5
+  },
+  "varanasi_sarnath": {
+    "crime_score": 7.5,
+    "health_score": 6.5,
+    "infrastructure_score": 6.0,
+    "tourist_friendliness": 8.5
+  },
+  "varkala": {
+    "crime_score": 8.0,
+    "health_score": 7.0,
+    "infrastructure_score": 6.5,
+    "tourist_friendliness": 8.5
+  },
+  "veraval": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 5.0,
+    "tourist_friendliness": 7.0
+  },
+  "visakhapatnam": {
+    "crime_score": 7.0,
+    "health_score": 7.0,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 7.5
+  },
+  "warangal": {
+    "crime_score": 8.0,
+    "health_score": 7.5,
+    "infrastructure_score": 7.0,
+    "tourist_friendliness": 8.5
+  },
+  "wayanad": {
+    "crime_score": 8.5,
+    "health_score": 8.0,
+    "infrastructure_score": 7.5,
+    "tourist_friendliness": 9.0
+  },
+  "ziro": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  },
+  "zuluk": {
+    "crime_score": 8.0,
+    "health_score": 5.5,
+    "infrastructure_score": 4.5,
+    "tourist_friendliness": 7.5
+  }
+}

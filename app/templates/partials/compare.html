@@ -1,0 +1,112 @@
+<!-- ═══════════════════════════════════════ COMPARE ═══ -->
+<section id="compare" class="section-light" data-reveal>
+  <div class="container">
+    <div class="cmp-hero-header">
+      <span class="cmp-badge"
+        ><i class="fas fa-balance-scale"></i> Side-by-Side Analysis</span
+      >
+      <h2 class="section-title">Compare Destinations</h2>
+      <p class="section-desc">
+        Deep-dive into budget, safety, weather & more — pick two places and see
+        who wins
+      </p>
+    </div>
+
+    <!-- Quick Popular Matchups -->
+    <div class="cmp-popular-bar">
+      <span class="cmp-popular-label"><i class="fas fa-fire"></i> Popular</span>
+      <button class="cmp-popular-chip" data-d1="Goa" data-d2="Munnar">
+        Goa vs Munnar
+      </button>
+      <button class="cmp-popular-chip" data-d1="Jaipur" data-d2="Udaipur">
+        Jaipur vs Udaipur
+      </button>
+      <button class="cmp-popular-chip" data-d1="Manali" data-d2="Shimla">
+        Manali vs Shimla
+      </button>
+      <button class="cmp-popular-chip" data-d1="Rishikesh" data-d2="Varanasi">
+        Rishikesh vs Varanasi
+      </button>
+      <button class="cmp-popular-chip" data-d1="Andaman" data-d2="Goa">
+        Andaman vs Goa
+      </button>
+    </div>
+
+    <div class="compare-form">
+      <!-- Destination Pickers -->
+      <div class="compare-selects">
+        <div class="cmp-pick-card" id="cmpPickCard1">
+          <div class="cmp-pick-num">1</div>
+          <div class="cmp-pick-body">
+            <label for="cmpDest1">Destination</label>
+            <select id="cmpDest1" data-dest-dropdown>
+              <option value="">Choose first place…</option>
+            </select>
+            <div class="cmp-pick-meta" id="cmpMeta1"></div>
+          </div>
+        </div>
+
+        <div class="compare-vs">
+          <div class="cmp-vs-ring">
+            <span>VS</span>
+          </div>
+        </div>
+
+        <div class="cmp-pick-card" id="cmpPickCard2">
+          <div class="cmp-pick-num">2</div>
+          <div class="cmp-pick-body">
+            <label for="cmpDest2">Destination</label>
+            <select id="cmpDest2" data-dest-dropdown>
+              <option value="">Choose second place…</option>
+            </select>
+            <div class="cmp-pick-meta" id="cmpMeta2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trip Parameters Bar -->
+      <div class="cmp-params-bar">
+        <div class="cmp-param">
+          <i class="fas fa-calendar-alt"></i>
+          <label for="cmpDays">Days</label>
+          <input type="number" id="cmpDays" min="1" max="30" value="5" />
+        </div>
+        <div class="cmp-param-divider"></div>
+        <div class="cmp-param">
+          <i class="fas fa-users"></i>
+          <label for="cmpFamily">People</label>
+          <input type="number" id="cmpFamily" min="1" max="20" value="4" />
+        </div>
+        <div class="cmp-param-divider"></div>
+        <div class="cmp-param">
+          <i class="fas fa-gem"></i>
+          <label for="cmpClass">Class</label>
+          <select id="cmpClass">
+            <option value="economy">Economy</option>
+            <option value="comfort">Comfort</option>
+            <option value="premium">Premium</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="cmpSubmit" class="cmp-submit-btn">
+        <span class="cmp-submit-text"
+          ><i class="fas fa-bolt"></i> Compare Now</span
+        >
+        <span class="cmp-submit-shimmer"></span>
+      </button>
+    </div>
+
+    <div id="cmpResult">
+      <div class="empty-state" id="cmpEmpty">
+        <i class="fas fa-balance-scale"></i>
+        <p>
+          Pick two destinations above and hit <strong>Compare Now</strong> to
+          see a side-by-side analysis.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ BUDGET ═══ -->

@@ -1,0 +1,161 @@
+/* =======================================================
+ * Time Travel – Expense tracker
+ * ======================================================= */
+
+/* ═══════════════════════════════════════════════════════════
+   EXPENSE TRACKER
+   ═══════════════════════════════════════════════════════════ */
+.expense-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 24px;
+  align-items: start;
+}
+.expense-form-card,
+.expense-summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+}
+.expense-form-card h3 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  color: var(--primary-light);
+}
+.expense-total-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-dark, #4338ca)
+  );
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.expense-total-label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.expense-total-amount {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+.expense-category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.exp-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.exp-bar-label {
+  font-size: 0.82rem;
+  min-width: 110px;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+.exp-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.exp-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.exp-bar-amount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 70px;
+  text-align: right;
+}
+.expense-list {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.exp-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+.exp-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.exp-item-icon {
+  font-size: 1.3rem;
+}
+.exp-item-info {
+  flex: 1;
+}
+.exp-item-info strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+.exp-item-info small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+.exp-item-amount {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary-light);
+}
+.exp-item-del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+.exp-item-del:hover {
+  color: #ef4444;
+}
+
+body.light-mode .expense-form-card,
+body.light-mode .expense-summary-card {
+  background: #fff;
+  border-color: #e5e7eb;
+}
+body.light-mode .exp-bar-track {
+  background: #e5e7eb;
+}
+body.light-mode .exp-item {
+  background: #f9fafb;
+}
+body.light-mode .exp-item:hover {
+  background: #f3f4f6;
+}
+body.light-mode .exp-item-amount {
+  color: #4f46e5;
+}
+
+@media (max-width: 768px) {
+  .expense-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+

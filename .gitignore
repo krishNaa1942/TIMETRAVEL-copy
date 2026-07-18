@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════
+# TIMETRAVEL Backend — .gitignore
+# ═══════════════════════════════════════════════════════════
+
+# Byte-compiled / optimised
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables (contains API keys!)
+.env
+.env.local
+
+# SQLite databases & instance data
+instance/
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Pytest & coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Logs
+*.log
+
+# ── Build artifacts & bundles ──────────────────────────────
+# Generated JS bundles (10+ MB each) — must NEVER be committed
+bundle.js
+live_web_bundle.js
+temp_web_bundle.js
+*.js.map
+
+# ── User data & uploads ───────────────────────────────────
+uploads/
+
+# ── Expo (root-level stray) ────────────────────────────────
+.expo/
+
+# ── Node (root + mobile) ───────────────────────────────────
+node_modules/
+
+# ── Mobile build output ────────────────────────────────────
+TimeTravelMobile/dist/
+TimeTravelMobile/web-build/
+TimeTravelMobile/.expo/
+
+# ── Scaffold / one-time files ──────────────────────────────
+STARTER_*
+SETUP_MOBILE_APP.sh
+*.bak

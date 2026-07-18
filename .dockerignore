@@ -1,0 +1,56 @@
+# ── Version control ──────────────────────────────────────
+.git
+.gitignore
+
+# ── Python artifacts ─────────────────────────────────────
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.venv/
+env/
+
+# ── Testing & linting ───────────────────────────────────
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.flake8
+
+# ── IDE / editor ────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Docker ──────────────────────────────────────────────
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# ── Documentation & CI ──────────────────────────────────
+*.md
+LICENSE
+.github/
+.gitlab-ci.yml
+
+# ── Environment & secrets ───────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── OS files ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Uploads (runtime data, not baked into image) ────────
+uploads/
+instance/

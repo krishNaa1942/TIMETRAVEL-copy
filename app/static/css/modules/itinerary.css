@@ -1,0 +1,418 @@
+/* =======================================================
+ * Time Travel – AI itinerary timeline + trip sharing + drag-and-drop + view toggle + timeline view
+ * ======================================================= */
+
+/* ═══════════════════════════════════════════════════════════
+   AI Itinerary Timeline
+   ═══════════════════════════════════════════════════════════ */
+.itin-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.itin-day {
+  background: var(--bg-dark-2);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+
+.itin-day:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.itin-day-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  cursor: pointer;
+  user-select: none;
+}
+
+.itin-day-badge {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.itin-day-title {
+  flex: 1;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.itin-day-toggle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  transition: transform 0.3s;
+}
+
+.itin-day.open .itin-day-toggle {
+  transform: rotate(180deg);
+}
+
+.itin-day-body {
+  display: none;
+  padding: 24px;
+}
+
+.itin-day.open .itin-day-body {
+  display: block;
+}
+
+.itin-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.itin-slot {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.itin-slot-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.itin-slot-icon.morning {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.itin-slot-icon.afternoon {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+}
+
+.itin-slot-icon.evening {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+}
+
+.itin-slot-content {
+  flex: 1;
+}
+
+.itin-slot-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.itin-slot-activity {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.itin-slot-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.itin-slot-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.itin-slot-meta i {
+  margin-right: 4px;
+}
+
+.itin-tip {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.itin-tip i {
+  margin-right: 6px;
+}
+
+@media (max-width: 768px) {
+  .itin-day-header {
+    padding: 14px 18px;
+  }
+  .itin-day-body {
+    padding: 16px;
+  }
+  .itin-slot {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .itin-slot-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TRIP SHARING
+   ═══════════════════════════════════════════════════════════ */
+.share-link-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 8px 14px;
+  max-width: 100%;
+}
+.share-link-box i {
+  color: var(--primary);
+}
+.share-link-box input {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 280px;
+  max-width: 50vw;
+  outline: none;
+}
+
+body.light-mode .share-link-box {
+  background: #fff;
+  border-color: #d1d5db;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DRAG & DROP ITINERARY
+   ═══════════════════════════════════════════════════════════ */
+.itin-slot[draggable="true"] {
+  cursor: grab;
+}
+.itin-slot[draggable="true"]:active {
+  cursor: grabbing;
+}
+.itin-slot.dragging {
+  opacity: 0.4;
+}
+.itin-slot.drag-over {
+  outline: 2px dashed var(--primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.itin-slot-activity[contenteditable="true"] {
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.2s;
+}
+.itin-slot-activity[contenteditable="true"]:hover {
+  border-bottom-color: var(--primary-light);
+}
+.itin-slot-activity[contenteditable="true"]:focus {
+  outline: none;
+  border-bottom-color: var(--primary);
+  background: rgba(99, 102, 241, 0.06);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ITINERARY VIEW TOGGLE
+   ═══════════════════════════════════════════════════════════ */
+.itin-view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.itin-view-btn {
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+}
+.itin-view-btn.active {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+}
+
+.itin-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.itin-source-badge.ai {
+  color: #5eead4;
+  background: rgba(20, 184, 166, 0.12);
+  border-color: rgba(20, 184, 166, 0.28);
+}
+
+.itin-source-badge.fallback {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.itin-source-note {
+  margin: 2px auto 10px;
+  max-width: 720px;
+  text-align: center;
+  font-size: 0.76rem;
+  color: #fbbf24;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TIMELINE VIEW
+   ═══════════════════════════════════════════════════════════ */
+.timeline-container {
+  position: relative;
+  padding-left: 40px;
+}
+.timeline-container::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), #10b981, #8b5cf6);
+  border-radius: 1px;
+}
+.timeline-day-marker {
+  position: relative;
+  margin: 20px 0 12px -40px;
+  padding-left: 40px;
+}
+.timeline-day-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+.timeline-day-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-left: 8px;
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+}
+.timeline-dot {
+  position: absolute;
+  left: -31px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary, #0f172a);
+  z-index: 1;
+}
+.timeline-time {
+  min-width: 70px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-top: 10px;
+}
+.timeline-card {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+.timeline-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.timeline-card-header strong {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+.timeline-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 4px 0;
+}
+.timeline-card-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+.timeline-card-meta span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.timeline-card-meta i {
+  margin-right: 3px;
+}
+
+body.light-mode .timeline-card {
+  background: #fff;
+  border-color: #e5e7eb;
+}
+body.light-mode .itin-source-badge.ai {
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.1);
+  border-color: rgba(15, 118, 110, 0.24);
+}
+body.light-mode .itin-source-badge.fallback {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.24);
+}
+body.light-mode .itin-source-note {
+  color: #92400e;
+}
+body.light-mode .timeline-dot {
+  border-color: #fff;
+}
+body.light-mode .timeline-container::before {
+  background: linear-gradient(to bottom, #4f46e5, #059669, #7c3aed);
+}

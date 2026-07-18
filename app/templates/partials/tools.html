@@ -1,0 +1,130 @@
+    <section id="budget" class="section-light" data-reveal>
+      <div class="container">
+        <h2 class="section-title">Trip Budget Estimator</h2>
+        <p class="section-desc">Plan your finances before you travel</p>
+        <div class="tool-layout">
+          <div class="tool-form">
+            <div class="form-group">
+              <label for="budgetDest"
+                ><i class="fas fa-map-marker-alt"></i> Destination</label
+              >
+              <select id="budgetDest" data-dest-dropdown>
+                <option value="">Select a destination</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="budgetDays"
+                  ><i class="fas fa-calendar-alt"></i> Days</label
+                >
+                <input
+                  type="number"
+                  id="budgetDays"
+                  min="1"
+                  max="30"
+                  value="5"
+                />
+              </div>
+              <div class="form-group">
+                <label for="budgetFamily"
+                  ><i class="fas fa-users"></i> Family Size</label
+                >
+                <input
+                  type="number"
+                  id="budgetFamily"
+                  min="1"
+                  max="20"
+                  value="4"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="budgetClass"
+                ><i class="fas fa-star"></i> Travel Class</label
+              >
+              <select id="budgetClass">
+                <option value="economy">Economy</option>
+                <option value="comfort">Comfort</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <button id="budgetSubmit" class="btn btn-primary btn-full">
+              <i class="fas fa-calculator"></i> Calculate Budget
+            </button>
+          </div>
+          <div class="tool-result" id="budgetResult">
+            <div class="result-placeholder">
+              <i class="fas fa-receipt"></i>
+              <p>
+                Fill the form and click Calculate to see your trip budget
+                breakdown
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════ SAFETY ═══ -->
+    <section id="safety" class="section-dark" data-reveal>
+      <div class="container">
+        <h2 class="section-title light">Destination Safety Check</h2>
+        <p class="section-desc light">
+          Know how safe your destination is before you go
+        </p>
+        <div class="tool-layout">
+          <div class="tool-form compact">
+            <div class="form-group">
+              <label for="safetyDest"
+                ><i class="fas fa-map-marker-alt"></i> Destination</label
+              >
+              <select id="safetyDest" data-dest-dropdown>
+                <option value="">Select a destination</option>
+              </select>
+            </div>
+            <button id="safetySubmit" class="btn btn-primary btn-full">
+              <i class="fas fa-shield-alt"></i> Check Safety
+            </button>
+          </div>
+          <div class="tool-result" id="safetyResult">
+            <div class="result-placeholder light">
+              <i class="fas fa-shield-alt"></i>
+              <p>Select a destination and click Check Safety</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════ WEATHER ══ -->
+    <section id="weather" class="section-light">
+      <div class="container">
+        <h2 class="section-title">Weather & Packing Advisor</h2>
+        <p class="section-desc">
+          Live weather data with smart packing suggestions
+        </p>
+        <div class="tool-layout">
+          <div class="tool-form compact">
+            <div class="form-group">
+              <label for="weatherDest"
+                ><i class="fas fa-cloud-sun"></i> Destination</label
+              >
+              <select id="weatherDest" data-dest-dropdown>
+                <option value="">Select a destination</option>
+              </select>
+            </div>
+            <button id="weatherSubmit" class="btn btn-primary btn-full">
+              <i class="fas fa-cloud-sun"></i> Get Weather & Packing Tips
+            </button>
+          </div>
+          <div class="tool-result" id="weatherResult">
+            <div class="result-placeholder">
+              <i class="fas fa-cloud-sun"></i>
+              <p>Select a destination to see live weather and what to pack</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ AI ITINERARY ═══ -->

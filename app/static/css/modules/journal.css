@@ -1,0 +1,167 @@
+/* =======================================================
+ * Time Travel – Travel journal
+ * ======================================================= */
+
+/* ═══════════════════════════════════════════════════════════
+   TRAVEL JOURNAL
+   ═══════════════════════════════════════════════════════════ */
+.journal-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 24px;
+  align-items: start;
+}
+.journal-form-card,
+.journal-list-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+}
+.journal-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 4px;
+}
+.journal-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.journal-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+.journal-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.journal-entry {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  border-left: 3px solid var(--primary);
+  transition: background 0.2s;
+}
+.journal-entry:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.journal-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.journal-entry-title {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+.journal-entry-dest {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+.journal-entry-meta {
+  display: flex;
+  gap: 8px;
+}
+.journal-mood {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+.journal-stars {
+  font-size: 0.75rem;
+}
+.journal-entry-content {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 6px 0;
+  line-height: 1.5;
+}
+.journal-entry-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.journal-entry-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.journal-entry-author {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.journal-del-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+.journal-del-btn:hover {
+  color: #ef4444;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin: 8px 0;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+}
+
+body.light-mode .journal-form-card,
+body.light-mode .journal-list-card {
+  background: #fff;
+  border-color: #e5e7eb;
+}
+body.light-mode .journal-tabs {
+  background: #f3f4f6;
+}
+body.light-mode .journal-tab:hover:not(.active) {
+  background: #e5e7eb;
+}
+body.light-mode .journal-entry {
+  background: #f9fafb;
+}
+body.light-mode .journal-entry:hover {
+  background: #f3f4f6;
+}
+
+@media (max-width: 768px) {
+  .journal-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+

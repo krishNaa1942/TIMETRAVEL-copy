@@ -1,0 +1,412 @@
+/* =======================================================
+ * Time Travel – Light/Dark Mode Enhancements
+ * Unified theme, consistent colors, proper contrast
+ * ======================================================= */
+
+/* ══════════════════════════════════════════════════════════
+   DARK MODE (Default)
+   ══════════════════════════════════════════════════════════ */
+
+body {
+  /* Default to dark mode */
+  --actual-bg: #0f172a;
+  --actual-bg-secondary: #1e293b;
+  --actual-text-primary: #f1f5f9;
+  --actual-text-secondary: #94a3b8;
+  --actual-text-muted: #64748b;
+  --actual-border: rgba(255, 255, 255, 0.08);
+  
+  color: var(--actual-text-primary);
+  background-color: var(--actual-bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  /* Typography enhancements for dark mode */
+  --text-body-contrast: #e8eef8;
+  --text-heading-contrast: #f8fafc;
+  --text-muted-contrast: #9ca3af;
+
+  /* Shadows for elevation in dark mode */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg-dark: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body .section-title,
+body .hero-title {
+  color: var(--text-heading-contrast);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+body p,
+body .text-body {
+  color: var(--text-body-contrast);
+  line-height: 1.6;
+}
+
+body a {
+  color: #14b8a6;
+  transition: color 0.3s ease;
+}
+
+body a:hover {
+  color: #0d9488;
+}
+
+body .text-muted,
+body .text-secondary {
+  color: var(--text-muted-contrast) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT MODE
+   ══════════════════════════════════════════════════════════ */
+
+body.light-mode {
+  /* Light mode color scheme */
+  --actual-bg: #ffffff;
+  --actual-bg-secondary: #f8fafc;
+  --actual-text-primary: #0f172a;
+  --actual-text-secondary: #475569;
+  --actual-text-muted: #64748b;
+  --actual-border: #e2e8f0;
+
+  color: var(--actual-text-primary);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+
+  /* Typography enhancements for light mode */
+  --text-body-contrast: #1e293b;
+  --text-heading-contrast: #0f172a;
+  --text-muted-contrast: #64748b;
+
+  /* Shadows for elevation in light mode */
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg-dark: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode h5,
+body.light-mode h6 {
+  color: #0f172a;
+}
+
+body.light-mode p,
+body.light-mode .text-body {
+  color: #1e293b;
+}
+
+body.light-mode a {
+  color: #0f766e;
+}
+
+body.light-mode a:hover {
+  color: #0d5e58;
+}
+
+body.light-mode .text-muted,
+body.light-mode .text-secondary {
+  color: #64748b !important;
+}
+
+/* Trip Dashboard light-mode overrides */
+body.light-mode {
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --accent-primary: #38bdf8;
+  --accent-secondary: #60a5fa;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --bg-primary: #f8fafc;
+  --glass-blur: blur(12px) saturate(1.5);
+  --glass-border: 1px solid rgba(0, 0, 0, 0.08);
+  --neon-glow: 0 0 20px rgba(56, 189, 248, 0.14);
+  --td-gradient: linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%);
+}
+
+body.light-mode .navbar {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(248, 250, 252, 0.78)
+  );
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+body.light-mode .nav-shimmer {
+  opacity: 0.4;
+}
+body.light-mode .navbar::before {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 118, 110, 0.02) 0%,
+    rgba(245, 158, 11, 0.01) 100%
+  );
+}
+body.light-mode .navbar.scrolled {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 250, 252, 0.88)
+  );
+  border-color: rgba(15, 23, 42, 0.09);
+  box-shadow:
+    0 7px 16px rgba(15, 23, 42, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+body.light-mode .nav-brand-name {
+  background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+body.light-mode .nav-brand-tag {
+  color: var(--primary);
+  opacity: 0.6;
+}
+body.light-mode .nav-links a,
+body.light-mode .nav-dropdown-trigger {
+  color: rgba(15, 23, 42, 0.74);
+}
+body.light-mode .nav-links a:hover,
+body.light-mode .nav-dropdown-trigger:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.06);
+  border-color: rgba(15, 23, 42, 0.14);
+}
+body.light-mode .nav-links a.active {
+  color: #0f172a;
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(217, 119, 6, 0.34);
+}
+body.light-mode .nav-indicator {
+  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(15, 118, 110, 0.1);
+}
+body.light-mode .nav-mega-menu {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+body.light-mode .nav-mega-menu::before {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .nav-mega-col {
+  border-right-color: rgba(15, 23, 42, 0.04);
+}
+body.light-mode .nav-mega-col h4 {
+  color: rgba(15, 23, 42, 0.52);
+}
+body.light-mode .nav-mega-label {
+  color: rgba(15, 23, 42, 0.82);
+}
+body.light-mode .nav-mega-item:hover .nav-mega-label {
+  color: #0f172a;
+}
+body.light-mode .nav-mega-desc {
+  color: rgba(15, 23, 42, 0.55);
+}
+body.light-mode .nav-mega-icon {
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+body.light-mode .nav-mega-item--primary {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(217, 119, 6, 0.26);
+}
+body.light-mode .hamburger-line {
+  background: var(--text-dark);
+}
+body.light-mode .nav-search-trigger,
+body.light-mode .theme-toggle {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: rgba(15, 23, 42, 0.74);
+}
+body.light-mode .nav-search-esc {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.3);
+}
+body.light-mode .nav-login-btn {
+  color: rgba(15, 23, 42, 0.82);
+  border-color: rgba(15, 23, 42, 0.16);
+}
+body.light-mode .nav-login-btn:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.08);
+}
+body.light-mode .nav-signup-btn,
+body.light-mode .nav-cta-mobile {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.26);
+  color: rgba(15, 23, 42, 0.88);
+  box-shadow: none;
+}
+body.light-mode .nav-signup-btn:hover,
+body.light-mode .nav-cta-mobile:hover {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.14);
+}
+body.light-mode .nav-user-dropdown {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+}
+body.light-mode .nav-user-trigger {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-dark);
+}
+body.light-mode .nav-user-name {
+  color: var(--text-dark);
+}
+body.light-mode .nav-user-links a {
+  color: rgba(0, 0, 0, 0.6);
+}
+body.light-mode .nav-user-links a:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+body.light-mode .nav-user-view-all {
+  color: #b45309;
+}
+body.light-mode .nav-user-header,
+body.light-mode .nav-user-footer {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .user-greeting {
+  color: var(--text-dark);
+}
+body.light-mode .nav-breadcrumb {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: var(--primary);
+}
+body.light-mode .nav-search-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+body.light-mode .nav-search-modal {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+}
+body.light-mode .nav-search-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .nav-search-header input {
+  color: var(--text-dark);
+}
+body.light-mode .nav-search-header input::placeholder {
+  color: rgba(0, 0, 0, 0.25);
+}
+body.light-mode .nav-search-results a {
+  color: rgba(0, 0, 0, 0.55);
+}
+body.light-mode .nav-search-results a:hover,
+body.light-mode .nav-search-results a.highlighted {
+  background: rgba(15, 118, 110, 0.07);
+  color: var(--primary);
+}
+body.light-mode .nav-search-footer {
+  border-top-color: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.25);
+}
+body.light-mode .nav-search-footer kbd {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+body.light-mode .footer {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+body.light-mode .section-dark {
+  background: #1e293b;
+}
+body.light-mode .section-dark .tool-form {
+  background: #2d3a4e;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHT MODE OVERRIDES – New Sections
+   ═══════════════════════════════════════════════════════════ */
+
+body.light-mode .hiw-step-card h3 {
+  color: var(--text-dark);
+}
+body.light-mode .hiw-step-card p {
+  color: var(--text-muted);
+}
+body.light-mode .hiw-step-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .hiw-step:hover .hiw-step-card {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(15, 118, 110, 0.15);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.06);
+}
+body.light-mode .hiw-step-icon {
+  background: rgba(15, 118, 110, 0.06);
+  border-color: rgba(15, 118, 110, 0.1);
+}
+body.light-mode .hiw-connector {
+  background: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .hiw-tag {
+  background: rgba(15, 118, 110, 0.06);
+  border-color: rgba(15, 118, 110, 0.1);
+}
+body.light-mode .hiw-step-cta {
+  background: rgba(15, 118, 110, 0.04);
+  border-color: rgba(15, 118, 110, 0.15);
+}
+body.light-mode .hiw-step-badge {
+  color: var(--primary);
+}
+body.light-mode .hiw-cta-sub {
+  color: var(--text-muted);
+}
+
+body.light-mode .testimonial-card {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.light-mode .testimonials-btn {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .floating-orb {
+  opacity: 0.04;
+}
+body.light-mode .cursor-glow {
+  background: radial-gradient(
+    circle,
+    rgba(15, 118, 110, 0.04) 0%,
+    transparent 70%
+  );
+}
+
+body.light-mode .section-eyebrow {
+  background: rgba(15, 118, 110, 0.06);
+  border-color: rgba(15, 118, 110, 0.1);
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Time Travel",
+  "short_name": "TimeTravel",
+  "description": "AI-powered smart tourism assistant — plan budget-friendly family trips across 22+ Indian destinations with Gemini AI, weather forecasts, safety scores & more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0c1d",
+  "theme_color": "#0f766e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "tourism", "lifestyle"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

@@ -1,0 +1,51 @@
+    <section id="booking" class="section-light" data-reveal>
+      <div class="container">
+        <h2 class="section-title">
+          <i class="fas fa-ticket-alt"></i> Book Flights, Hotels & Transport
+        </h2>
+        <p class="section-desc">
+          Quick links to India's top travel booking platforms — compare prices
+          across providers
+        </p>
+        <div class="tool-layout">
+          <div class="tool-form" style="max-width: 400px">
+            <div class="form-group">
+              <label for="bookingDest"
+                ><i class="fas fa-map-marker-alt"></i> Destination</label
+              >
+              <select id="bookingDest" data-dest-dropdown>
+                <option value="">Select a destination</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bookingCheckin"
+                  ><i class="fas fa-calendar"></i> Check-in</label
+                >
+                <input type="date" id="bookingCheckin" />
+              </div>
+              <div class="form-group">
+                <label for="bookingCheckout"
+                  ><i class="fas fa-calendar-check"></i> Check-out</label
+                >
+                <input type="date" id="bookingCheckout" />
+              </div>
+            </div>
+            <button id="bookingSearchBtn" class="btn btn-primary btn-full">
+              <i class="fas fa-search"></i> Find Booking Links
+            </button>
+          </div>
+          <div class="tool-result" id="bookingResult">
+            <div class="result-placeholder">
+              <i class="fas fa-ticket-alt"></i>
+              <p>
+                Select a destination to see flights, hotels, trains & bus links
+                from top platforms
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════ CURRENCY CONVERTER ═══ -->

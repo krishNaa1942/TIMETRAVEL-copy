@@ -1,0 +1,372 @@
+/* =======================================================
+ * Route Page System — Lazy loading, skeletons, transitions,
+ * scroll-reveal animations, dynamic counters
+ * ======================================================= */
+
+/* ── Base: all route pages hidden ── */
+.route-page {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+/* ── Active page is visible ── */
+.route-page--active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Enter animation ── */
+.route-page--enter {
+  animation: routePageIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Exit animation ── */
+.route-page--exit {
+  animation: routePageOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes routePageIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes routePageOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.99);
+  }
+}
+
+/* ── Main container ── */
+#appMain {
+  min-height: 50vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* =======================================================
+ * SKELETON LOADING SCREENS
+ * ======================================================= */
+
+.route-skeleton {
+  padding: 3rem 2rem;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.route-skeleton__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: skelFadeIn 0.5s ease forwards;
+}
+
+.route-skeleton__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.15),
+    rgba(118, 75, 162, 0.15)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary, #667eea);
+  animation: skelPulseIcon 2s ease-in-out infinite;
+}
+
+.route-skeleton__title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  letter-spacing: 0.02em;
+}
+
+.route-skeleton__spinner {
+  margin-top: 0.5rem;
+}
+
+.route-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(102, 126, 234, 0.15);
+  border-top-color: var(--primary, #667eea);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+.route-skeleton__body {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: skelFadeIn 0.6s ease 0.2s both;
+}
+
+/* Skeleton lines */
+.skel-line {
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(
+    90deg,
+    rgba(102, 126, 234, 0.08) 25%,
+    rgba(102, 126, 234, 0.18) 50%,
+    rgba(102, 126, 234, 0.08) 75%
+  );
+  background-size: 200% 100%;
+  animation: skelShimmer 1.8s ease-in-out infinite;
+}
+.skel-line--w90 {
+  width: 90%;
+}
+.skel-line--w80 {
+  width: 80%;
+}
+.skel-line--w70 {
+  width: 70%;
+}
+.skel-line--w60 {
+  width: 60%;
+}
+.skel-line--w50 {
+  width: 50%;
+}
+
+/* Skeleton cards */
+.skel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.2rem;
+  margin: 1rem 0;
+}
+
+.skel-card {
+  height: 180px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    rgba(102, 126, 234, 0.06) 25%,
+    rgba(102, 126, 234, 0.14) 50%,
+    rgba(102, 126, 234, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: skelShimmer 1.8s ease-in-out infinite;
+}
+.skel-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.skel-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Error state */
+.route-load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 40vh;
+  color: var(--text-secondary, #94a3b8);
+  text-align: center;
+}
+.route-load-error i {
+  font-size: 2.5rem;
+  color: #ef4444;
+}
+.route-load-error p {
+  font-size: 1.1rem;
+}
+.btn-retry {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary, #667eea), #764ba2);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.btn-retry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* =======================================================
+ * SCROLL-REVEAL ANIMATIONS
+ * ======================================================= */
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Directional variants */
+.reveal-on-scroll.reveal-left {
+  transform: translateX(-50px);
+}
+.reveal-on-scroll.reveal-left.revealed {
+  transform: translateX(0);
+}
+
+.reveal-on-scroll.reveal-right {
+  transform: translateX(50px);
+}
+.reveal-on-scroll.reveal-right.revealed {
+  transform: translateX(0);
+}
+
+.reveal-on-scroll.reveal-scale {
+  transform: scale(0.9);
+}
+.reveal-on-scroll.reveal-scale.revealed {
+  transform: scale(1);
+}
+
+/* Stagger children: use .reveal-stagger on parent */
+.reveal-stagger > .reveal-on-scroll:nth-child(1) {
+  transition-delay: 0s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(4) {
+  transition-delay: 0.3s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(5) {
+  transition-delay: 0.4s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(6) {
+  transition-delay: 0.5s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(7) {
+  transition-delay: 0.6s;
+}
+.reveal-stagger > .reveal-on-scroll:nth-child(8) {
+  transition-delay: 0.7s;
+}
+
+/* =======================================================
+ * ANIMATED COUNTERS
+ * ======================================================= */
+
+.count-up {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =======================================================
+ * KEYFRAME ANIMATIONS
+ * ======================================================= */
+
+@keyframes skelShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes skelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes skelPulseIcon {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Respect reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .route-page,
+  .route-page--enter,
+  .route-page--exit,
+  .reveal-on-scroll,
+  .route-skeleton__icon,
+  .route-spinner,
+  .skel-line,
+  .skel-card {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 768px) {
+  .route-skeleton {
+    padding: 2rem 1rem;
+  }
+  .skel-cards {
+    grid-template-columns: 1fr;
+  }
+  .route-skeleton__icon {
+    width: 52px;
+    height: 52px;
+    font-size: 1.2rem;
+  }
+}
