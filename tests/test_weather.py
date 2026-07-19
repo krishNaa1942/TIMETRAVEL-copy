@@ -15,12 +15,12 @@ from app.models.schemas import WeatherResponse
 class TestWeatherEndpoint:
     """Tests for GET /api/weather/<destination>."""
 
-    def test_weather_returns_503_when_no_api_key(self, client):
-        """Without an API key the service should return 503."""
+    def test_weather_returns_fallback_when_no_api_key(self, client):
+        """Without an API key the service should return 200 with fallback data."""
         resp = client.get("/api/weather/Goa")
-        assert resp.status_code == 503
+        assert resp.status_code == 200
         data = resp.get_json()
-        assert "error" in data
+        assert data.get("using_fallback") is True
 
     def test_weather_returns_400_for_short_name(self, client):
         resp = client.get("/api/weather/X")

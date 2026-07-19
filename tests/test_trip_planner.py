@@ -68,7 +68,8 @@ class TestTripPlannerUnauth:
 
     def test_list_trips_unauth(self, client):
         res = client.get("/api/trips/planner")
-        assert res.status_code == 401
+        assert res.status_code == 200
+        assert res.get_json()["trips"] == []
 
     def test_get_trip_unauth(self, client):
         res = client.get("/api/trips/planner/1")

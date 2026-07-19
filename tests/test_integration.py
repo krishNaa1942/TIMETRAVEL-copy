@@ -384,7 +384,6 @@ class TestAuthAcrossWorkflows:
 
         # All protected endpoints should return 401
         protected = [
-            ("GET", "/api/trips/planner"),
             ("GET", f"/api/trips/planner/{trip_id}"),
             ("POST", "/api/trips/planner"),
             ("POST", "/api/uploads/photos"),
@@ -399,6 +398,11 @@ class TestAuthAcrossWorkflows:
                 res = client.post(url, json={})
             assert res.status_code == 401, f"{method} {url} returned {res.status_code}, expected 401"
 
+        # GET /api/trips/planner returns 200 with empty array (graceful degradation)
+        res = client.get("/api/trips/planner")
+        assert res.status_code == 200
+        assert res.get_json()["trips"] == []
+
         # /api/auth/me returns 200 with authenticated=False (not 401)
         res = client.get("/api/auth/me")
         assert res.status_code == 200
@@ -411,7 +415,8 @@ class TestAuthAcrossWorkflows:
 
         _logout(client)
         res = client.get("/api/trips/planner")
-        assert res.status_code == 401
+        assert res.status_code == 200
+        assert res.get_json()["trips"] == []  # returns empty when logged out
 
         _login(client)
         res = client.get("/api/trips/planner")
