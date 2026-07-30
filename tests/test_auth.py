@@ -203,3 +203,177 @@ class TestTrips:
         _register(client)
         res = client.get("/api/trips/9999")
         assert res.status_code == 404
+
+
+# ═══════════════════════════════════════════════════════════
+# JWT REFRESH (v2 auth)
+# ═══════════════════════════════════════════════════════════
+
+
+def _v2_register(client):
+    return client.post("/api/auth/v2/register", json={
+        "name": "JWT Test",
+        "email": "jwt-test@example.com",
+        "password": "Secret123!",
+    })
+
+
+def _v2_login(client):
+    return client.post("/api/auth/v2/login", json={
+        "email": "jwt-test@example.com",
+        "password": "Secret123!",
+    })
+
+
+class TestJWTRefresh:
+    def test_refresh_success(self, client):
+        _v2_register(client)
+        login_res = _v2_login(client)
+        tokens = login_res.get_json()["tokens"]
+        refresh_token = tokens["refresh_token"]
+
+        res = client.post("/api/auth/v2/refresh", json={
+            "refresh_token": refresh_token,
+        })
+        assert res.status_code == 200
+        new_tokens = res.get_json()["tokens"]
+        assert "access_token" in new_tokens
+        assert "refresh_token" in new_tokens
+
+    def test_refresh_with_new_token_works(self, client):
+        _v2_register(client)
+        login_res = _v2_login(client)
+        tokens = login_res.get_json()["tokens"]
+
+        res = client.post("/api/auth/v2/refresh", json={
+            "refresh_token": tokens["refresh_token"],
+        })
+        new_tokens = res.get_json()["tokens"]
+
+        me_res = client.get(
+            "/api/auth/v2/me",
+            headers={"Authorization": f"Bearer {new_tokens['access_token']}"},
+        )
+        assert me_res.status_code == 200
+        assert me_res.get_json()["user"]["email"] == "jwt-test@example.com"
+
+    def test_refresh_missing_token(self, client):
+        res = client.post("/api/auth/v2/refresh", json={})
+        assert res.status_code == 400
+
+    def test_refresh_invalid_token(self, client):
+        res = client.post("/api/auth/v2/refresh", json={
+            "refresh_token": "totally-invalid-token",
+        })
+        assert res.status_code == 401
+
+    def test_refresh_tampered_token(self, client):
+        _v2_register(client)
+        login_res = _v2_login(client)
+        token = login_res.get_json()["tokens"]["refresh_token"]
+        parts = token.split(".")
+        if len(parts) == 3:
+            tampered = parts[0] + ".eyJtYWxpY2lvdXMiOiJ0cnVlIn0." + parts[2]
+            res = client.post("/api/auth/v2/refresh", json={"refresh_token": tampered})
+            assert res.status_code == 401
+
+    def test_refresh_blacklisted_after_logout(self, client):
+        _v2_register(client)
+        login_res = _v2_login(client)
+        tokens = login_res.get_json()["tokens"]
+        access_token = tokens["access_token"]
+        refresh_token = tokens["refresh_token"]
+
+        client.post(
+            "/api/auth/v2/logout",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json={"logout_all_devices": False},
+        )
+
+        res = client.post("/api/auth/v2/refresh", json={
+            "refresh_token": refresh_token,
+        })
+        assert res.status_code == 401
+
+
+# ═══════════════════════════════════════════════════════════
+# SQL INJECTION TESTS
+# ═══════════════════════════════════════════════════════════
+
+
+SQL_PAYLOADS = [
+    "' OR 1=1 --",
+    "'; DROP TABLE users; --",
+    "' UNION SELECT * FROM users --",
+    "admin' --",
+    "test@example.com' OR '1'='1",
+    "<script>alert('xss')</script>",
+    "${7*7}",
+    "../../etc/passwd",
+    "1; SELECT * FROM users",
+]
+
+
+class TestSQLInjection:
+    def test_login_sql_injection_email(self, client):
+        for payload in SQL_PAYLOADS:
+            res = client.post("/api/auth/login", json={
+                "email": payload,
+                "password": "irrelevant123",
+            })
+            assert res.status_code in (401, 422, 400), f"Payload '{payload}' returned {res.status_code}"
+
+    def test_register_sql_injection(self, client):
+        for payload in SQL_PAYLOADS:
+            res = client.post("/api/auth/register", json={
+                "name": payload,
+                "email": f"sqli-{abs(hash(payload))}@test.com",
+                "password": "Secret123!",
+            })
+            assert res.status_code in (201, 422, 400), f"Payload '{payload}' returned {res.status_code}"
+
+    def test_chat_sql_injection(self, client):
+        _register(client)
+
+        for payload in SQL_PAYLOADS:
+            res = client.post("/api/chat", json={
+                "message": payload,
+            })
+            assert res.status_code in (200, 400, 422), f"Payload '{payload}' returned {res.status_code}"
+
+    def test_budget_sql_injection(self, client):
+        _register(client)
+        res = client.post("/api/budget/estimate", json={
+            "destination": "Goa' OR 1=1 --",
+            "num_days": 3,
+            "family_size": 2,
+            "travel_class": "economy",
+        })
+        assert res.status_code in (200, 400, 422)
+
+
+# ═══════════════════════════════════════════════════════════
+# RATE LIMITING TESTS  (requires RATELIMIT_ENABLED=True in config)
+# ═══════════════════════════════════════════════════════════
+
+import os
+
+pytestmark_rate_limit = pytest.mark.skipif(
+    os.environ.get("RATELIMIT_ENABLED", "False") != "True",
+    reason="Rate limiting disabled in test config. Set RATELIMIT_ENABLED=True to run.",
+)
+
+
+@pytestmark_rate_limit
+class TestRateLimiting:
+    def test_rate_limit_returns_429(self, client):
+        RATE_LIMIT = 10
+        for i in range(RATE_LIMIT + 2):
+            res = client.post("/api/auth/login", json={
+                "email": f"spam{i}@test.com",
+                "password": "irrelevant",
+            })
+            if i >= RATE_LIMIT:
+                if res.status_code == 429:
+                    return
+        assert False, "Rate limit did not trigger 429 after burst of requests"
