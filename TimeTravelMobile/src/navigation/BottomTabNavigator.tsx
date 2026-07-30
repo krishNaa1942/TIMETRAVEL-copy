@@ -11,15 +11,13 @@ import React, {
   Component,
   ErrorInfo,
   ReactNode,
-  Suspense,
-  lazy,
   useEffect,
   useCallback,
   useMemo,
+  useState,
 } from "react";
 import {
   ActivityIndicator,
-  InteractionManager,
   Platform,
   StyleSheet,
   Text,
@@ -50,17 +48,11 @@ import {
 } from "./config/tabConfig";
 import AnimatedTabIcon from "./components/AnimatedTabIcon";
 
-const loadHomeStack = () => import("./stacks/HomeStack");
-const loadExploreStack = () => import("./stacks/ExploreStack");
-const loadChatStack = () => import("./stacks/ChatStack");
-const loadTripsStack = () => import("./stacks/TripStack");
-const loadProfileStack = () => import("./stacks/ProfileStack");
-
-const HomeStack = lazy(loadHomeStack);
-const ExploreStack = lazy(loadExploreStack);
-const ChatStack = lazy(loadChatStack);
-const TripsStack = lazy(loadTripsStack);
-const ProfileStack = lazy(loadProfileStack);
+import HomeStack from "./stacks/HomeStack";
+import ExploreStack from "./stacks/ExploreStack";
+import ChatStack from "./stacks/ChatStack";
+import TripStack from "./stacks/TripStack";
+import ProfileStack from "./stacks/ProfileStack";
 
 export type BottomTabParamList = {
   Home: undefined;
@@ -132,14 +124,12 @@ const LoadingFallback: React.FC = () => (
 );
 
 const ProtectedStackScreen = (
-  StackComponent: React.LazyExoticComponent<React.ComponentType<any>>,
+  StackComponent: React.ComponentType<any>,
   label: string,
 ): React.ComponentType => {
   const Screen: React.FC = () => (
     <TabErrorBoundary fallbackMessage={`Please try opening ${label} again.`}>
-      <Suspense fallback={<LoadingFallback />}>
-        <StackComponent />
-      </Suspense>
+      <StackComponent />
     </TabErrorBoundary>
   );
 
@@ -151,16 +141,8 @@ const TAB_STACK_SCREENS: Record<TabRouteName, React.ComponentType> = {
   Home: ProtectedStackScreen(HomeStack, "Home"),
   Explore: ProtectedStackScreen(ExploreStack, "Explore"),
   Chat: ProtectedStackScreen(ChatStack, "Chat"),
-  Trips: ProtectedStackScreen(TripsStack, "Trips"),
+  Trips: ProtectedStackScreen(TripStack, "Trips"),
   Profile: ProtectedStackScreen(ProfileStack, "Profile"),
-};
-
-const TAB_STACK_LOADERS: Record<TabRouteName, () => Promise<unknown>> = {
-  Home: loadHomeStack,
-  Explore: loadExploreStack,
-  Chat: loadChatStack,
-  Trips: loadTripsStack,
-  Profile: loadProfileStack,
 };
 
 const RestrictedAccessScreen: React.FC<{
@@ -344,7 +326,7 @@ const BottomTabNavigator: React.FC<BottomTabNavigatorProps> = ({
         return;
       }
 
-      InteractionManager.runAfterInteractions(() => {
+      setTimeout(() => {
         analytics.trackScreenView(`${tabName}Tab`);
         analytics.trackEvent(tab.analytics.eventName, {
           ...tab.analytics.properties,
@@ -377,7 +359,7 @@ const BottomTabNavigator: React.FC<BottomTabNavigatorProps> = ({
           Haptics.NotificationFeedbackType.Warning,
         );
 
-        InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
           analytics.trackEvent("tab_access_denied", {
             tab: tab.name,
             requiredRole: tab.permissions.minRole,
@@ -409,21 +391,12 @@ const BottomTabNavigator: React.FC<BottomTabNavigatorProps> = ({
   );
 
   useEffect(() => {
-    const preloadTask = InteractionManager.runAfterInteractions(() => {
-      void Promise.allSettled(
-        TAB_CONFIGS.map((tab) => TAB_STACK_LOADERS[tab.name]()),
-      );
-    });
-
-    return () => {
-      preloadTask.cancel();
-    };
+    return;
   }, []);
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
-      detachInactiveScreens={false}
       screenOptions={navigatorScreenOptions}
       screenListeners={screenListeners}
     >

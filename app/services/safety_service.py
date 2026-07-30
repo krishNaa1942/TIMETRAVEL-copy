@@ -33,6 +33,9 @@ def _load_safety_data(path: str) -> dict:
         except FileNotFoundError:
             logger.warning("Safety data file not found at %s", path)
             _SAFETY_CACHE = {}
+        except json.JSONDecodeError:
+            logger.error("Safety data file is malformed JSON at %s", path)
+            _SAFETY_CACHE = {}
     return _SAFETY_CACHE
 
 

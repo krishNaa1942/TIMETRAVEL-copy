@@ -10,8 +10,7 @@ Designed to be extended with ML-based price prediction in future versions.
 
 import json
 import logging
-from pathlib import Path
-from typing import Optional
+import threading
 
 from app.models.schemas import BudgetRequest, BudgetEstimate
 from app.utils.constants import TRAVEL_CLASS_MULTIPLIERS
@@ -21,20 +20,24 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Load baseline data once at module level
 # ---------------------------------------------------------------------------
-_BASELINE_CACHE: Optional[dict] = None
+_BASELINE_CACHE: dict = {}
+_BASELINE_LOCK = threading.Lock()
 
 
 def _load_baselines(path: str) -> dict:
     """Load and cache budget baselines from JSON file."""
     global _BASELINE_CACHE
-    if _BASELINE_CACHE is None:
-        try:
-            with open(path, "r") as fh:
-                _BASELINE_CACHE = json.load(fh)
-            logger.info("Budget baselines loaded (%d destinations)", len(_BASELINE_CACHE))
-        except FileNotFoundError:
-            logger.warning("Budget baselines file not found at %s – using defaults", path)
-            _BASELINE_CACHE = {}
+    if not _BASELINE_CACHE:
+        with _BASELINE_LOCK:
+            if _BASELINE_CACHE:
+                return _BASELINE_CACHE
+            try:
+                with open(path, "r") as fh:
+                    _BASELINE_CACHE = json.load(fh)
+                logger.info("Budget baselines loaded (%d destinations)", len(_BASELINE_CACHE))
+            except FileNotFoundError:
+                logger.warning("Budget baselines file not found at %s – using defaults", path)
+                _BASELINE_CACHE = {}
     return _BASELINE_CACHE
 
 

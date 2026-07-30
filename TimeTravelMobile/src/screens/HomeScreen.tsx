@@ -56,12 +56,9 @@ import {
 import { destinationsService } from "@/services/destinations";
 import { weatherService } from "@/services/weather";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
-import {
-  Destination,
-  RootStackParamList,
-  UnsplashImage,
-  WeatherData,
-} from "@/types";
+import { Destination } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
+import type { WeatherData } from "@/types";
 import { colors, spacing } from "@/theme/colors";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -442,7 +439,6 @@ const CarouselSection = memo(
         <FlashList
           horizontal
           data={data}
-          estimatedItemSize={270}
           keyExtractor={(item: Destination) => item.id}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.carouselList}
@@ -636,7 +632,7 @@ export default function HomeScreen() {
   const handleAiSubmit = useCallback(() => {
     if (aiQuery.trim()) {
       logSearch(aiQuery);
-      navigation.navigate("Itinerary" as any, { query: aiQuery });
+      navigation.navigate("Itinerary", { query: aiQuery });
     }
   }, [aiQuery, logSearch, navigation]);
 
@@ -659,45 +655,37 @@ export default function HomeScreen() {
 
   const handleQuickAction = useCallback(
     (action: (typeof QUICK_ACTIONS)[number]) => {
-      if (
-        action.route === "Trips" ||
-        action.route === "Explore" ||
-        action.route === "Budget"
-      ) {
-        navigation.navigate("MainTabs" as any, { screen: action.route });
-      } else {
-        navigation.navigate(action.route as any);
-      }
+      navigation.navigate("MainTabs", { screen: action.route as any, params: {} });
     },
     [navigation],
   );
 
   // Navigation helpers for "See All" buttons
   const handleSeeAllRecommended = useCallback(() => {
-    navigation.navigate("MainTabs" as any, {
-      screen: "Explore",
+    navigation.navigate("MainTabs", {
+      screen: "ExploreTab",
       params: { filter: activeFilter || "featured" },
     });
   }, [navigation, activeFilter]);
 
   const handleSeeAllTrending = useCallback(() => {
-    navigation.navigate("MainTabs" as any, {
-      screen: "Explore",
+    navigation.navigate("MainTabs", {
+      screen: "ExploreTab",
       params: { filter: "trending" },
     });
   }, [navigation]);
 
   const handleSeeAllBudget = useCallback(() => {
-    navigation.navigate("MainTabs" as any, {
-      screen: "Explore",
+    navigation.navigate("MainTabs", {
+      screen: "ExploreTab",
       params: { filter: "budget" },
     });
   }, [navigation]);
 
   const handleInsightPress = useCallback(() => {
     if (travelInsight.type === "tip") {
-      navigation.navigate("MainTabs" as any, {
-        screen: "Explore",
+      navigation.navigate("MainTabs", {
+        screen: "ExploreTab",
         params: { season: CURRENT_SEASON },
       });
     } else if (destinations.length > 0) {
@@ -747,7 +735,7 @@ export default function HomeScreen() {
             </View>
             <PressableScale
               onPress={() =>
-                navigation.navigate("MainTabs" as any, { screen: "Profile" })
+                navigation.navigate("MainTabs", { screen: "ProfileTab" })
               }
               style={styles.avatarContainer}
               accessibilityLabel="Profile settings"
@@ -841,7 +829,7 @@ export default function HomeScreen() {
               daysUntil={daysUntilTrip}
               getImageUrl={getImageUrl}
               onPress={() =>
-                navigation.navigate("MainTabs" as any, { screen: "Trips" })
+                navigation.navigate("MainTabs", { screen: "TripsTab" })
               }
             />
           )}
@@ -872,7 +860,7 @@ export default function HomeScreen() {
           {/* Promo Banner */}
           <PressableScale
             style={styles.promoBanner}
-            onPress={() => navigation.navigate("Itinerary" as any)}
+            onPress={() => navigation.navigate("Itinerary", {})}
           >
             <LinearGradient
               colors={["#667EEA", "#764BA2"]}
@@ -910,7 +898,7 @@ export default function HomeScreen() {
       {/* FAB */}
       <PressableScale
         style={styles.fab}
-        onPress={() => navigation.navigate("Itinerary" as any)}
+        onPress={() => navigation.navigate("Itinerary", {})}
       >
         <LinearGradient
           colors={["#667EEA", "#764BA2"]}

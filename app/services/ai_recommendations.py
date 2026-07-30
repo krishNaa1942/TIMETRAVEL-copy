@@ -6,7 +6,7 @@ Production-grade recommendation engine using vector embeddings
 import math
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -91,8 +91,6 @@ class AIRecommendationService:
         """
         self.db = db_service
         self.embedding_service = embedding_service
-        self._destination_cache = {}
-        self._user_embedding_cache = {}
     
     def get_recommendations(
         self,
@@ -127,7 +125,7 @@ class AIRecommendationService:
                 scored_destinations.append({
                     "destination": dest,
                     "score": score,
-                    "score_breakdown": self._get_score_breakdown(user_prefs, dest, context)
+                    "score_breakdown": self._get_score_breakdown(user_prefs, dest, context, user_id)
                 })
             
             # Sort by score and paginate
@@ -330,25 +328,50 @@ class AIRecommendationService:
         return destination.seasonality_score * seasonal_multipliers.get(start_month, 1.0)
     
     def _calculate_social_proof(self, user_id: str, destination: Destination) -> float:
-        """Calculate social proof score based on similar users."""
-        # This would typically query the database for:
-        # - Friends who visited
-        # - Reviews from similar users
-        # - Overall engagement metrics
-        
-        # Simplified implementation
+        """Calculate social proof score based on similar users and destination popularity."""
         base_score = 0.5
-        
-        # High rating indicates social proof
+
+        try:
+            from app.models.database import db
+            from app.models.entities import Favorite, TripQuery, Expense
+
+            uid = int(user_id)
+
+            fav_count = Favorite.query.filter_by(user_id=uid).count()
+            if fav_count > 5:
+                base_score += 0.1
+
+            own_trips_count = TripQuery.query.filter_by(user_id=uid).count()
+            if own_trips_count > 3:
+                base_score += 0.1
+
+            others_count = TripQuery.query.filter(
+                TripQuery.user_id != uid,
+                TripQuery.destination.ilike(f"%{destination.name}%")
+            ).count()
+            if others_count > 20:
+                base_score += 0.15
+            elif others_count > 5:
+                base_score += 0.1
+
+            expense_count = Expense.query.filter_by(
+                destination=destination.name
+            ).count()
+            if expense_count > 10:
+                base_score += 0.15
+            elif expense_count > 3:
+                base_score += 0.05
+        except Exception:
+            pass
+
         if destination.rating >= 4.5:
-            base_score += 0.3
+            base_score += 0.2
         elif destination.rating >= 4.0:
-            base_score += 0.2
-        
-        # High booking count indicates popularity
+            base_score += 0.1
+
         if destination.booking_count > 1000:
-            base_score += 0.2
-        
+            base_score += 0.1
+
         return min(base_score, 1.0)
     
     def _get_user_embedding(self, user_prefs: UserPreferences) -> List[float]:
@@ -390,12 +413,20 @@ class AIRecommendationService:
         context: RecommendationContext
     ) -> Dict[str, float]:
         """Get detailed score breakdown for transparency."""
+    def _get_score_breakdown(
+        self,
+        user_prefs: UserPreferences,
+        destination: Destination,
+        context: RecommendationContext,
+        user_id: str = ""
+    ) -> Dict[str, float]:
+        """Get detailed score breakdown for transparency."""
         return {
             "preference_match": round(self._calculate_preference_match(user_prefs, destination), 3),
             "popularity": round(self._calculate_popularity_score(destination), 3),
             "context_relevance": round(self._calculate_context_relevance(destination, context), 3),
             "seasonality": round(self._calculate_seasonality(destination, context), 3),
-            "social_proof": round(self._calculate_social_proof("", destination), 3)
+            "social_proof": round(self._calculate_social_proof(user_id, destination), 3)
         }
     
     def _generate_recommendation_reason(self, item: Dict) -> str:

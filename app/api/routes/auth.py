@@ -50,6 +50,8 @@ def _validate_register(data: dict) -> list:
         errors.append("password must contain a lowercase letter")
     if not re.search(r"[0-9]", password):
         errors.append("password must contain a digit")
+    if not re.search(r"[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]", password):
+        errors.append("password must contain a special character")
     return errors
 
 
@@ -124,7 +126,11 @@ def login():
     except SQLAlchemyError as exc:
         logger.exception("Login query failed (database unavailable): %s", exc)
         return jsonify({"error": "Authentication service temporarily unavailable"}), 503
-    if not user or not user.check_password(password):
+    if not user:
+        logger.warning("Failed login attempt for unknown email from IP: %s", request.remote_addr)
+        return jsonify({"error": "Invalid email or password"}), 401
+
+    if not user.check_password(password):
         logger.warning("Failed login attempt for: %s from IP: %s", email, request.remote_addr)
         return jsonify({"error": "Invalid email or password"}), 401
 
@@ -171,8 +177,6 @@ def refresh_session():
     Used by frontend to keep sessions alive during active use.
     """
     from flask import session
-    from datetime import timedelta
-
     if not current_user.is_authenticated:
         return jsonify({"error": "Session expired", "authenticated": False}), 401
 

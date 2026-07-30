@@ -10,7 +10,7 @@ import asyncio
 import threading
 from typing import Dict, List, Set, Any, Optional, Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 
@@ -58,7 +58,7 @@ class WebSocketMessage:
     """WebSocket message structure"""
     type: MessageType
     payload: Dict[str, Any]
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     message_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     
     def to_json(self) -> str:
@@ -87,8 +87,8 @@ class ConnectedClient:
     user_id: str
     connection: Any  # WebSocket connection object
     rooms: Set[str] = field(default_factory=set)
-    connected_at: datetime = field(default_factory=datetime.utcnow)
-    last_activity: datetime = field(default_factory=datetime.utcnow)
+    connected_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    last_activity: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -307,13 +307,13 @@ class WebSocketService:
             # Update last activity
             client = self._clients.get(client_id)
             if client:
-                client.last_activity = datetime.utcnow()
+                client.last_activity = datetime.now(timezone.utc)
             
             # Handle ping/pong
             if message.type == MessageType.PING:
                 await self._send_to_client(client_id, WebSocketMessage(
                     type=MessageType.PONG,
-                    payload={"timestamp": datetime.utcnow().isoformat()}
+                    payload={"timestamp": datetime.now(timezone.utc).isoformat()}
                 ))
                 return
             
@@ -519,7 +519,7 @@ class WebSocketService:
             try:
                 await asyncio.sleep(self._heartbeat_interval)
                 
-                now = datetime.utcnow()
+                now = datetime.now(timezone.utc)
                 stale_clients = []
                 
                 with self._lock:

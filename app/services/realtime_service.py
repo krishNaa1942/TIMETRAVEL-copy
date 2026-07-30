@@ -10,7 +10,7 @@ import asyncio
 import threading
 from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 import hashlib
 
@@ -49,7 +49,7 @@ class PriceAlert:
     currency: str = "USD"
     threshold_percent: float = 10.0  # Alert when price drops by this percent
     status: AlertStatus = AlertStatus.ACTIVE
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     expires_at: datetime = None
     last_checked: datetime = None
     triggered_at: datetime = None
@@ -57,7 +57,7 @@ class PriceAlert:
     
     def __post_init__(self):
         if self.expires_at is None:
-            self.expires_at = datetime.utcnow() + timedelta(days=30)
+            self.expires_at = datetime.now(timezone.utc) + timedelta(days=30)
 
 
 @dataclass
@@ -67,7 +67,7 @@ class TripUpdate:
     update_type: UpdateType
     user_id: str
     data: Dict[str, Any]
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     collaborator_ids: List[str] = field(default_factory=list)
 
 
@@ -142,7 +142,7 @@ class RealtimeTripService:
         # Notify other collaborators
         await self._notify_collaborators(trip_id, UpdateType.COLLABORATOR_ADDED, {
             "user_id": user_id,
-            "joined_at": datetime.utcnow().isoformat()
+            "joined_at": datetime.now(timezone.utc).isoformat()
         }, exclude_user=user_id)
         
         # Get current collaborators
@@ -188,7 +188,7 @@ class RealtimeTripService:
         # Notify remaining collaborators
         await self._notify_collaborators(trip_id, UpdateType.COLLABORATOR_REMOVED, {
             "user_id": user_id,
-            "left_at": datetime.utcnow().isoformat()
+            "left_at": datetime.now(timezone.utc).isoformat()
         })
         
         logger.info(f"User {user_id} left trip {trip_id}")
@@ -326,7 +326,8 @@ class RealtimeTripService:
     
     def get_trip_collaborators(self, trip_id: str) -> List[str]:
         """Get list of collaborators for a trip."""
-        return list(self._trip_collaborators.get(trip_id, set()))
+        with self._lock:
+            return list(self._trip_collaborators.get(trip_id, set()))
     
     def get_user_active_trips(self, user_id: str) -> List[str]:
         """Get trips a user is currently collaborating on."""
@@ -374,12 +375,16 @@ class RealtimeTripService:
         
         collaborators = self.get_trip_collaborators(trip_id)
         
+        from app.services.websocket_service import WebSocketMessage, MessageType as WsMsgType
+
+        message = WebSocketMessage(
+            type=WsMsgType(update_type.value),
+            payload={"trip_id": trip_id, **data},
+        ).to_json()
+
         for user_id in collaborators:
             if user_id != exclude_user:
-                await self.ws.send_to_user(user_id, self.ws._create_message(
-                    update_type.value,
-                    {"trip_id": trip_id, **data}
-                ))
+                await self.ws.send_to_user(user_id, message)
 
 
 class PriceAlertService:
@@ -454,7 +459,7 @@ class PriceAlertService:
         Returns:
             Created price alert
         """
-        alert_id = hashlib.md5(f"{user_id}_{destination}_{datetime.utcnow().isoformat()}".encode()).hexdigest()[:12]
+        alert_id = hashlib.md5(f"{user_id}_{destination}_{datetime.now(timezone.utc).isoformat()}".encode()).hexdigest()[:12]
         
         # Get current price if not provided
         if current_price is None:
@@ -472,7 +477,7 @@ class PriceAlertService:
             current_price=current_price,
             currency=currency,
             threshold_percent=threshold_percent,
-            expires_at=datetime.utcnow() + timedelta(days=expires_days)
+            expires_at=datetime.now(timezone.utc) + timedelta(days=expires_days)
         )
         
         with self._lock:
@@ -543,12 +548,9 @@ class PriceAlertService:
             for alert in active_alerts:
                 # Check if threshold met
                 if new_price <= alert.target_price or price_change_percent >= alert.threshold_percent:
-                    # Trigger alert
                     alert.status = AlertStatus.TRIGGERED
-                    alert.triggered_at = datetime.utcnow()
+                    alert.triggered_at = datetime.now(timezone.utc)
                     alert.current_price = new_price
-                    
-                    # Send notifications
                     await self._send_alert_notification(alert, old_price, new_price)
                     
                     triggered_alerts.append({
@@ -604,19 +606,23 @@ class PriceAlertService:
         """Start background price monitoring."""
         self._running = True
         
-        while self._running:
-            try:
-                await asyncio.sleep(self._check_interval)
-                results = await self.check_all_alerts()
-                logger.info(f"Price check results: {results}")
-                
-                # Clean up expired alerts
-                await self._cleanup_expired_alerts()
-                
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                logger.error(f"Price monitoring error: {e}")
+        try:
+            while self._running:
+                try:
+                    await asyncio.sleep(self._check_interval)
+                    if not self._running:
+                        break
+                    results = await self.check_all_alerts()
+                    logger.info(f"Price check results: {results}")
+                    
+                    await self._cleanup_expired_alerts()
+                    
+                except asyncio.CancelledError:
+                    break
+                except Exception as e:
+                    logger.error(f"Price monitoring error: {e}")
+        finally:
+            self._running = False
     
     def stop_monitoring(self):
         """Stop background monitoring."""
@@ -655,7 +661,7 @@ class PriceAlertService:
     
     async def _cleanup_expired_alerts(self):
         """Remove expired alerts."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         with self._lock:
             for alert_id, alert in list(self._alerts.items()):

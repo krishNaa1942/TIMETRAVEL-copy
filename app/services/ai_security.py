@@ -13,7 +13,7 @@ This is CRITICAL for production AI systems.
 
 import re
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
@@ -92,11 +92,9 @@ class AIPromptSanitizer:
     # ─────────────────────────────────────────────────────────────
     
     SENSITIVE_PATTERNS = [
-        # Credit cards
-        (r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b", "CREDIT_CARD"),
-        
-        # SSN
-        (r"\b\d{3}[\s-]?\d{2}[\s-]?\d{4}\b", "SSN"),
+        (r"\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b", "CREDIT_CARD"),
+
+        (r"\b(?!000|666|9\d{2})\d{3}[\s-]?(?!00)\d{2}[\s-]?(?!0000)\d{4}\b", "SSN"),
         
         # Email addresses
         (r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "EMAIL"),
@@ -270,12 +268,14 @@ class AIPromptSanitizer:
         Returns:
             Safe prompt string
         """
-        # Sanitize user input first
         scan_result = cls.sanitize_input(user_input)
         if scan_result.should_block:
-            return None
-        
-        # Build safe prompt with clear boundaries
+            return (
+                "I'm sorry, but I can't process that request. "
+                "Please ask me about travel destinations, trip planning, "
+                "or other travel-related topics!"
+            )
+
         safe_prompt = f"""SYSTEM INSTRUCTIONS (DO NOT MODIFY):
 {system_prompt}
 

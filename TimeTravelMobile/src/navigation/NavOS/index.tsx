@@ -25,10 +25,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useAuthStore } from "@/stores/authStore";
-import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { getTabDeepLinkScreens } from "../config/tabConfig";
-
-// Import screens
 import AuthScreen from "@/screens/AuthScreen";
 import BottomTabNavigator from "../BottomTabNavigator";
 import DestinationDetailScreen from "@/screens/DestinationDetailScreen";
@@ -52,8 +49,8 @@ import PhrasebookScreen from "@/screens/PhrasebookScreen";
 // Types
 export type RootStackParamList = {
   Auth: undefined;
-  MainTabs: undefined;
-  DestinationDetail: { id: string; name?: string };
+  MainTabs: { screen?: string; params?: any } | undefined;
+  DestinationDetail: { destination: any; id?: string };
   Budget: { destinationId?: string; days?: number };
   Itinerary: { destinationId?: string; days?: number };
   Packing: undefined;
@@ -94,7 +91,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       MainTabs: {
         path: "",
         screens: getTabDeepLinkScreens(),
-      },
+      } as any,
       DestinationDetail: "destination/:id",
       Budget: "budget",
       Itinerary: "itinerary/:destinationId",
@@ -210,7 +207,7 @@ const AuthenticatedStack = React.memo<AuthenticatedStackProps>(
         options={transparentHeader}
         initialParams={
           initialRoute === "DestinationDetail"
-            ? (initialParams as any)
+            ? (initialParams as Partial<{ destination: any; id?: string }>)
             : undefined
         }
       />
@@ -451,7 +448,11 @@ export const NavOS: React.FC = () => {
         }}
       >
         <StatusBar barStyle="light-content" />
-        {isAuthenticated ? <AuthenticatedStack /> : <GuestStack />}
+        {isAuthenticated ? (
+          <AuthenticatedStack />
+        ) : (
+          <GuestStack />
+        )}
       </NavigationContainer>
     </NavigationErrorBoundary>
   );

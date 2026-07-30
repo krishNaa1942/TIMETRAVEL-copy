@@ -1,126 +1,30 @@
 # ──────────────────────────────────────────────────────────
-# CI/CD Pipeline – Time Travel
+# CI Pipeline – Time Travel
 # Runs on every push & pull request to main
+# Combines unit tests, integration tests, lint, Docker smoke test,
+# and TypeScript checks for the mobile app.
 # ──────────────────────────────────────────────────────────
 
 name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, develop]
   pull_request:
     branches: [main, master]
 
+env:
+  FLASK_ENV: testing
+  SECRET_KEY: ci-test-secret-key-not-for-production
+
 jobs:
-  # ── Unit Tests with Coverage ──────────────────────────
-  test:
-    name: Unit Tests + Coverage
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run linter (flake8)
-        run: |
-          flake8 app/ --max-line-length=120 --count --statistics --exclude=__pycache__
-
-      - name: Run unit tests with coverage
-        env:
-          FLASK_ENV: testing
-          SECRET_KEY: ci-test-secret-key-not-for-production
-        run: |
-          python -m pytest tests/ \
-            --ignore=tests/test_integration.py \
-            --cov=app \
-            --cov-report=term-missing \
-            --cov-report=xml:coverage-unit.xml \
-            --cov-fail-under=50 \
-            --tb=short -q
-
-      - name: Upload unit test coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-unit-py${{ matrix.python-version }}
-          path: coverage-unit.xml
-
-  # ── Integration Tests ─────────────────────────────────
-  integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run integration tests with coverage
-        env:
-          FLASK_ENV: testing
-          SECRET_KEY: ci-test-secret-key-not-for-production
-        run: |
-          python -m pytest tests/test_integration.py \
-            --cov=app \
-            --cov-report=term-missing \
-            --cov-report=xml:coverage-integration.xml \
-            --tb=short -v
-
-      - name: Upload integration coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-integration
-          path: coverage-integration.xml
-
-  # ── Code Formatting ──────────────────────────────────
+  # ── Lint & Format ─────────────────────────────────────
   lint:
-    name: Code Formatting
+    name: Lint & Format
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -133,20 +37,159 @@ jobs:
       - name: Check formatting (black)
         run: black --check --diff app/ tests/
 
+      - name: Lint (flake8)
+        run: flake8 app/ --max-line-length=120 --count --statistics --exclude=__pycache__
+
+  # ── Unit Tests (matrix) ───────────────────────────────
+  test:
+    name: Unit Tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests with coverage
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/test_integration.py \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage-unit.xml \
+            --cov-fail-under=60 \
+            --tb=short -q
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit-py${{ matrix.python-version }}
+          path: coverage-unit.xml
+
+  # ── Integration Tests ─────────────────────────────────
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: timetravel_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Integration tests
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/timetravel_test
+        run: |
+          python -m pytest tests/test_integration.py \
+            --cov=app --cov-report=term-missing \
+            --cov-report=xml:coverage-integration.xml \
+            --tb=short -v
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-integration
+          path: coverage-integration.xml
+
+  # ── TypeScript Checks (Mobile App) ────────────────────
+  typescript:
+    name: TypeScript Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: TimeTravelMobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: TimeTravelMobile
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+        working-directory: TimeTravelMobile
+
+  # ── Security Scan ──────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy (filesystem)
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          exit-code: 1
+          severity: HIGH,CRITICAL
+
   # ── Docker Build & Smoke Test ─────────────────────────
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
-    needs: [test, integration]
+    needs: [test, integration, security]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t timetravel:ci .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: timetravel:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Verify container starts
+      - name: Smoke test
         run: |
           docker run -d --name tt-test \
             -e FLASK_ENV=testing \
@@ -156,3 +199,13 @@ jobs:
           sleep 5
           curl -f http://localhost:5001/api/health || exit 1
           docker stop tt-test
+
+      - name: Run Trivy (image)
+        if: always()
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          scan-type: image
+          scan-ref: timetravel:ci
+          format: table
+          exit-code: 0
+          severity: HIGH,CRITICAL

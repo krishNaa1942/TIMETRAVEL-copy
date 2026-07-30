@@ -10,6 +10,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
 import { useAuthStore, User } from "@/stores/authStore";
 import { tokenManager } from "@/services/tokenManager";
@@ -71,7 +72,8 @@ export function AuthProvider({
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>("free");
   const [tokenExpiringSoon, setTokenExpiringSoon] = useState(false);
-  const [initialized, setInitialized] = useState(false);
+  const [initRetryCount, setInitRetryCount] = useState(0);
+  const initializedRef = useRef(false);
 
   // Compute derived state
   const isAuthenticated = status === "authenticated";
@@ -104,7 +106,7 @@ export function AuthProvider({
 
   // Initialize auth state on mount
   useEffect(() => {
-    if (initialized) return;
+    if (initializedRef.current) return;
 
     const initializeAuth = async () => {
       console.log("🔐 Initializing auth state...");
@@ -131,18 +133,24 @@ export function AuthProvider({
           store.clearUser();
         }
       } catch (error) {
+        if (initRetryCount < 2) {
+          const delay = 1000 * Math.pow(2, initRetryCount);
+          console.log(`🔐 Retrying auth init in ${delay}ms (attempt ${initRetryCount + 1})`);
+          setInitRetryCount(c => c + 1);
+          await new Promise(r => setTimeout(r, delay));
+          return;
+        }
+
         console.error("🔐 Auth initialization error:", error);
-        setStatus("error");
-        store.setError(
-          error instanceof Error ? error.message : "Authentication failed",
-        );
+        setStatus("unauthenticated");
+        store.clearUser();
       } finally {
-        setInitialized(true);
+        initializedRef.current = true;
       }
     };
 
     initializeAuth();
-  }, [initialized]);
+  }, [initRetryCount]);
 
   // Note: Token subscription is handled internally by tokenManager
   // through its refresh mechanism and getValidToken() method

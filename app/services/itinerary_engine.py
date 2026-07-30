@@ -13,7 +13,7 @@ import math
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 
@@ -426,7 +426,7 @@ class ItineraryEngine:
             "total_travel_time": total_travel,
             "total_distance": total_dist,
             "estimated_cost": total_cost,
-            "generated_at": datetime.utcnow().isoformat()
+            "generated_at": datetime.now(timezone.utc).isoformat()
         }
     
     def _empty_itinerary(self, destination: str, total_days: int) -> Dict[str, Any]:

@@ -82,7 +82,7 @@ export const authServiceV2 = {
           email: credentials.email.trim().toLowerCase(),
           password: credentials.password,
         },
-        { skipDedup: true },
+        { skipDedup: true, skipRetry: true },
       );
 
       if (!response.success || !response.user || !response.tokens) {

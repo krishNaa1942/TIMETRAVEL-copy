@@ -19,7 +19,9 @@ Falls back gracefully when ``SUPABASE_URL`` is not configured
 from __future__ import annotations
 
 import logging
+import socket
 from typing import Any, Optional
+from urllib.parse import urlparse
 
 from flask import current_app
 
@@ -30,10 +32,23 @@ logger = logging.getLogger(__name__)
 _db_client_cache: dict = {}
 
 
+def _resolve_host(host: str, timeout: float = 3.0) -> bool:
+    """Quickly check whether *host* resolves via DNS (NXDOMAIN = False)."""
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.gethostbyname(host)
+        return True
+    except (socket.gaierror, OSError):
+        return False
+    finally:
+        socket.setdefaulttimeout(None)
+
+
 def _get_db_client():
     """Return a cached ``supabase.Client`` configured for database access.
 
-    Returns ``None`` when Supabase credentials are absent.
+    Returns ``None`` when Supabase credentials are absent or the
+    host does not resolve (prevents a ~30s hang on stale DNS).
     """
     url = current_app.config.get("SUPABASE_URL", "")
     key = (
@@ -41,6 +56,11 @@ def _get_db_client():
         or current_app.config.get("SUPABASE_KEY", "")
     )
     if not url or not key:
+        return None
+
+    parsed = urlparse(url)
+    if parsed.hostname and not _resolve_host(parsed.hostname):
+        logger.warning("Supabase host %s does not resolve — skipping", parsed.hostname)
         return None
 
     cache_key = f"db:{url}:{key}"

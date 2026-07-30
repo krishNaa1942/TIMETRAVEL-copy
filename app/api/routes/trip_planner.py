@@ -3,10 +3,9 @@ Trip Planner API – Full CRUD for the trip workspace.
 Create trips, manage days, add/move places, companions.
 """
 
-import json
-from datetime import datetime, date
+from datetime import date
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 
 from app.models.database import db
@@ -98,9 +97,9 @@ def get_trip(trip_id):
         return jsonify({"error": "Trip not found."}), 404
 
     d = trip.to_dict(include_days=True, include_places=True)
-    d["reservations"] = [r.to_dict() for r in trip.reservations.all()]
-    d["photos"] = [p.to_dict() for p in trip.photos.all()]
-    d["companions"] = [c.to_dict() for c in trip.companions.all()]
+    d["reservations"] = [r.to_dict() for r in trip.reservations]
+    d["photos"] = [p.to_dict() for p in trip.photos]
+    d["companions"] = [c.to_dict() for c in trip.companions]
     return jsonify({"trip": d})
 
 
@@ -113,23 +112,85 @@ def update_trip(trip_id):
         return jsonify({"error": "Trip not found."}), 404
 
     data = request.get_json(silent=True) or {}
-    for field in ["title", "destination", "notes", "travel_class", "cover_image_url", "status", "itinerary_json"]:
+    errors = []
+
+    # String fields with max length
+    for field, maxlen in [("title", 200), ("destination", 200), ("notes", 5000), ("cover_image_url", 1024)]:
         if field in data:
-            setattr(trip, field, data[field])
+            if not isinstance(data[field], str):
+                errors.append(f"{field} must be a string")
+            else:
+                setattr(trip, field, data[field][:maxlen])
+
+    # Enum fields
+    valid_classes = {"economy", "business", "first", "budget", "luxury"}
+    if "travel_class" in data:
+        if data["travel_class"] not in valid_classes:
+            errors.append(f"travel_class must be one of: {', '.join(sorted(valid_classes))}")
+        else:
+            trip.travel_class = data["travel_class"]
+
+    valid_statuses = {"planning", "active", "completed"}
+    if "status" in data:
+        if data["status"] not in valid_statuses:
+            errors.append(f"status must be one of: {', '.join(sorted(valid_statuses))}")
+        else:
+            trip.status = data["status"]
+
+    # JSON field
+    if "itinerary_json" in data:
+        if data["itinerary_json"] is not None:
+            if not isinstance(data["itinerary_json"], str):
+                errors.append("itinerary_json must be a string")
+            else:
+                import json as _json
+                try:
+                    _json.loads(data["itinerary_json"])
+                    trip.itinerary_json = data["itinerary_json"]
+                except ValueError:
+                    errors.append("itinerary_json must be valid JSON")
+        else:
+            trip.itinerary_json = None
+
+    # Integer fields
     for int_field in ["num_days", "family_size"]:
         if int_field in data:
-            setattr(trip, int_field, int(data[int_field]))
+            if data[int_field] is not None:
+                try:
+                    setattr(trip, int_field, int(data[int_field]))
+                except (TypeError, ValueError):
+                    errors.append(f"{int_field} must be an integer")
+            else:
+                setattr(trip, int_field, None)
+
+    # Float fields
     for float_field in ["budget_total"]:
         if float_field in data:
-            setattr(trip, float_field, float(data[float_field]) if data[float_field] else None)
+            if data[float_field] is not None:
+                try:
+                    setattr(trip, float_field, float(data[float_field]))
+                except (TypeError, ValueError):
+                    errors.append(f"{float_field} must be a number")
+            else:
+                setattr(trip, float_field, None)
+
+    # Date fields
     for date_field in ["start_date", "end_date"]:
         if date_field in data:
-            try:
-                setattr(trip, date_field, date.fromisoformat(data[date_field]) if data[date_field] else None)
-            except ValueError:
-                pass
+            if data[date_field]:
+                try:
+                    setattr(trip, date_field, date.fromisoformat(data[date_field]))
+                except (TypeError, ValueError):
+                    errors.append(f"{date_field} must be a valid ISO date (YYYY-MM-DD)")
+            else:
+                setattr(trip, date_field, None)
+
+    # Boolean fields
     if "is_public" in data:
         trip.is_public = bool(data["is_public"])
+
+    if errors:
+        return jsonify({"error": "validation_failed", "details": errors}), 422
 
     db.session.commit()
     return jsonify({"trip": trip.to_dict()})
@@ -158,7 +219,7 @@ def add_day(trip_id):
         return jsonify({"error": "Trip not found."}), 404
 
     data = request.get_json(silent=True) or {}
-    day_num = trip.days.count() + 1
+    day_num = len(trip.days) + 1
     day = TripDay(
         trip_id=trip.id,
         day_number=day_num,
@@ -297,8 +358,14 @@ def reorder_places(trip_id):
 
     data = request.get_json(silent=True) or {}
     order = data.get("order", [])  # [{id: place_id, day_id: x, position: y}]
+    ids = [item["id"] for item in order]
+    places_map = {
+        p.id: p for p in TripPlace.query.filter(
+            TripPlace.id.in_(ids), TripPlace.trip_id == trip.id
+        ).all()
+    }
     for item in order:
-        place = TripPlace.query.filter_by(id=item["id"], trip_id=trip.id).first()
+        place = places_map.get(item["id"])
         if place:
             place.day_id = item.get("day_id", place.day_id)
             place.position_order = item.get("position", place.position_order)
@@ -330,7 +397,7 @@ def add_companion(trip_id):
         email=data.get("email"),
         phone=data.get("phone"),
         role=data.get("role", "traveler"),
-        avatar_color=COLORS[trip.companions.count() % len(COLORS)],
+        avatar_color=COLORS[len(trip.companions) % len(COLORS)],
     )
     db.session.add(comp)
     db.session.commit()

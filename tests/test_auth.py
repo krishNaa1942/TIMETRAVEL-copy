@@ -29,7 +29,7 @@ def client(app):
     return app.test_client()
 
 
-def _register(client, name="Test User", email="test@example.com", password="Secret123"):
+def _register(client, name="Test User", email="test@example.com", password="Secret123!"):
     return client.post("/api/auth/register", json={
         "name": name,
         "email": email,
@@ -37,7 +37,7 @@ def _register(client, name="Test User", email="test@example.com", password="Secr
     })
 
 
-def _login(client, email="test@example.com", password="Secret123"):
+def _login(client, email="test@example.com", password="Secret123!"):
     return client.post("/api/auth/login", json={
         "email": email,
         "password": password,

@@ -5,7 +5,7 @@ Manages user travel preferences for AI recommendations
 
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field, asdict
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 
@@ -32,8 +32,8 @@ class TravelPreferences:
         "recommendations": True,
         "newsletter": False
     })
-    created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
-    updated_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
@@ -54,6 +54,9 @@ class SavedDestination:
     saved_at: str
     notes: str = ""
     tags: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
 
 
 class UserPreferencesService:
@@ -149,7 +152,7 @@ class UserPreferencesService:
                 
                 setattr(current, key, value)
         
-        current.updated_at = datetime.utcnow().isoformat()
+        current.updated_at = datetime.now(timezone.utc).isoformat()
         
         # Save to database
         if self.db:
@@ -173,7 +176,7 @@ class UserPreferencesService:
         
         if activity not in prefs.activity_preferences:
             prefs.activity_preferences.append(activity)
-            prefs.updated_at = datetime.utcnow().isoformat()
+            prefs.updated_at = datetime.now(timezone.utc).isoformat()
             
             if self.db:
                 await self.db.save_user_preferences(user_id, prefs.to_dict())
@@ -192,7 +195,7 @@ class UserPreferencesService:
         
         if activity in prefs.activity_preferences:
             prefs.activity_preferences.remove(activity)
-            prefs.updated_at = datetime.utcnow().isoformat()
+            prefs.updated_at = datetime.now(timezone.utc).isoformat()
             
             if self.db:
                 await self.db.save_user_preferences(user_id, prefs.to_dict())
@@ -304,7 +307,7 @@ class UserPreferencesService:
             "search_type": search_type,
             "filters": filters or {},
             "results_count": results_count,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
         self._search_history_cache[user_id].append(search_entry)

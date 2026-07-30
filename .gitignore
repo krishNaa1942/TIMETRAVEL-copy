@@ -21,6 +21,7 @@ env/
 # Environment variables (contains API keys!)
 .env
 .env.local
+scripts/test_connection.py
 
 # SQLite databases & instance data
 instance/

@@ -97,12 +97,18 @@ class TokenStore:
         if self._redis is None and self.redis_url and not self._use_memory:
             try:
                 import redis
-                self._redis = redis.from_url(self.redis_url, decode_responses=True)
-                # Test connection
+                pool = redis.ConnectionPool.from_url(
+                    self.redis_url,
+                    max_connections=10,
+                    decode_responses=True,
+                    socket_connect_timeout=3,
+                    socket_timeout=3,
+                )
+                self._redis = redis.Redis(connection_pool=pool)
                 self._redis.ping()
-                logger.info("Connected to Redis for token storage")
+                logger.info("Connected to Redis for token storage (pool max 10)")
             except Exception as e:
-                logger.warning(f"Redis connection failed, using in-memory fallback: {e}")
+                logger.critical(f"Redis connection failed — blacklist degraded to in-memory (not shared across workers): {e}")
                 self._use_memory = True
                 self._redis = None
         return self._redis
@@ -570,7 +576,11 @@ class JWTServiceV2:
         return hashlib.sha256(token.encode()).hexdigest()
     
     def decode_token_unsafe(self, token: str) -> Optional[Dict[str, Any]]:
-        """Decode token without verification (for debugging only)"""
+        """Decode token without verification (for debugging only).
+        
+        WARNING: Never call this in production code paths.
+        """
+        logger.warning("decode_token_unsafe called - this bypasses signature verification")
         try:
             return jwt.decode(token, options={"verify_signature": False})
         except Exception:

@@ -10,49 +10,24 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { apiService } from './api';
 
-// Network state fallback - uses a simple online/offline check
-// For full implementation, install: npm install @react-native-community/netinfo
-type NetInfoState = {
-  isConnected: boolean | null;
-  isInternetReachable: boolean | null;
+const getNetworkState = async (): Promise<NetInfoState> => {
+  try {
+    return await NetInfo.fetch();
+  } catch {
+    return { isConnected: true, isInternetReachable: true } as NetInfoState;
+  }
 };
 
-// Simple network check fallback
-const getNetworkState = (): Promise<NetInfoState> => {
-  return new Promise((resolve) => {
-    // Use navigator.onLine for web, assume online for native
-    const isOnline = typeof navigator !== 'undefined' 
-      ? navigator.onLine 
-      : true;
-    resolve({
-      isConnected: isOnline,
-      isInternetReachable: isOnline,
-    });
-  });
-};
-
-// Subscribe to network changes (simplified)
 const subscribeToNetworkChanges = (
   callback: (state: NetInfoState) => void
 ): (() => void) => {
-  // For web
-  if (typeof window !== 'undefined') {
-    const handleOnline = () => callback({ isConnected: true, isInternetReachable: true });
-    const handleOffline = () => callback({ isConnected: false, isInternetReachable: false });
-    
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }
-  
-  // For native without netinfo, just return noop
-  return () => {};
+  const unsubscribe = NetInfo.addEventListener((state) => {
+    callback(state);
+  });
+  return unsubscribe;
 };
 
 // ─────────────────────────────────────────────────────────────

@@ -212,9 +212,15 @@ def upload_document():
         except ValueError:
             pass
 
+    trip_id = int(request.form["trip_id"]) if request.form.get("trip_id") else None
+    if trip_id is not None:
+        trip = Trip.query.filter_by(id=trip_id, user_id=current_user.id).first()
+        if not trip:
+            return jsonify({"error": "Trip not found or access denied"}), 404
+
     doc = TripDocument(
         user_id=current_user.id,
-        trip_id=int(request.form["trip_id"]) if request.form.get("trip_id") else None,
+        trip_id=trip_id,
         doc_type=_sanitize_text(request.form.get("doc_type", "other"), 50),
         title=_sanitize_text(request.form.get("title", file.filename), 200),
         filename=stored_name,

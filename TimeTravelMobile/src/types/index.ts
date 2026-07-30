@@ -48,6 +48,7 @@ export interface SafetyData {
   infrastructure_score: number;
   tourist_friendliness: number;
   advisory: string;
+  is_estimated?: boolean;
 }
 
 // ── Chat ──────────────────────────────────────────────────────
@@ -134,7 +135,7 @@ export interface CompareRouteParams {
 
 export type RootStackParamList = {
   Auth: undefined;
-  MainTabs: undefined;
+  MainTabs: { screen?: string; params?: any } | undefined;
   DestinationDetail: { destination: Destination };
   Budget: { destination?: Destination };
   Itinerary: { query?: string };

@@ -6,7 +6,7 @@ All API responses follow a consistent envelope pattern.
 
 from typing import Any, Optional, Dict, List
 from dataclasses import dataclass
-from flask import jsonify, Response
+from flask import jsonify
 from enum import Enum
 
 

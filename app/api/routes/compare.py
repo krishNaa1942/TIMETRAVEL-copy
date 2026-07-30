@@ -7,6 +7,7 @@ Returns side-by-side budget, safety, and weather data for two destinations.
 """
 
 from flask import Blueprint, request, jsonify, current_app
+from flask_login import login_required
 
 from app.models.schemas import BudgetRequest
 from app.services.budget_service import estimate_budget
@@ -23,6 +24,7 @@ compare_bp = Blueprint("compare", __name__)
 
 
 @compare_bp.route("/api/compare", methods=["GET"])
+@login_required
 @limiter.limit("30 per minute")
 def compare_destinations():
     """Compare two destinations side-by-side on budget, safety, weather."""

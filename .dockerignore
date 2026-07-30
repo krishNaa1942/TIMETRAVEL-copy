@@ -1,56 +1,46 @@
-# ── Version control ──────────────────────────────────────
 .git
 .gitignore
-
-# ── Python artifacts ─────────────────────────────────────
-__pycache__
-*.pyc
-*.pyo
-*.egg-info
+.gitattributes
+.env
+.env.*
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
 dist/
 build/
-*.egg
-.eggs/
-venv/
 .venv/
+venv/
 env/
-
-# ── Testing & linting ───────────────────────────────────
-tests/
+node_modules/
 .pytest_cache/
 .coverage
 htmlcov/
-.mypy_cache/
-.flake8
-
-# ── IDE / editor ────────────────────────────────────────
+*.log
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-
-# ── Docker ──────────────────────────────────────────────
-Dockerfile
+TimeTravelMobile/
+tests/
+scripts/
+data/
+AUDIT_REPORT.md
+CHANGELOG.md
+README.md
+IMPLEMENTATION_ROADMAP.md
+PROJECT_SUMMARY.md
+TECHNICAL_DOCUMENTATION.md
+CONTRIBUTING.md
 docker-compose*.yml
-.dockerignore
-
-# ── Documentation & CI ──────────────────────────────────
-*.md
-LICENSE
-.github/
-.gitlab-ci.yml
-
-# ── Environment & secrets ───────────────────────────────
-.env
-.env.*
-*.pem
-*.key
-
-# ── OS files ─────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-
-# ── Uploads (runtime data, not baked into image) ────────
+deploy/
 uploads/
 instance/
+*.db
+*.sqlite
+*.sqlite3
+.mypy_cache/
+.ruff_cache/

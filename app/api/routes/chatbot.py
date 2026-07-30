@@ -22,7 +22,7 @@ Response JSON:
 
 import uuid
 from flask import Blueprint, request, jsonify, current_app
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app.chatbot.engine import chat
 from app.models.database import db
@@ -65,6 +65,7 @@ def _persist_message(session_id, user_msg_text, bot_reply, intent=None):
 # POST /api/chat – Smart auto-select (Gemini if available, else classic)
 # ---------------------------------------------------------------------------
 @chatbot_bp.route("/api/chat", methods=["POST"])
+@login_required
 @limiter.limit("20 per minute")
 def chat_endpoint():
     """Handle a chatbot message – uses Gemini AI if available, else classic ML."""
@@ -138,11 +139,10 @@ def chat_endpoint():
         current_app.logger.warning("Unsupported chat mode '%s'; using classic fallback", mode)
         return _classic_response(message, session_id)
 
-    except Exception as exc:
-        current_app.logger.exception("Unhandled error in /api/chat: %s", exc)
+    except Exception:
+        current_app.logger.exception("Unhandled error in /api/chat")
         return jsonify({
             "error": "Internal Server Error",
-            "details": str(exc),
         }), 500
 
 
@@ -150,6 +150,7 @@ def chat_endpoint():
 # POST /api/chat/ai – Force Gemini AI mode
 # ---------------------------------------------------------------------------
 @chatbot_bp.route("/api/chat/ai", methods=["POST"])
+@login_required
 @limiter.limit("20 per minute")
 def chat_ai_endpoint():
     """Force Gemini AI response."""
@@ -189,6 +190,7 @@ def chat_ai_endpoint():
 # POST /api/chat/classic – Force classic ML mode
 # ---------------------------------------------------------------------------
 @chatbot_bp.route("/api/chat/classic", methods=["POST"])
+@login_required
 @limiter.limit("20 per minute")
 def chat_classic_endpoint():
     """Force classic ML response."""

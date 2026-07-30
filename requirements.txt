@@ -15,6 +15,9 @@ scikit-learn>=1.4,<2.0
 # ---------- AI (Gemini) ----------
 google-generativeai>=0.8,<1.0
 
+# ---------- Redis ----------
+redis>=5.0,<6.0
+
 # ---------- Resilience ----------
 tenacity>=8.0,<10.0
 
@@ -33,6 +36,9 @@ flake8>=7.0
 # ---------- Supabase ----------
 supabase>=2.0,<3.0
 psycopg2-binary>=2.9,<3.0
+
+# ---------- Database Migrations ----------
+alembic>=1.18,<2.0
 
 # ---------- Production WSGI ----------
 gunicorn>=22.0,<24.0

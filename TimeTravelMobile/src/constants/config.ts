@@ -78,12 +78,14 @@ function resolveDevelopmentApiUrl(
 ): string {
   const candidateHost = extractHost(candidateUrl);
 
+  // Trust an explicitly configured API URL — don't replace with tunnel host
   if (!candidateHost || !isPrivateHost(candidateHost)) {
     return candidateUrl;
   }
 
-  if (expoHost && candidateHost !== expoHost) {
-    return `http://${expoHost}:5001/api`;
+  // Trust LAN IP over tunnel host
+  if (expoHost && !isPrivateHost(expoHost) && candidateHost !== expoHost) {
+    return candidateUrl;
   }
 
   return candidateUrl;
@@ -100,7 +102,15 @@ function getWebAppUrl(): string {
 
 // API URLs - Use environment variables with fallbacks
 const getApiUrl = (): string => {
-  // Priority: Environment variable > Expo extra > Platform default
+  // Web: always use localhost in dev (env vars contain LAN IPs for mobile)
+  if (Platform.OS === "web") {
+    if (isDevelopment) {
+      return `http://localhost:${API_PORT}/api`;
+    }
+    return "/api";
+  }
+
+  // Mobile: Priority: Environment variable > Expo extra > Platform default
   const expoHost = getExpoHost();
 
   const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -120,11 +130,6 @@ const getApiUrl = (): string => {
     }
 
     return `http://${lanIp}:5001/api`;
-  }
-
-  if (Platform.OS === "web") {
-    // Web: Use same origin to avoid CORS issues
-    return "/api";
   }
 
   // Mobile: Use environment-based or localhost for development

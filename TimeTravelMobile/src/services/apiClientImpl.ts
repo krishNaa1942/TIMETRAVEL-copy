@@ -313,7 +313,8 @@ class BulletproofApiClient {
     data: any,
     config?: { skipRetry?: boolean; timeout?: number },
   ): Promise<T> {
-    const maxRetries = config?.skipRetry ? 0 : 3;
+    const isMutation = !["get", "head", "options"].includes(method.toLowerCase());
+    const maxRetries = config?.skipRetry || isMutation ? 0 : 3;
     let lastError: ApiError | null = null;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {

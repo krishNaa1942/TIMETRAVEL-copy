@@ -10,60 +10,19 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
-from functools import wraps
 
-from flask import Blueprint, jsonify, request, g
-from flask_login import current_user
+from flask import Blueprint, jsonify
 
 from app.api.routes.travel_stats import get_travel_stats
 from app.models.database import db
 from app.models.entities import Trip, User
 from app.services.ai_insights_service import ai_insights_service, UserContext
-from app.services.jwt_service_v2 import jwt_service_v2, TokenType
 from app.services.user_preferences import user_preferences_service
+from app.utils.auth import resolve_user_id
 
 logger = logging.getLogger(__name__)
 
 profile_bp = Blueprint("profile", __name__, url_prefix="/api/profile")
-
-
-def _resolve_authenticated_user() -> int | None:
-    """Resolve the current user from either a session cookie or bearer token."""
-    if current_user.is_authenticated:
-        user_id = getattr(current_user, "id", None)
-        if user_id is not None:
-            g.user_id = user_id
-            g.user_email = getattr(current_user, "email", None)
-            return int(user_id)
-
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        return None
-
-    parts = auth_header.split()
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return None
-
-    token = parts[1]
-    payload = jwt_service_v2.verify_token(token, TokenType.ACCESS)
-    if not payload:
-        return None
-
-    user_id = payload.get("sub")
-    if user_id is None:
-        return None
-
-    g.user_id = user_id
-    g.user_email = payload.get("email")
-
-    try:
-        return int(user_id)
-    except (TypeError, ValueError):
-        return None
-
-
-def _load_user(user_id: int) -> User | None:
-    return db.session.get(User, user_id)
 
 
 def _run_sync(coro):
@@ -385,10 +344,10 @@ def _normalize_insight(insight: dict) -> dict:
 
 
 def _build_user_context(user: User, stats: dict, context_data: dict) -> UserContext:
-    trips = Trip.query.filter_by(user_id=user.id).order_by(Trip.created_at.desc()).all()
-    completed_trips = [trip for trip in trips if trip.status == "completed"]
-    active_trips = [trip for trip in trips if trip.status == "active"]
-    upcoming_trips = [trip for trip in trips if trip.status in {"planning", "active"}]
+    base_q = Trip.query.filter_by(user_id=user.id).order_by(Trip.created_at.desc())
+    completed_trips = base_q.filter(Trip.status == "completed").limit(10).all()
+    active_trips = base_q.filter(Trip.status == "active").limit(10).all()
+    upcoming_trips = base_q.filter(Trip.status.in_({"planning", "active"})).limit(10).all()
 
     search_history = [{"query": query} for query in context_data.get("recent_searches", []) if query]
 
@@ -396,10 +355,10 @@ def _build_user_context(user: User, stats: dict, context_data: dict) -> UserCont
         user_id=str(user.id),
         preferences=context_data.get("preferences", {}),
         search_history=search_history,
-        booking_history=[trip.to_dict() for trip in completed_trips[:10]],
+        booking_history=[trip.to_dict() for trip in completed_trips],
         saved_destinations=context_data.get("favorite_destinations", []),
-        active_trips=[trip.to_dict() for trip in active_trips[:10]],
-        upcoming_trips=[trip.to_dict() for trip in upcoming_trips[:10]],
+        active_trips=[trip.to_dict() for trip in active_trips],
+        upcoming_trips=[trip.to_dict() for trip in upcoming_trips],
         past_destinations=[trip.destination for trip in completed_trips if trip.destination],
         budget_range=(0, float("inf")),
         home_location=None,
@@ -409,11 +368,11 @@ def _build_user_context(user: User, stats: dict, context_data: dict) -> UserCont
 @profile_bp.route("/summary", methods=["GET"])
 def get_profile_summary():
     """Return a backend-backed profile summary for the mobile profile screen."""
-    user_id = _resolve_authenticated_user()
+    user_id = resolve_user_id()
     if user_id is None:
         return jsonify({"error": "Authentication required"}), 401
 
-    user = _load_user(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({"error": "user_not_found", "message": "User not found"}), 404
 

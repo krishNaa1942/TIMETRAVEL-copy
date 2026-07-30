@@ -236,6 +236,14 @@ class ApiService {
    * Check if error is retryable
    */
   private isRetryableError(error: any): boolean {
+    // ApiError from the response interceptor — check its status directly
+    if (error instanceof ApiError) {
+      return (
+        error.status === 408 ||
+        error.status === 429 ||
+        error.status >= 500
+      );
+    }
     // Network errors (no response)
     if (!error.response) {
       return true;

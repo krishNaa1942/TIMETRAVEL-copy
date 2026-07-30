@@ -77,23 +77,30 @@ def expense_summary():
     if dest:
         query = query.filter_by(destination=dest)
 
-    expenses = query.all()
+    from sqlalchemy import func
 
-    by_category = {}
-    total = 0
-    for e in expenses:
-        cat = e.category
-        if cat not in by_category:
-            by_category[cat] = {"category": cat, "total": 0, "count": 0}
-        by_category[cat]["total"] += e.amount
-        by_category[cat]["count"] += 1
-        total += e.amount
+    rows = (
+        query.with_entities(
+            Expense.category,
+            func.sum(Expense.amount),
+            func.count(Expense.id),
+        )
+        .group_by(Expense.category)
+        .all()
+    )
+
+    by_category = [
+        {"category": cat, "total": round(total, 2), "count": count}
+        for cat, total, count in rows
+    ]
+    total_expenses = sum(r["total"] for r in by_category)
+    total_count = sum(r["count"] for r in by_category)
 
     return jsonify({
         "destination": dest or "all",
-        "total": round(total, 2),
-        "count": len(expenses),
-        "by_category": list(by_category.values()),
+        "total": round(total_expenses, 2),
+        "count": total_count,
+        "by_category": by_category,
     })
 
 

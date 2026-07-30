@@ -5,6 +5,20 @@
 # ──────────────────────────────────────────────────────────
 
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: timetravel-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
     container_name: timetravel-web
@@ -13,11 +27,15 @@ services:
     env_file:
       - .env
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - db-data:/app/instance
       - ./data:/app/data:ro
     restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -33,4 +51,6 @@ services:
 
 volumes:
   db-data:
+    driver: local
+  redis-data:
     driver: local

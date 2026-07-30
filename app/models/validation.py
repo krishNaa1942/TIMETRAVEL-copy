@@ -5,7 +5,7 @@ Production-grade input validation schemas
 
 from pydantic import BaseModel, Field, validator, root_validator
 from typing import List, Optional, Dict, Any
-from datetime import datetime, date
+from datetime import datetime, timezone, date
 from enum import Enum
 import re
 
@@ -321,7 +321,7 @@ class ErrorResponse(BaseModel):
     error: str
     message: str
     details: Optional[Dict[str, Any]] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class SuccessResponse(BaseModel):

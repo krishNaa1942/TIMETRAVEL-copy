@@ -6,9 +6,9 @@ Production-grade vector embedding service using OpenAI embeddings
 import os
 import hashlib
 import logging
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 import json
 import threading
 
@@ -58,9 +58,9 @@ class UserEmbedding:
     
     def __post_init__(self):
         if self.created_at is None:
-            self.created_at = datetime.utcnow()
+            self.created_at = datetime.now(timezone.utc)
         if self.updated_at is None:
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(timezone.utc)
 
 
 class EmbeddingService:
@@ -238,8 +238,8 @@ class EmbeddingService:
             country=country,
             embedding=embedding,
             metadata=metadata or {},
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
         )
     
     def create_user_embedding(
@@ -496,7 +496,7 @@ class EmbeddingService:
             cached = self._embedding_cache.get(cache_key)
             if cached:
                 # Check if still valid
-                age = (datetime.utcnow() - cached.created_at).total_seconds()
+                age = (datetime.now(timezone.utc) - cached.created_at).total_seconds()
                 if age < self.CACHE_TTL_SECONDS:
                     return cached
                 else:
@@ -520,7 +520,7 @@ class EmbeddingService:
                 vector=embedding,
                 dimension=len(embedding),
                 model=self.model,
-                created_at=datetime.utcnow()
+                created_at=datetime.now(timezone.utc)
             )
     
     def _preferences_to_text(self, preferences: Dict[str, Any]) -> str:

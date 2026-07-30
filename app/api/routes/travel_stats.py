@@ -2,75 +2,16 @@
 Travel Stats API – User dashboard analytics and travel statistics.
 """
 
-from flask import Blueprint, jsonify, request, g
-from functools import wraps
+from flask import Blueprint, jsonify
 from sqlalchemy import func
-from flask_login import current_user
 
 from app.models.database import db
 from app.models.entities import (
     Trip, TripPlace, Reservation, TripPhoto, Expense, Favorite
 )
-from app.services.jwt_service_v2 import jwt_service_v2, TokenType
+from app.utils.auth import resolve_user_id
 
 travel_stats_bp = Blueprint("travel_stats", __name__, url_prefix="/api/stats")
-
-
-def require_jwt_auth(f):
-    """Decorator to require JWT authentication for mobile app"""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth_header = request.headers.get("Authorization")
-        
-        if not auth_header:
-            return jsonify({"error": "Authentication required"}), 401
-        
-        parts = auth_header.split()
-        if len(parts) != 2 or parts[0].lower() != "bearer":
-            return jsonify({"error": "Invalid authorization header"}), 401
-        
-        token = parts[1]
-        payload = jwt_service_v2.verify_token(token, TokenType.ACCESS)
-        
-        if not payload:
-            return jsonify({"error": "Invalid or expired token"}), 401
-        
-        g.user_id = payload.get("sub")
-        g.user_email = payload.get("email")
-        return f(*args, **kwargs)
-    return decorated
-
-
-def _resolve_authenticated_user():
-    """Resolve the current user from either a session cookie or a bearer token."""
-    if current_user.is_authenticated:
-        user_id = getattr(current_user, "id", None)
-        if user_id is not None:
-            g.user_id = user_id
-            g.user_email = getattr(current_user, "email", None)
-            return user_id
-
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        return None
-
-    parts = auth_header.split()
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return None
-
-    token = parts[1]
-    payload = jwt_service_v2.verify_token(token, TokenType.ACCESS)
-
-    if not payload:
-        return None
-
-    user_id = payload.get("sub")
-    if user_id is None:
-        return None
-
-    g.user_id = user_id
-    g.user_email = payload.get("email")
-    return user_id
 
 
 def get_default_stats():
@@ -94,7 +35,7 @@ def get_default_stats():
 @travel_stats_bp.route("", methods=["GET"])
 def get_travel_stats():
     """Return comprehensive travel statistics for the current user."""
-    uid = _resolve_authenticated_user()
+    uid = resolve_user_id()
     if uid is None:
         return jsonify({"error": "Authentication required"}), 401
 

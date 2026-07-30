@@ -8,11 +8,13 @@ with morning / afternoon / evening activity slots.
 import json
 import logging
 import re
+import threading
 from pathlib import Path
 
 import google.generativeai as genai
 
 from app.models.schemas import BudgetRequest
+from app.services.ai_security import AIPromptSanitizer
 from app.services.budget_service import estimate_budget
 from app.services.maps_service import geocode
 from app.utils.constants import DESTINATION_COORDS, resolve_destination_key
@@ -24,6 +26,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _model = None
 _configured = False
+_configure_lock = threading.Lock()
 _BUDGET_BASELINES_PATH = Path(__file__).resolve().parents[2] / "data" / "budget_baselines.json"
 _ROUTE_POINT_GEOCODE_CACHE: dict[str, dict] = {}
 
@@ -62,25 +65,26 @@ def _configure(api_key: str) -> None:
     if _configured:
         return
 
-    genai.configure(api_key=api_key)
-    _model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash",
-        generation_config=genai.GenerationConfig(
-            # Bug 4.2 fix: lower temperature for structured JSON output to reduce
-            # the chance of Gemini returning malformed JSON or markdown noise.
-            temperature=0.35,
-            top_p=0.85,
-            max_output_tokens=4096,
-            response_mime_type="application/json",
-        ),
-        safety_settings=[
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-        ],
-    )
-    _configured = True
+    with _configure_lock:
+        if _configured:
+            return
+        genai.configure(api_key=api_key)
+        _model = genai.GenerativeModel(
+            model_name="gemini-2.5-flash",
+            generation_config=genai.GenerationConfig(
+                temperature=0.35,
+                top_p=0.85,
+                max_output_tokens=4096,
+                response_mime_type="application/json",
+            ),
+            safety_settings=[
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            ],
+        )
+        _configured = True
     logger.info("Itinerary service: Gemini configured")
 
 
@@ -359,12 +363,22 @@ def generate_itinerary(
     try:
         _configure(api_key)
 
+        sanitized_interests = AIPromptSanitizer.sanitize_input(
+            interests or "general sightseeing",
+            context="itinerary",
+            max_length=500,
+            strict_mode=False,
+        )
+        if sanitized_interests.threats_detected:
+            logger.warning("Itinerary input threats: %s", sanitized_interests.threats_detected)
+        safe_interests = sanitized_interests.sanitized_input or "general sightseeing"
+
         prompt = ITINERARY_PROMPT.format(
             destination=destination,
             num_days=num_days,
             family_size=family_size,
             travel_class=travel_class,
-            interests=interests or "general sightseeing",
+            interests=safe_interests,
         )
 
         response = _model.generate_content(prompt)

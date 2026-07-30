@@ -309,8 +309,10 @@ ALTER TABLE companions        ENABLE ROW LEVEL SECURITY;
 -- No RLS on destinations, trip_templates, newsletter_subscribers
 
 -- ── User policies ─ owns their own row ──────────────────────────────
+-- The Flask app MUST set `app.user_id` via `SELECT set_config('app.user_id', :uid, true)`
+-- on every authenticated request. If unset, COALESCE defaults to -1 (no matches).
 CREATE POLICY users_self ON users
-    FOR ALL USING (id = current_setting('app.user_id', true)::int);
+    FOR ALL USING (id = COALESCE(NULLIF(current_setting('app.user_id', true), ''), '-1')::int);
 
 -- ── Policies for user_id-owned tables ───────────────────────────────
 DO $$
@@ -326,7 +328,7 @@ BEGIN
         ])
     LOOP
         EXECUTE format(
-            'CREATE POLICY %I ON %I FOR ALL USING (user_id = current_setting(''app.user_id'', true)::int)',
+            'CREATE POLICY %I ON %I FOR ALL USING (user_id = COALESCE(NULLIF(current_setting(''app.user_id'', true), ''''), ''-1'')::int)',
             t || '_owner', t
         );
     END LOOP;
@@ -335,12 +337,12 @@ END $$;
 -- Trip days & places are owned via their parent trip
 CREATE POLICY trip_days_owner ON trip_days
     FOR ALL USING (
-        trip_id IN (SELECT id FROM trips WHERE user_id = current_setting('app.user_id', true)::int)
+        trip_id IN (SELECT id FROM trips WHERE user_id = COALESCE(NULLIF(current_setting('app.user_id', true), ''), '-1')::int)
     );
 
 CREATE POLICY trip_places_owner ON trip_places
     FOR ALL USING (
-        trip_id IN (SELECT id FROM trips WHERE user_id = current_setting('app.user_id', true)::int)
+        trip_id IN (SELECT id FROM trips WHERE user_id = COALESCE(NULLIF(current_setting('app.user_id', true), ''), '-1')::int)
     );
 
 -- Public travel notes (is_public = true) are readable by everyone

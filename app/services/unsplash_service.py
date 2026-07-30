@@ -12,6 +12,7 @@ Features:
 
 import logging
 import time
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
@@ -25,6 +26,7 @@ UNSPLASH_BASE = "https://api.unsplash.com"
 
 # ── In-memory cache: { "goa": { "ts": epoch, "data": [...] } }
 _cache: dict = {}
+_cache_lock = threading.Lock()
 CACHE_TTL = 3600  # 1 hour
 
 # Unsplash auth circuit breaker: avoid hammering API/logs on invalid keys.
@@ -32,11 +34,13 @@ AUTH_FAILURE_COOLDOWN = 900  # 15 minutes
 _auth_failed_until = 0.0
 _auth_failed_key_sig = ""
 _auth_failure_logged = False
+_auth_lock = threading.Lock()
 
 # Unsplash free-tier throttle protection: avoid repeatedly hitting 403 rate limits.
 RATE_LIMIT_COOLDOWN = 3600  # 1 hour
 _rate_limited_until = 0.0
 _rate_limit_logged = False
+_rate_limit_lock = threading.Lock()
 
 # Keep bulk gallery fetch under free-tier limits (50 req/hour).
 UNSPLASH_BULK_FETCH_LIMIT = 40
@@ -52,72 +56,83 @@ def _key_sig(access_key: str) -> str:
 
 def _reset_auth_circuit() -> None:
     global _auth_failed_until, _auth_failed_key_sig, _auth_failure_logged
-    _auth_failed_until = 0.0
-    _auth_failed_key_sig = ""
-    _auth_failure_logged = False
+    with _auth_lock:
+        _auth_failed_until = 0.0
+        _auth_failed_key_sig = ""
+        _auth_failure_logged = False
 
 
 def _reset_rate_limit_circuit() -> None:
     global _rate_limited_until, _rate_limit_logged
-    _rate_limited_until = 0.0
-    _rate_limit_logged = False
+    with _rate_limit_lock:
+        _rate_limited_until = 0.0
+        _rate_limit_logged = False
 
 
 def _is_auth_temporarily_disabled(access_key: str) -> bool:
     global _auth_failed_until, _auth_failed_key_sig, _auth_failure_logged
-    now = time.time()
+    with _auth_lock:
+        now = time.time()
 
-    if _auth_failed_until and now >= _auth_failed_until:
-        _reset_auth_circuit()
-        return False
+        if _auth_failed_until and now >= _auth_failed_until:
+            _auth_failed_until = 0.0
+            _auth_failed_key_sig = ""
+            _auth_failure_logged = False
+            return False
 
-    sig = _key_sig(access_key)
-    if _auth_failed_key_sig and sig and sig != _auth_failed_key_sig:
-        _reset_auth_circuit()
-        return False
+        sig = _key_sig(access_key)
+        if _auth_failed_key_sig and sig and sig != _auth_failed_key_sig:
+            _auth_failed_until = 0.0
+            _auth_failed_key_sig = ""
+            _auth_failure_logged = False
+            return False
 
-    return now < _auth_failed_until
+        return now < _auth_failed_until
 
 
 def _mark_auth_failure(access_key: str, destination: str) -> None:
     global _auth_failed_until, _auth_failed_key_sig, _auth_failure_logged
-    _auth_failed_until = time.time() + AUTH_FAILURE_COOLDOWN
-    _auth_failed_key_sig = _key_sig(access_key)
+    with _auth_lock:
+        _auth_failed_until = time.time() + AUTH_FAILURE_COOLDOWN
+        _auth_failed_key_sig = _key_sig(access_key)
 
-    if not _auth_failure_logged:
-        logger.error(
-            "Unsplash unauthorized (401) while fetching '%s'. "
-            "Temporarily disabling Unsplash requests for %ds. "
-            "Verify UNSPLASH_ACCESS_KEY.",
-            destination,
-            AUTH_FAILURE_COOLDOWN,
-        )
-        _auth_failure_logged = True
+        if not _auth_failure_logged:
+            logger.error(
+                "Unsplash unauthorized (401) while fetching '%s'. "
+                "Temporarily disabling Unsplash requests for %ds. "
+                "Verify UNSPLASH_ACCESS_KEY.",
+                destination,
+                AUTH_FAILURE_COOLDOWN,
+            )
+            _auth_failure_logged = True
 
 
 def _is_rate_limited_temporarily() -> bool:
     global _rate_limited_until
-    now = time.time()
+    with _rate_limit_lock:
+        now = time.time()
 
-    if _rate_limited_until and now >= _rate_limited_until:
-        _reset_rate_limit_circuit()
-        return False
+        if _rate_limited_until and now >= _rate_limited_until:
+            _rate_limited_until = 0.0
+            _rate_limit_logged = False
+            return False
 
-    return now < _rate_limited_until
+        return now < _rate_limited_until
 
 
 def _mark_rate_limited(destination: str, retry_in_sec: int = RATE_LIMIT_COOLDOWN) -> None:
     global _rate_limited_until, _rate_limit_logged
-    _rate_limited_until = time.time() + max(60, retry_in_sec)
+    with _rate_limit_lock:
+        _rate_limited_until = time.time() + max(60, retry_in_sec)
 
-    if not _rate_limit_logged:
-        logger.warning(
-            "Unsplash rate limit reached while fetching '%s'. "
-            "Using fallback images for %ds.",
-            destination,
-            max(60, retry_in_sec),
-        )
-        _rate_limit_logged = True
+        if not _rate_limit_logged:
+            logger.warning(
+                "Unsplash rate limit reached while fetching '%s'. "
+                "Using fallback images for %ds.",
+                destination,
+                max(60, retry_in_sec),
+            )
+            _rate_limit_logged = True
 
 
 def _is_rate_limit_response(resp: requests.Response) -> bool:

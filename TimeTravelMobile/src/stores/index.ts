@@ -107,10 +107,6 @@ export { useTravelIntelligence } from './travelIntelligenceStore';
  * Call this in App.tsx before rendering
  */
 export const initializeStores = async (): Promise<void> => {
-  // Initialize auth store (load tokens from secure storage)
-  const { useAuthStore } = await import('./authStore.refactored');
-  await useAuthStore.getState().initialize();
-  
   console.log('[Stores] All stores initialized');
 };
 

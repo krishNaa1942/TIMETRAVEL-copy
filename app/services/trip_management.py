@@ -5,7 +5,7 @@ Production-grade trip management with AI integration
 
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 import json
 import logging
 import uuid
@@ -49,7 +49,7 @@ class TripCollaborator:
     email: str
     avatar: Optional[str] = None
     role: str = "viewer"  # owner, editor, viewer
-    added_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    added_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 @dataclass
@@ -69,8 +69,8 @@ class Trip:
     tags: List[str] = field(default_factory=list)
     collaborators: List[TripCollaborator] = field(default_factory=list)
     cover_image: Optional[str] = None
-    created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
-    updated_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     is_public: bool = False
     ai_generated: bool = False
     
@@ -120,8 +120,8 @@ class Trip:
             tags=data.get('tags', []),
             collaborators=collaborators,
             cover_image=data.get('cover_image'),
-            created_at=data.get('created_at', datetime.utcnow().isoformat()),
-            updated_at=data.get('updated_at', datetime.utcnow().isoformat()),
+            created_at=data.get('created_at', datetime.now(timezone.utc).isoformat()),
+            updated_at=data.get('updated_at', datetime.now(timezone.utc).isoformat()),
             is_public=data.get('is_public', False),
             ai_generated=data.get('ai_generated', False)
         )
@@ -301,7 +301,7 @@ class TripManagementService:
             if field in updates:
                 setattr(trip, field, updates[field])
         
-        trip.updated_at = datetime.utcnow().isoformat()
+        trip.updated_at = datetime.now(timezone.utc).isoformat()
         
         # Save to database
         if self.db:
@@ -420,7 +420,7 @@ class TripManagementService:
         )
         
         trip.destinations.append(new_dest)
-        trip.updated_at = datetime.utcnow().isoformat()
+        trip.updated_at = datetime.now(timezone.utc).isoformat()
         
         if self.db:
             await self.db.update_trip(trip_id, trip.to_dict())
@@ -449,7 +449,7 @@ class TripManagementService:
         for i, dest in enumerate(trip.destinations):
             dest.order = i
         
-        trip.updated_at = datetime.utcnow().isoformat()
+        trip.updated_at = datetime.now(timezone.utc).isoformat()
         
         if self.db:
             await self.db.update_trip(trip_id, trip.to_dict())
@@ -497,7 +497,7 @@ class TripManagementService:
             )
             trip.collaborators.append(collaborator)
         
-        trip.updated_at = datetime.utcnow().isoformat()
+        trip.updated_at = datetime.now(timezone.utc).isoformat()
         
         if self.db:
             await self.db.update_trip(trip_id, trip.to_dict())
@@ -625,7 +625,7 @@ class TripManagementService:
             raise ValueError(f"Invalid status: {new_status}")
         
         trip.status = new_status
-        trip.updated_at = datetime.utcnow().isoformat()
+        trip.updated_at = datetime.now(timezone.utc).isoformat()
         
         if self.db:
             await self.db.update_trip(trip_id, trip.to_dict())

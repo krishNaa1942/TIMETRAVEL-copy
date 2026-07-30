@@ -64,10 +64,9 @@ export const useAuthStore = create<AuthStore>()(
       error: null,
       isAuthenticated: false,
 
-      // Action: Set token and persist
       setToken: async (token: string) => {
         set({
-          token: token ? AUTH_TOKEN_MARKER : null,
+          token: token,
           isAuthenticated: !!token,
         });
       },
@@ -76,7 +75,7 @@ export const useAuthStore = create<AuthStore>()(
       setUser: (user: User) => {
         set({
           user,
-          token: AUTH_TOKEN_MARKER,
+          token: get().token || AUTH_TOKEN_MARKER,
           isAuthenticated: true,
         });
       },
@@ -142,7 +141,7 @@ export const useAuthStore = create<AuthStore>()(
 
             if (response.user) {
               set({
-                token: AUTH_TOKEN_MARKER,
+                token: token,
                 user: normalizeUser(response.user),
                 isLoading: false,
                 isAuthenticated: true,
@@ -160,23 +159,15 @@ export const useAuthStore = create<AuthStore>()(
               });
               return;
             }
-
-            const currentUser = get().user;
-            set({
-              token: AUTH_TOKEN_MARKER,
-              user: currentUser,
-              isLoading: false,
-              isAuthenticated: true,
-            });
-            return;
           }
 
+          // Token exists but server unreachable — keep user but mark unauthenticated
           const currentUser = get().user;
           set({
-            token: AUTH_TOKEN_MARKER,
+            token: token,
             user: currentUser,
             isLoading: false,
-            isAuthenticated: true,
+            isAuthenticated: false,
           });
         } catch (error) {
           console.log("[AUTH] Failed to load auth state:", error);

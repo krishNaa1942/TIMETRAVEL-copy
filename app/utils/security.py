@@ -12,7 +12,7 @@ import hashlib
 import string
 from typing import Any, Dict, List, Optional, Union, Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 
 logger = logging.getLogger(__name__)
@@ -692,7 +692,7 @@ class SecurityAudit:
             risk_level: Risk level (low, medium, high, critical)
         """
         event = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event_type": event_type,
             "user_id": user_id,
             "ip_address": ip_address,

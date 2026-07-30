@@ -288,12 +288,12 @@ export default function ChatScreen() {
     setDestination,
   } = useChatAgent();
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages using requestAnimationFrame
   useEffect(() => {
     if (messages.length > 0) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      });
     }
   }, [messages.length]);
 
@@ -404,7 +404,9 @@ export default function ChatScreen() {
           initialNumToRender={10}
           maxToRenderPerBatch={5}
           windowSize={21}
-          removeClippedSubviews={true}
+          // removeClippedSubviews removed — causes visual glitches
+          // on iOS when messages are rapidly appended
+        
         />
 
         {/* Typing Indicator */}

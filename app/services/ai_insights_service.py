@@ -7,9 +7,8 @@ import os
 import logging
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +48,7 @@ class Insight:
     action_text: Optional[str] = None
     action_data: Optional[Dict[str, Any]] = None
     expires_at: Optional[datetime] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     is_read: bool = False
     
     def to_dict(self) -> Dict[str, Any]:
@@ -194,7 +193,7 @@ class AIInsightsService:
             if search_terms:
                 # Generate insight based on search patterns
                 insight = Insight(
-                    id=f"rec_search_{context.user_id}_{datetime.utcnow().timestamp()}",
+                    id=f"rec_search_{context.user_id}_{datetime.now(timezone.utc).timestamp()}",
                     type=InsightType.RECOMMENDATION,
                     title="Based on your recent searches",
                     content=f"You've been searching for {', '.join(search_terms[:3])}. These destinations match your interests perfectly!",
@@ -203,7 +202,7 @@ class AIInsightsService:
                     is_actionable=True,
                     action_text="View recommendations",
                     action_data={"type": "search_based", "terms": search_terms},
-                    expires_at=datetime.utcnow() + timedelta(days=7)
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=7)
                 )
                 insights.append(insight)
         
@@ -212,7 +211,7 @@ class AIInsightsService:
             booked_destinations = [b.get("destination", "") for b in context.booking_history if b.get("destination")]
             if booked_destinations:
                 insight = Insight(
-                    id=f"rec_book_{context.user_id}_{datetime.utcnow().timestamp()}",
+                    id=f"rec_book_{context.user_id}_{datetime.now(timezone.utc).timestamp()}",
                     type=InsightType.RECOMMENDATION,
                     title="Destinations you might love",
                     content=f"Since you enjoyed {booked_destinations[0]}, we found similar destinations you'd like to explore.",
@@ -221,7 +220,7 @@ class AIInsightsService:
                     is_actionable=True,
                     action_text="See similar destinations",
                     action_data={"type": "booking_based", "destinations": booked_destinations},
-                    expires_at=datetime.utcnow() + timedelta(days=14)
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=14)
                 )
                 insights.append(insight)
         
@@ -238,11 +237,11 @@ class AIInsightsService:
                 start_date = trip.get("start_date")
                 
                 if destination and start_date:
-                    days_until = (start_date - datetime.utcnow().date()).days if isinstance(start_date, datetime) else 7
+                    days_until = (start_date - datetime.now(timezone.utc).date()).days if isinstance(start_date, datetime) else 7
                     
                     if days_until <= 14:
                         insight = Insight(
-                            id=f"tip_upcoming_{context.user_id}_{datetime.utcnow().timestamp()}",
+                            id=f"tip_upcoming_{context.user_id}_{datetime.now(timezone.utc).timestamp()}",
                             type=InsightType.TIP,
                             title=f"Trip to {destination} coming up!",
                             content=f"Your trip is in {days_until} days. Make sure to check visa requirements and weather forecast.",
@@ -251,7 +250,7 @@ class AIInsightsService:
                             is_actionable=True,
                             action_text="View trip details",
                             action_data={"type": "trip", "trip_id": trip.get("id")},
-                            expires_at=datetime.utcnow() + timedelta(days=days_until)
+                            expires_at=datetime.now(timezone.utc) + timedelta(days=days_until)
                         )
                         insights.append(insight)
         
@@ -267,7 +266,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="Learn more",
                 action_data={"type": "tip", "category": "adventure"},
-                expires_at=datetime.utcnow() + timedelta(days=30)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=30)
             )
             insights.append(insight)
         
@@ -291,7 +290,7 @@ class AIInsightsService:
                     is_actionable=True,
                     action_text="View deal",
                     action_data={"type": "price_alert", "destination_id": dest.get("id")},
-                    expires_at=datetime.utcnow() + timedelta(days=3)
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=3)
                 )
                 insights.append(insight)
         
@@ -313,7 +312,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="Set price alert",
                 action_data={"type": "prediction", "category": "timing"},
-                expires_at=datetime.utcnow() + timedelta(days=14)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=14)
             )
             insights.append(insight)
         
@@ -324,7 +323,7 @@ class AIInsightsService:
         insights = []
         
         # Seasonal trends
-        current_month = datetime.utcnow().month
+        current_month = datetime.now(timezone.utc).month
         trending_destinations = self._get_trending_destinations(current_month)
         
         if trending_destinations:
@@ -338,7 +337,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="Explore trending destinations",
                 action_data={"type": "trend", "destinations": trending_destinations},
-                expires_at=datetime.utcnow() + timedelta(days=30)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=30)
             )
             insights.append(insight)
         
@@ -360,7 +359,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="View budget trips",
                 action_data={"type": "suggestion", "category": "budget"},
-                expires_at=datetime.utcnow() + timedelta(days=7)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=7)
             )
             insights.append(insight)
         
@@ -377,7 +376,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="Explore relaxation trips",
                 action_data={"type": "suggestion", "category": "relaxation"},
-                expires_at=datetime.utcnow() + timedelta(days=14)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=14)
             )
             insights.append(insight)
         
@@ -400,7 +399,7 @@ class AIInsightsService:
                     is_actionable=True,
                     action_text="Book now",
                     action_data={"type": "price_prediction", "trip_id": trip.get("id")},
-                    expires_at=datetime.utcnow() + timedelta(days=14)
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=14)
                 )
                 insights.append(insight)
         
@@ -410,7 +409,7 @@ class AIInsightsService:
         """Generate seasonal insights."""
         insights = []
         
-        current_month = datetime.utcnow().month
+        current_month = datetime.now(timezone.utc).month
         
         # Seasonal destination suggestions
         if current_month in [11, 12, 1, 2]:  # Winter months
@@ -424,7 +423,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="View warm destinations",
                 action_data={"type": "seasonal", "category": "winter_escape"},
-                expires_at=datetime.utcnow() + timedelta(days=60)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=60)
             )
             insights.append(insight)
         elif current_month in [6, 7, 8]:  # Summer months
@@ -438,7 +437,7 @@ class AIInsightsService:
                 is_actionable=True,
                 action_text="Explore summer destinations",
                 action_data={"type": "seasonal", "category": "summer"},
-                expires_at=datetime.utcnow() + timedelta(days=90)
+                expires_at=datetime.now(timezone.utc) + timedelta(days=90)
             )
             insights.append(insight)
         
@@ -468,7 +467,7 @@ class AIInsightsService:
                             is_actionable=True,
                             action_text="View budget breakdown",
                             action_data={"type": "budget", "trip_id": trip.get("id")},
-                            expires_at=datetime.utcnow() + timedelta(days=7)
+                            expires_at=datetime.now(timezone.utc) + timedelta(days=7)
                         )
                         insights.append(insight)
         
@@ -493,7 +492,7 @@ class AIInsightsService:
                     is_actionable=True,
                     action_text="View safety info",
                     action_data={"type": "safety", "destination": destination},
-                    expires_at=datetime.utcnow() + timedelta(days=30)
+                    expires_at=datetime.now(timezone.utc) + timedelta(days=30)
                 )
                 insights.append(insight)
         

@@ -25,6 +25,7 @@ import random
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -41,6 +42,11 @@ _intent_tags: List[str] = []
 
 # Minimum confidence to accept an intent (else fallback)
 CONFIDENCE_THRESHOLD = 0.35
+
+# Persisted model path
+_MODEL_DIR = Path(__file__).parent / "model_cache"
+_MODEL_PATH = _MODEL_DIR / "pipeline.joblib"
+_INTENTS_PATH = _MODEL_DIR / "intent_tags.joblib"
 
 
 def _train_pipeline() -> Pipeline:
@@ -81,8 +87,13 @@ def _train_pipeline() -> Pipeline:
     ])
 
     pipeline.fit(texts, labels)
+
+    _MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(pipeline, _MODEL_PATH)
+    joblib.dump(_intent_tags, _INTENTS_PATH)
+
     logger.info(
-        "Chatbot pipeline trained – %d patterns, %d intents",
+        "Chatbot pipeline trained and persisted – %d patterns, %d intents",
         len(texts),
         len(_intent_tags),
     )
@@ -90,10 +101,21 @@ def _train_pipeline() -> Pipeline:
 
 
 def _get_pipeline() -> Pipeline:
-    """Lazy-load and cache the ML pipeline."""
+    """Load persisted pipeline or train if not cached."""
     global _pipeline
-    if _pipeline is None:
-        _pipeline = _train_pipeline()
+    if _pipeline is not None:
+        return _pipeline
+
+    if _MODEL_PATH.exists() and _INTENTS_PATH.exists():
+        try:
+            _pipeline = joblib.load(_MODEL_PATH)
+            _intent_tags = joblib.load(_INTENTS_PATH)
+            logger.info("Chatbot pipeline loaded from disk (%d intents)", len(_intent_tags))
+            return _pipeline
+        except Exception:
+            logger.warning("Failed to load persisted pipeline; retraining")
+
+    _pipeline = _train_pipeline()
     return _pipeline
 
 

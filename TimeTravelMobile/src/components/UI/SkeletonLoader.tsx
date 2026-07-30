@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Animated, ViewStyle } from "react-native";
+import { View, StyleSheet, Animated, ViewStyle, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 // ─────────────────────────────────────────────────────────────
@@ -27,12 +27,12 @@ export const Shimmer: React.FC<ShimmerProps> = ({ width, height, borderRadius = 
         Animated.timing(shimmerValue, {
           toValue: 1,
           duration: 1000,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS === "android" || Platform.OS === "ios",
         }),
         Animated.timing(shimmerValue, {
           toValue: 0,
           duration: 1000,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS === "android" || Platform.OS === "ios",
         }),
       ])
     );

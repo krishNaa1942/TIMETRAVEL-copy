@@ -9,11 +9,10 @@ import logging
 import hashlib
 import threading
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from typing import Any, Dict, Optional, Callable
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from functools import wraps
-import pickle
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +62,7 @@ class InMemoryCache:
                 return None
             
             # Check expiration
-            if entry.expires_at and datetime.utcnow() > entry.expires_at:
+            if entry.expires_at and datetime.now(timezone.utc) > entry.expires_at:
                 del self._cache[key]
                 self._misses += 1
                 return None
@@ -85,18 +84,14 @@ class InMemoryCache:
                 self._evict_oldest()
             
             ttl = ttl or self._default_ttl
-            expires_at = datetime.utcnow() + timedelta(seconds=ttl) if ttl else None
+            expires_at = datetime.now(timezone.utc) + timedelta(seconds=ttl) if ttl else None
             
-            # Estimate size
-            try:
-                size_bytes = len(pickle.dumps(value))
-            except:
-                size_bytes = 0
+            size_bytes = len(json.dumps(value, default=str)) if value else 0
             
             entry = CacheEntry(
                 key=key,
                 value=value,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
                 expires_at=expires_at,
                 ttl=ttl,
                 size_bytes=size_bytes
@@ -120,8 +115,7 @@ class InMemoryCache:
             if entry is None:
                 return False
             
-            # Check expiration
-            if entry.expires_at and datetime.utcnow() > entry.expires_at:
+            if entry.expires_at and datetime.now(timezone.utc) > entry.expires_at:
                 del self._cache[key]
                 return False
             
@@ -192,10 +186,16 @@ class RedisCache:
         
         try:
             import redis
-            self._redis = redis.from_url(redis_url, decode_responses=True)
-            # Test connection
+            pool = redis.ConnectionPool.from_url(
+                redis_url,
+                max_connections=20,
+                decode_responses=True,
+                socket_connect_timeout=3,
+                socket_timeout=3,
+            )
+            self._redis = redis.Redis(connection_pool=pool)
             self._redis.ping()
-            logger.info(f"Redis cache connected: {redis_url}")
+            logger.info(f"Redis cache connected: {redis_url} (pool max 20)")
         except ImportError:
             logger.warning("Redis package not installed - falling back to in-memory cache")
         except Exception as e:
@@ -426,12 +426,15 @@ class CacheService:
             for key in keys_to_delete:
                 del self._memory._cache[key]
         
-        # Invalidate Redis if available
         if self._redis.is_available:
             try:
-                keys = self._redis._redis.keys(full_pattern)
-                if keys:
-                    self._redis._redis.delete(*keys)
+                cursor = 0
+                while True:
+                    cursor, keys = self._redis._redis.scan(cursor=cursor, match=full_pattern, count=100)
+                    if keys:
+                        self._redis._redis.delete(*keys)
+                    if cursor == 0:
+                        break
             except Exception as e:
                 logger.error(f"Redis pattern invalidation error: {e}")
     

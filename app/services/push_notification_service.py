@@ -8,7 +8,7 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import hashlib
 
@@ -44,7 +44,7 @@ class PushNotification:
     sound: str = "default"
     badge: Optional[int] = None
     ttl: int = 86400  # 24 hours
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
     def to_fcm_payload(self, token: str) -> Dict[str, Any]:
         """Convert to FCM payload format."""
@@ -122,8 +122,8 @@ class DeviceToken:
     platform: str  # 'ios', 'android', 'web'
     device_id: Optional[str] = None
     device_name: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    last_used: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    last_used: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = True
 
 
@@ -222,7 +222,7 @@ class PushNotificationService:
         # Check if token already exists
         for existing in self._tokens[user_id]:
             if existing.token == token:
-                existing.last_used = datetime.utcnow()
+                existing.last_used = datetime.now(timezone.utc)
                 existing.is_active = True
                 return True
         
@@ -440,8 +440,8 @@ class PushNotificationService:
     ) -> bool:
         """Send notification to a specific device."""
         if not self._fcm_available:
-            logger.warning("FCM not available - simulating notification send")
-            return True
+            logger.error("FCM not available - push notification not sent")
+            return False
         
         try:
             from firebase_admin import messaging
@@ -481,12 +481,13 @@ class PushNotificationService:
                 )
             )
             
-            # Send the message
-            response = self._messaging.send(message)
+            # Send the message (sync SDK call, don't block event loop)
+            import asyncio
+            response = await asyncio.to_thread(self._messaging.send, message)
             logger.info(f"Successfully sent message to {device.device_id}: {response}")
             
             # Update last used
-            device.last_used = datetime.utcnow()
+            device.last_used = datetime.now(timezone.utc)
             
             return True
             

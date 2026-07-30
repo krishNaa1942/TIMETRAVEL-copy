@@ -6,7 +6,6 @@ Supports development, testing, and production profiles.
 """
 
 import os
-import secrets
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -22,9 +21,15 @@ DB_DIR = BASE_DIR / "instance"
 class Config:
     """Base configuration shared across all environments."""
 
-    # A random key is generated each startup when no env var is set.
-    # This is fine for dev (sessions reset on restart) but NOT for production.
-    SECRET_KEY = os.getenv("SECRET_KEY") or secrets.token_hex(32)
+    SECRET_KEY = os.getenv("SECRET_KEY", "")
+    if not SECRET_KEY:
+        env = os.getenv("FLASK_ENV", "development").lower()
+        if env == "production":
+            raise RuntimeError(
+                "SECRET_KEY environment variable is required in production. "
+                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            )
+        SECRET_KEY = "dev-secret-key-change-in-production-min-32-chars!"
     DEBUG = False
     TESTING = False
 
@@ -103,13 +108,6 @@ class ProductionConfig(Config):
     DEBUG = False
     SESSION_COOKIE_SECURE = True     # Cookies only over HTTPS
     REMEMBER_COOKIE_SECURE = True
-
-    def __init__(self):
-        if not os.getenv("SECRET_KEY"):
-            raise RuntimeError(
-                "SECRET_KEY environment variable is required in production. "
-                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
-            )
 
 
 # ---------------------------------------------------------------------------

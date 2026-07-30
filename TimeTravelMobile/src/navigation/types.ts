@@ -87,7 +87,8 @@ export type RootStackParamList = {
   // Auth flows
   Auth: undefined;
 
-  // Main app
+  // Main app (corresponds to BottomTabNavigator in RootNavigator)
+  MainTabs: { screen?: keyof MainTabParamList; params?: Record<string, any> } | undefined;
   MainApp: undefined;
 
   // Feature stacks (modal presentation)
@@ -96,9 +97,25 @@ export type RootStackParamList = {
   SocialStack: NavigatorScreenParams<SocialStackParamList>;
   SettingsStack: NavigatorScreenParams<SettingsStackParamList>;
 
-  // Direct deep link targets
+  // Detail screens
   DestinationDetail: { destination: Destination };
   SharedTrip: { shareToken: string };
+  Budget: { destination?: Destination; tripId?: string };
+  Itinerary: { query?: string; tripId?: string };
+  Packing: { tripId?: string };
+  Favorites: undefined;
+  Currency: undefined;
+  Compare: CompareRouteParams | undefined;
+  Places: { destination?: Destination };
+  RoutePlanner: undefined;
+  TripWorkspace: { tripId?: string };
+  Expenses: { tripId?: string };
+  TravelJournal: { tripId?: string };
+  Reservations: { tripId?: string };
+  TripSharing: { tripId?: string; shareToken?: string };
+  NewsFeed: undefined;
+  TravelStats: undefined;
+  Phrasebook: undefined;
 
   // Modals
   CurrencyModal: undefined;

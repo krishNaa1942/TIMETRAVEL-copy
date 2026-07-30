@@ -17,7 +17,7 @@ Key Principles:
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 import math
 
@@ -543,18 +543,91 @@ class RecommendationService:
             return self._get_fallback_recommendations(limit)
     
     def _get_user_profile(self, user_id: str) -> UserProfile:
-        """Fetch user profile from database."""
-        # Default profile
-        return UserProfile(
-            id=user_id,
-            preferences=UserPreferences(),
-            last_active=datetime.utcnow()
-        )
+        """Build user profile from database — inferring preferences from trip history."""
+        from app.models.database import db
+        from app.models.entities import TripQuery
+
+        prefs = UserPreferences()
+        try:
+            trips = TripQuery.query.filter_by(user_id=int(user_id)).order_by(
+                TripQuery.created_at.desc()
+            ).limit(10).all()
+
+            travel_classes = []
+            for t in trips:
+                if t.travel_class:
+                    travel_classes.append(t.travel_class.lower())
+                if t.estimated_budget:
+                    if t.estimated_budget < 10000:
+                        prefs.price_sensitivity = 0.8
+                    elif t.estimated_budget > 50000:
+                        prefs.price_sensitivity = 0.2
+                    else:
+                        prefs.price_sensitivity = 0.5
+
+            if travel_classes:
+                dominant = max(set(travel_classes), key=travel_classes.count)
+                style_map = {
+                    "budget": TravelStyle.BUDGET,
+                    "economy": TravelStyle.BUDGET,
+                    "business": TravelStyle.LUXURY,
+                    "luxury": TravelStyle.LUXURY,
+                    "adventure": TravelStyle.ADVENTURE,
+                    "cultural": TravelStyle.CULTURAL,
+                    "spiritual": TravelStyle.SPIRITUAL,
+                    "beach": TravelStyle.BEACH,
+                    "nature": TravelStyle.NATURE,
+                }
+                matched = style_map.get(dominant)
+                if matched:
+                    prefs.travel_styles = [matched]
+                    prefs.style_affinity[matched.value] = 0.8
+
+            return UserProfile(
+                id=user_id,
+                preferences=prefs,
+                last_active=datetime.now(timezone.utc)
+            )
+        except Exception:
+            logger.exception("Failed to infer user profile from trip history")
+            return UserProfile(
+                id=user_id,
+                preferences=prefs,
+                last_active=datetime.now(timezone.utc)
+            )
     
     def _get_candidate_destinations(self, context: RecommendationContext) -> List[Destination]:
-        """Fetch candidate destinations."""
-        # Would query database
-        return []
+        """Fetch candidate destinations from the database."""
+        from app.models.database import db
+        from app.models.entities import Destination as DestinationModel
+
+        try:
+            rows = DestinationModel.query.all()
+            result = []
+            for row in rows:
+                categories = []
+                if row.best_season:
+                    try:
+                        categories.append(TravelStyle(row.best_season.lower()))
+                    except ValueError:
+                        pass
+                if not categories:
+                    categories = [TravelStyle.ADVENTURE]
+                result.append(Destination(
+                    id=str(row.id),
+                    name=row.name,
+                    country=row.country or "",
+                    region="",
+                    categories=categories,
+                    rating=row.safety_score / 2 if row.safety_score else 5.0,
+                    avg_daily_cost=row.avg_daily_cost or 0.0,
+                    safety_score=row.safety_score / 10 if row.safety_score else 0.5,
+                    current_season_score=0.5,
+                ))
+            return result
+        except Exception:
+            logger.exception("Failed to fetch candidate destinations")
+            return []
     
     def _format_result(self, result: RecommendationResult) -> Dict[str, Any]:
         """Format result for API response."""

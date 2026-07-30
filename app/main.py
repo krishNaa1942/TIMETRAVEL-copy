@@ -14,17 +14,19 @@ from flask_cors import CORS
 from app.config import get_config
 
 import logging
+import os
 
 # Shared extension instances
 login_manager = LoginManager()
 csrf = CSRFProtect()
+_redis_url = os.environ.get("REDIS_URL", "")
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=[
         lambda: current_app.config.get("GLOBAL_RATE_LIMIT_PER_DAY", "2000 per day"),
         lambda: current_app.config.get("GLOBAL_RATE_LIMIT_PER_HOUR", "500 per hour"),
     ],
-    storage_uri="memory://",
+    storage_uri=_redis_url or "memory://",
 )
 
 
@@ -55,11 +57,7 @@ def create_app(config_class=None):
     Returns:
         Configured Flask application instance.
     """
-    app = Flask(
-        __name__,
-        template_folder="templates",
-        static_folder="static",
-    )
+    app = Flask(__name__)
 
     # ── Load configuration ──────────────────────────────────────────
     if config_class is None:
@@ -140,6 +138,48 @@ def create_app(config_class=None):
     def unauthorized():
         from flask import jsonify
         return jsonify({"error": "Authentication required"}), 401
+
+    # ── Bridge JWT Bearer tokens to Flask-Login sessions ───────────
+    # Mobile clients authenticate via JWT (Authorization header) while
+    # most backend endpoints rely on Flask-Login's @login_required.
+    # This before_request handler sets g.user from a valid Bearer token
+    # and the request_loader bridges g.user into current_user so that
+    # @login_required works without creating a session cookie (eliminating
+    # the CSRF vector that a session cookie would introduce).
+
+    @login_manager.request_loader
+    def load_user_from_request(request):
+        from flask import g
+        user = getattr(g, "user", None)
+        if user:
+            from app.models.entities import User as UserModel
+            return UserModel.query.get(user["user_id"])
+        return None
+
+    @app.before_request
+    def bridge_jwt_to_flask_login():
+        from flask import request, g
+        from flask_login import current_user
+        from app.services.jwt_service_v2 import jwt_service_v2, TokenType
+
+        if current_user.is_authenticated:
+            return
+
+        auth = request.headers.get("Authorization", "")
+        if not auth.lower().startswith("bearer "):
+            return
+
+        token = auth.split(" ", 1)[1]
+        payload = jwt_service_v2.verify_token(token, TokenType.ACCESS)
+        if payload is None:
+            return
+
+        g.user = {
+            "user_id": payload.get("sub"),
+            "email": payload.get("email"),
+            "session_id": payload.get("sid"),
+        }
+
     # ── Exempt API routes from CSRF (mobile apps use JWT, not CSRF tokens) ──
     @app.before_request
     def exempt_api_from_csrf():
@@ -147,7 +187,6 @@ def create_app(config_class=None):
         if request.path.startswith('/api/'):
             request.environ['CSRF_EXEMPT'] = True
     # ── Register API blueprints ─────────────────────────────────────
-    from app.api.routes.frontend import frontend_bp
     from app.api.routes.health import health_bp
     from app.api.routes.auth import auth_bp
     from app.api.routes.auth_v2 import auth_v2_bp
@@ -193,7 +232,6 @@ def create_app(config_class=None):
     for bp in api_blueprints:
         csrf.exempt(bp)
 
-    app.register_blueprint(frontend_bp)
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(auth_v2_bp)

@@ -54,7 +54,7 @@ class TripPDF(FPDF):
 
     @staticmethod
     def _safe(text: str) -> str:
-        """Replace non-latin1 characters with ASCII equivalents."""
+        """Normalize typographic characters while preserving UTF-8 for Indic scripts."""
         if not text:
             return ""
         return (
@@ -66,9 +66,7 @@ class TripPDF(FPDF):
             .replace("\u201c", '"')   # left double quote
             .replace("\u201d", '"')   # right double quote
             .replace("\u2026", "...") # ellipsis
-            .replace("\u20b9", "Rs ") # rupee sign
-            .encode("latin-1", "replace")
-            .decode("latin-1")
+            .replace("\u20b9", "\u20B9") # rupee sign preserved
         )
 
     def normalize_text(self, text):

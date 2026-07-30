@@ -9,17 +9,12 @@ GET    /api/favorites/check    – Check if an item is favourited
 Requires authentication (Flask-Login session or JWT bearer token).
 """
 
-import uuid
 import logging
 
 from flask import Blueprint, request, jsonify
-from flask import session
-from flask_login import current_user, login_user
-
 from app.models.database import db
-from app.models.entities import Favorite, User
-from app.services.jwt_service_v2 import jwt_service_v2, TokenType
-from app.utils.security import hash_password
+from app.models.entities import Favorite
+from app.utils.auth import resolve_authenticated_user
 
 logger = logging.getLogger(__name__)
 
@@ -28,55 +23,14 @@ favorites_bp = Blueprint("favorites", __name__)
 VALID_TYPES = {"destination", "place"}
 
 
-def _resolve_authenticated_user():
-    if current_user.is_authenticated:
-        return current_user
-
-    auth_header = request.headers.get("Authorization", "")
-    if not auth_header.lower().startswith("bearer "):
-        return None
-
-    token = auth_header.split(None, 1)[1].strip()
-    payload = jwt_service_v2.verify_token(token, TokenType.ACCESS)
-    if not payload:
-        return None
-
-    user = None
-    user_id = payload.get("sub")
-    if user_id is not None:
-        try:
-            user = db.session.get(User, int(user_id))
-        except (TypeError, ValueError):
-            user = None
-
-    email = (payload.get("email") or "").strip().lower()
-    if not user and email:
-        user = User.query.filter_by(email=email).first()
-
-    if not user and email:
-        user = User(
-            name=email.split("@", 1)[0] or "User",
-            email=email,
-            password_hash=hash_password(uuid.uuid4().hex),
-        )
-        db.session.add(user)
-        db.session.commit()
-
-    if user and not current_user.is_authenticated:
-        login_user(user)
-        session.permanent = True
-
-    return user
-
-
 # ── GET /api/favorites ──────────────────────────────────────
 @favorites_bp.route("/api/favorites", methods=["GET"])
 def list_favorites():
     """Return the authenticated user's favorites, newest first."""
-    user = _resolve_authenticated_user()
+
+    user = resolve_authenticated_user()
     if not user:
         return jsonify({"error": "Authentication required"}), 401
-
     item_type = request.args.get("type")  # optional filter
 
     query = Favorite.query.filter_by(user_id=user.id)
@@ -91,7 +45,7 @@ def list_favorites():
 @favorites_bp.route("/api/favorites", methods=["POST"])
 def add_favorite():
     """Bookmark a destination or place."""
-    user = _resolve_authenticated_user()
+    user = resolve_authenticated_user()
     if not user:
         return jsonify({"error": "Authentication required"}), 401
 
@@ -135,7 +89,7 @@ def add_favorite():
 @favorites_bp.route("/api/favorites/<int:fav_id>", methods=["DELETE"])
 def remove_favorite(fav_id):
     """Remove a bookmark by ID."""
-    user = _resolve_authenticated_user()
+    user = resolve_authenticated_user()
     if not user:
         return jsonify({"error": "Authentication required"}), 401
 
@@ -154,7 +108,7 @@ def remove_favorite(fav_id):
 @favorites_bp.route("/api/favorites/check", methods=["GET"])
 def check_favorite():
     """Check if an item is in the user's wishlist."""
-    user = _resolve_authenticated_user()
+    user = resolve_authenticated_user()
     if not user:
         return jsonify({"error": "Authentication required"}), 401
 

@@ -199,7 +199,7 @@ function ErrorBoundaryNavigationHandler({
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: "MainApp" }],
+        routes: [{ name: "MainTabs" }],
       }),
     );
   }, [navigation]);

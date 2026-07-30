@@ -5,7 +5,7 @@ SQLAlchemy models representing persistent data for the Time Travel app.
 """
 
 import uuid
-from datetime import datetime, timezone, date as date_type
+from datetime import datetime, timezone
 
 import bcrypt
 from flask_login import UserMixin
@@ -123,6 +123,9 @@ class Destination(db.Model):
     """Master list of supported destinations with metadata."""
 
     __tablename__ = "destinations"
+    __table_args__ = (
+        db.Index("ix_destinations_country", "country"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(128), unique=True, nullable=False, index=True)
@@ -146,6 +149,7 @@ class Favorite(db.Model):
     __tablename__ = "favorites"
     __table_args__ = (
         db.UniqueConstraint("user_id", "item_type", "item_name", name="uq_user_fav"),
+        db.Index("ix_favorites_item_type", "item_type"),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -176,6 +180,10 @@ class TravelNote(db.Model):
     """User's travel journal entries – notes, impressions, memories."""
 
     __tablename__ = "travel_notes"
+    __table_args__ = (
+        db.Index("ix_travel_notes_user_public", "user_id", "is_public"),
+        db.Index("ix_travel_notes_dest", "destination"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
@@ -193,7 +201,7 @@ class TravelNote(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    user = db.relationship("User", backref=db.backref("notes", lazy="dynamic"))
+    user = db.relationship("User", lazy="joined", backref=db.backref("notes", lazy="dynamic"))
 
     def to_dict(self):
         return {
@@ -220,6 +228,9 @@ class SharedTrip(db.Model):
     """Shareable trip link allowing others to view a user's trip plan."""
 
     __tablename__ = "shared_trips"
+    __table_args__ = (
+        db.Index("ix_shared_trips_trip", "trip_id"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     share_token = db.Column(
@@ -263,6 +274,11 @@ class Expense(db.Model):
     """Individual expense entries for real-time trip spending tracking."""
 
     __tablename__ = "expenses"
+    __table_args__ = (
+        db.Index("ix_expenses_trip_cat", "trip_id", "category"),
+        db.Index("ix_expenses_user_dest", "user_id", "destination"),
+        db.Index("ix_expenses_date", "date"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
@@ -302,6 +318,10 @@ class PackingItem(db.Model):
     """Interactive packing checklist with user-added items and check states."""
 
     __tablename__ = "packing_items"
+    __table_args__ = (
+        db.Index("ix_packing_items_user_dest", "user_id", "destination"),
+        db.Index("ix_packing_items_custom", "is_custom"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
@@ -334,6 +354,11 @@ class Trip(db.Model):
     """Full trip planning entity — central workspace for a travel plan."""
 
     __tablename__ = "trips"
+    __table_args__ = (
+        db.Index("ix_trips_user_status", "user_id", "status"),
+        db.Index("ix_trips_user_dest", "user_id", "destination"),
+        db.Index("ix_trips_is_public", "is_public"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
@@ -357,15 +382,15 @@ class Trip(db.Model):
     )
 
     user = db.relationship("User", backref=db.backref("planned_trips", lazy="dynamic"))
-    days = db.relationship("TripDay", backref="trip", lazy="dynamic",
+    days = db.relationship("TripDay", backref="trip", lazy="selectin",
                            cascade="all, delete-orphan", order_by="TripDay.day_number")
-    places = db.relationship("TripPlace", backref="trip", lazy="dynamic",
+    places = db.relationship("TripPlace", backref="trip", lazy="selectin",
                              cascade="all, delete-orphan")
-    reservations = db.relationship("Reservation", backref="trip", lazy="dynamic",
+    reservations = db.relationship("Reservation", backref="trip", lazy="selectin",
                                    cascade="all, delete-orphan")
-    photos = db.relationship("TripPhoto", backref="trip", lazy="dynamic",
+    photos = db.relationship("TripPhoto", backref="trip", lazy="selectin",
                              cascade="all, delete-orphan")
-    companions = db.relationship("Companion", backref="trip", lazy="dynamic",
+    companions = db.relationship("Companion", backref="trip", lazy="selectin",
                                  cascade="all, delete-orphan")
 
     def to_dict(self, include_days=False, include_places=False):
@@ -386,14 +411,14 @@ class Trip(db.Model):
             "is_public": self.is_public,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "companions_count": self.companions.count() if self.companions else 0,
-            "places_count": self.places.count() if self.places else 0,
-            "photos_count": self.photos.count() if self.photos else 0,
+            "companions_count": len(self.companions) if self.companions else 0,
+            "places_count": len(self.places) if self.places else 0,
+            "photos_count": len(self.photos) if self.photos else 0,
         }
         if include_days:
-            d["days"] = [day.to_dict(include_places=True) for day in self.days.all()]
+            d["days"] = [day.to_dict(include_places=True) for day in self.days]
         if include_places:
-            d["places"] = [p.to_dict() for p in self.places.all()]
+            d["places"] = [p.to_dict() for p in self.places]
         return d
 
     def __repr__(self):
@@ -412,7 +437,7 @@ class TripDay(db.Model):
     title = db.Column(db.String(256), nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    places = db.relationship("TripPlace", backref="day", lazy="dynamic",
+    places = db.relationship("TripPlace", backref="day", lazy="selectin",
                              cascade="all, delete-orphan", order_by="TripPlace.position_order")
 
     def to_dict(self, include_places=True):
@@ -425,7 +450,7 @@ class TripDay(db.Model):
             "notes": self.notes,
         }
         if include_places:
-            d["places"] = [p.to_dict() for p in self.places.all()]
+            d["places"] = [p.to_dict() for p in self.places]
         return d
 
 
@@ -433,6 +458,10 @@ class TripPlace(db.Model):
     """A place/activity pinned to a trip (optionally assigned to a day)."""
 
     __tablename__ = "trip_places"
+    __table_args__ = (
+        db.Index("ix_trip_places_day_pos", "day_id", "position_order"),
+        db.Index("ix_trip_places_category", "category"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
@@ -479,6 +508,10 @@ class Reservation(db.Model):
     """Booking / reservation tracker — flights, hotels, restaurants, etc."""
 
     __tablename__ = "reservations"
+    __table_args__ = (
+        db.Index("ix_reservations_type", "res_type"),
+        db.Index("ix_reservations_status", "status"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
@@ -643,6 +676,10 @@ class TripTemplate(db.Model):
     """Pre-built itinerary templates users can clone."""
 
     __tablename__ = "trip_templates"
+    __table_args__ = (
+        db.Index("ix_trip_templates_category", "category"),
+        db.Index("ix_trip_templates_dest", "destination"),
+    )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(256), nullable=False)

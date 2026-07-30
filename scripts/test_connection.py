@@ -1,9 +1,16 @@
-"""Quick connectivity test for Supabase PostgreSQL."""
+"""Quick connectivity test for Supabase PostgreSQL. Requires env vars."""
+import os
+import sys
+
 import psycopg2
 
-HOST_POOLER = "aws-1-ap-southeast-1.pooler.supabase.com"
-HOST_DIRECT = "db.eylcswantcgqvcytcaqy.supabase.co"
-PASSWORD = "REDACTED"
+HOST_POOLER = os.environ.get("SUPABASE_HOST_POOLER", "aws-1-ap-southeast-1.pooler.supabase.com")
+HOST_DIRECT = os.environ.get("SUPABASE_HOST_DIRECT", "db.eylcswantcgqvcytcaqy.supabase.co")
+PASSWORD = os.environ.get("SUPABASE_PASSWORD", "")
+
+if not PASSWORD:
+    print("FATAL: Set SUPABASE_PASSWORD environment variable to run this script.")
+    sys.exit(1)
 
 tests = [
     ("Pooler (6543)", HOST_POOLER, 6543, "postgres.eylcswantcgqvcytcaqy"),

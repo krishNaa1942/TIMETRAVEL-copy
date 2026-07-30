@@ -13,12 +13,16 @@ Session lifecycle:
   - Total session count is hard-capped at MAX_SESSIONS.
 """
 
+import functools
 import logging
 import time
+import threading
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from typing import Optional
 
 import google.generativeai as genai
 
+from app.services.ai_security import AIPromptSanitizer
 from app.utils.constants import VALID_DESTINATION_NAMES
 
 logger = logging.getLogger(__name__)
@@ -29,6 +33,7 @@ logger = logging.getLogger(__name__)
 _sessions: dict = {}
 _model = None
 _configured = False
+_configure_lock = threading.Lock()
 
 # Session limits
 SESSION_TTL = 1800          # 30 minutes of inactivity before expiry
@@ -37,6 +42,38 @@ MAX_HISTORY_TURNS = 20      # keep last N user+model turn pairs (40 messages)
 
 # Build destination list string from registry for the system prompt
 _dest_list = ", ".join(sorted(VALID_DESTINATION_NAMES))
+
+# Timeout and retry config
+_GEMINI_TIMEOUT = 25
+_MAX_RETRIES = 2
+_RETRY_BASE_DELAY = 1.0
+
+_executor = ThreadPoolExecutor(max_workers=4)
+
+
+def _call_with_timeout(fn, timeout_secs=_GEMINI_TIMEOUT, *args, **kwargs):
+    future = _executor.submit(fn, *args, **kwargs)
+    try:
+        return future.result(timeout=timeout_secs)
+    except TimeoutError:
+        future.cancel()
+        raise TimeoutError(f"Gemini call timed out after {timeout_secs}s")
+
+
+def _call_with_retry(fn, max_retries=_MAX_RETRIES, base_delay=_RETRY_BASE_DELAY, *args, **kwargs):
+    import time as _time
+    last_exc = None
+    for attempt in range(max_retries + 1):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            last_exc = e
+            if attempt < max_retries:
+                delay = base_delay * (2 ** attempt)
+                logger.warning("Retry %d/%d after: %s", attempt + 1, max_retries, e)
+                _time.sleep(delay)
+    raise last_exc
+
 
 # ---------------------------------------------------------------------------
 # System prompt – defines the AI personality and knowledge
@@ -79,24 +116,26 @@ def _configure(api_key: str) -> None:
     if _configured:
         return
 
-    genai.configure(api_key=api_key)
-
-    _model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash",
-        system_instruction=SYSTEM_PROMPT,
-        generation_config=genai.GenerationConfig(
-            temperature=0.7,
-            top_p=0.9,
-            max_output_tokens=1024,
-        ),
-        safety_settings=[
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-        ],
-    )
-    _configured = True
+    with _configure_lock:
+        if _configured:
+            return
+        genai.configure(api_key=api_key)
+        _model = genai.GenerativeModel(
+            model_name="gemini-2.5-flash",
+            system_instruction=SYSTEM_PROMPT,
+            generation_config=genai.GenerationConfig(
+                temperature=0.7,
+                top_p=0.9,
+                max_output_tokens=1024,
+            ),
+            safety_settings=[
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            ],
+        )
+        _configured = True
     logger.info("Gemini AI configured with model: gemini-2.5-flash")
 
 
@@ -174,16 +213,37 @@ def chat_with_gemini(
     """
     try:
         _configure(api_key)
+
+        scan_result = AIPromptSanitizer.sanitize_input(message, context="chat", max_length=2000)
+        if scan_result.threats_detected:
+            logger.warning("Gemini input threats: %s", scan_result.threats_detected)
+        if scan_result.should_block:
+            return {
+                "reply": "I'm sorry, but I can't respond to that request. Please keep our conversation focused on travel planning.",
+                "model": "gemini-2.5-flash",
+                "mode": "ai",
+            }
+        message = scan_result.sanitized_input
+
         session = _get_session(session_id)
-        response = session.send_message(message)
+        response = _call_with_retry(
+            lambda: _call_with_timeout(
+                session.send_message, _GEMINI_TIMEOUT, message
+            )
+        )
 
         # Cap conversation history to prevent unbounded growth
         _trim_history(session)
 
         reply = response.text.strip()
 
+        # Sanitize AI output before returning to user
+        sanitized_output, warnings = AIPromptSanitizer.sanitize_output(reply, context="chat")
+        if warnings:
+            logger.info("Gemini output sanitization warnings: %s", warnings)
+
         return {
-            "reply": reply,
+            "reply": sanitized_output,
             "model": "gemini-2.5-flash",
             "mode": "ai",
         }
