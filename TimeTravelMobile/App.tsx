@@ -7,6 +7,7 @@
  * - PaperProvider: Material Design components
  * - GestureHandler: Touch interactions
  * - RootErrorBoundary: Global crash recovery
+ * - Sentry: Error tracking and performance monitoring
  */
 
 import React, { type ComponentType, useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClientProvider } from "@tanstack/react-query";
 import ErrorBoundary, { type FallbackComponentProps } from "react-native-error-boundary";
+import * as Sentry from "@sentry/react-native";
 
 import { NavOS } from "@/navigation/NavOS";
 import { useUIStore } from "@/stores/uiStore";
@@ -24,6 +26,12 @@ import { lightTheme, darkTheme } from "@/theme/colors";
 import { queryClient } from "@/api/queryClient";
 import { initializeStores } from "@/stores";
 import LoadingSpinner from "@/components/Common/LoadingSpinner";
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || "",
+  tracesSampleRate: 0.2,
+  environment: process.env.EXPO_PUBLIC_ENV || "development",
+});
 
 const AppFallback: ComponentType<FallbackComponentProps> = ({
   error,
@@ -38,7 +46,7 @@ const AppFallback: ComponentType<FallbackComponentProps> = ({
   </View>
 );
 
-export default function App() {
+function App() {
   const { themeDark } = useUIStore();
   const paperTheme = themeDark ? darkTheme : lightTheme;
   const [ready, setReady] = useState(false);
@@ -69,6 +77,8 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(App);
 
 const styles = StyleSheet.create({
   container: {

@@ -67,8 +67,19 @@ def create_app(config_class=None):
     # ── Configure logging ───────────────────────────────────────────
     _configure_logging(app)
 
+    # ── Initialise Sentry error tracking ────────────────────────────
+    sentry_dsn = os.environ.get("SENTRY_DSN", "")
+    if sentry_dsn:
+        import sentry_sdk
+        traces_rate = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.0"))
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            traces_sample_rate=traces_rate,
+            send_default_pii=False,
+            environment=os.environ.get("FLASK_ENV", "development"),
+        )
+
     # ── Ensure instance directory exists (for local SQLite fallback) ───
-    import os
     os.makedirs(app.instance_path, exist_ok=True)
 
     # ── Initialise database ─────────────────────────────────────────
@@ -83,7 +94,6 @@ def create_app(config_class=None):
     # For development, we use a dynamic origin handler
     def get_cors_origin():
         """Get allowed origins for CORS."""
-        import os
         # Default localhost origins for web development
         origins = [
             "http://localhost:8081",
