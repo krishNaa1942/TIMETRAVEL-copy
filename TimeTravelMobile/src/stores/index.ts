@@ -40,6 +40,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { offlineQueue } from '@/services/offlineQueue';
+import { useAuthStore } from './authStore.refactored';
 
 // Auth Store - ONLY tokens and auth status (NOT user profile)
 export {

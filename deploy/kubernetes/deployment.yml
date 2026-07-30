@@ -79,7 +79,9 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/your-org/timetravel-api:latest
+          # Tag is overridden at deploy time via `kubectl set image`
+          # or by the CD pipeline. See deploy/kubernetes/setup-secrets.sh
+          image: ghcr.io/your-org/timetravel-api:main
           ports:
             - containerPort: 5001
           envFrom:
