@@ -41,6 +41,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { packingService, PackingItem } from "@/services/packing";
 import { destinationsService } from "@/services/destinations";
 import { weatherService } from "@/services/weather";
@@ -941,18 +942,19 @@ export default function PackingScreen() {
         </View>
       </LinearGradient>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor="#667EEA"
-          />
-        }
-      >
+      <KeyboardAvoidingWrapper scrollable={false}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor="#667EEA"
+            />
+          }
+        >
         {/* Destination Selector */}
         <DestinationSelector
           destinations={destinations}
@@ -1112,7 +1114,8 @@ export default function PackingScreen() {
             </PressableScale>
           </View>
         )}
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 }

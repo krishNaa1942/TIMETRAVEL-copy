@@ -10,6 +10,7 @@ import {
 import { Button, Chip, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { GlassCard } from "@/components/UI/GlassCard";
 import { PressableScale } from "@/components/UI/PressableScale";
 import type { Destination } from "@/types";
@@ -292,15 +293,16 @@ export const DestinationSelector = memo(
     }, []);
 
     return (
-      <GlassCard
-        style={[
-          styles.card,
-          {
-            backgroundColor: palette.surfaceElevated,
-            borderColor: palette.border,
-          },
-        ]}
-      >
+      <KeyboardAvoidingWrapper>
+        <GlassCard
+          style={[
+            styles.card,
+            {
+              backgroundColor: palette.surfaceElevated,
+              borderColor: palette.border,
+            },
+          ]}
+        >
         <View style={styles.headerRow}>
           <View>
             <Text
@@ -465,7 +467,8 @@ export const DestinationSelector = memo(
             </View>
           )}
         </View>
-      </GlassCard>
+        </GlassCard>
+      </KeyboardAvoidingWrapper>
     );
   },
 );

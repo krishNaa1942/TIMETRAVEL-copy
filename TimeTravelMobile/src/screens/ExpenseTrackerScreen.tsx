@@ -28,6 +28,7 @@ import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { expenseService, Expense, ExpenseSummary } from "@/services/expenses";
 import { colors, spacing } from "@/theme/colors";
 
@@ -925,8 +926,9 @@ export default function ExpenseTrackerScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Header */}
-      <View style={styles.header}>
+      <KeyboardAvoidingWrapper>
+        {/* Header */}
+        <View style={styles.header}>
         <View>
           <Text style={styles.title}>Travel Expenses</Text>
           <Text style={styles.subtitle}>
@@ -998,6 +1000,7 @@ export default function ExpenseTrackerScreen() {
         onSubmit={addExpense}
         loading={adding}
       />
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 }

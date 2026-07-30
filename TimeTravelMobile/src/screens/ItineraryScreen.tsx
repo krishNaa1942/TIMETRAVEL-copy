@@ -58,6 +58,7 @@ import {
   ItineraryRoutePoint,
 } from "@/services/itinerary";
 import { colors, spacing } from "@/theme/colors";
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { GlassCard } from "@/components/UI/GlassCard";
 import { ItinerarySkeleton } from "@/components/UI/SkeletonLoader";
@@ -576,9 +577,10 @@ export default function ItineraryScreen() {
   }, [itinerary]);
 
   return (
-    <View style={styles.container}>
-      {/* Map Background */}
-      <MapComponent
+    <KeyboardAvoidingWrapper>
+      <View style={styles.container}>
+        {/* Map Background */}
+        <MapComponent
         ref={mapRef as any}
         style={StyleSheet.absoluteFillObject}
         provider={MAP_PROVIDER}
@@ -761,7 +763,8 @@ export default function ItineraryScreen() {
           </BottomSheetView>
         )}
       </BottomSheet>
-    </View>
+      </View>
+    </KeyboardAvoidingWrapper>
   );
 }
 

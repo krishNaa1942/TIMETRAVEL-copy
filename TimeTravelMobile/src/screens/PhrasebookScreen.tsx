@@ -46,6 +46,7 @@ import {
   DestinationInfo,
 } from "@/services/phrasebook";
 import { colors, spacing } from "@/theme/colors";
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { usePhrasebookStore } from "@/features/phrasebook/store/phrasebookStore";
 import { PressableScale } from "@/components/UI/PressableScale";
@@ -1416,8 +1417,9 @@ export default function PhrasebookScreen() {
   return (
     <PhrasebookScreenErrorBoundary>
       <SafeAreaView style={styles.container} edges={["top"]}>
-        {/* Header */}
-        <LinearGradient colors={["#7C3AED", "#6D28D9"]} style={styles.header}>
+        <KeyboardAvoidingWrapper>
+          {/* Header */}
+          <LinearGradient colors={["#7C3AED", "#6D28D9"]} style={styles.header}>
           <View style={styles.headerContent}>
             <View>
               <Text style={styles.headerTitle}>Phrasebook</Text>
@@ -1616,6 +1618,7 @@ export default function PhrasebookScreen() {
             removeClippedSubviews
           />
         )}
+        </KeyboardAvoidingWrapper>
       </SafeAreaView>
     </PhrasebookScreenErrorBoundary>
   );

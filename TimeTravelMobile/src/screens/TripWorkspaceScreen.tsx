@@ -39,6 +39,7 @@ import { FlashList } from "@shopify/flash-list";
 import ReAnimated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 // Components
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import ErrorMessage from "@/components/Common/ErrorMessage";
 import { GlassCard } from "@/components/UI/GlassCard";
 import { PressableScale } from "@/components/UI/PressableScale";
@@ -449,18 +450,19 @@ export default function TripWorkspaceScreen() {
   if (currentTrip) {
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          refreshControl={
-            <RefreshControl
-              refreshing={detailLoading || isRefetching}
-              onRefresh={() => {
-                queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(currentTrip.id)) });
-              }}
-              tintColor={colors.primary}
-            />
-          }
-        >
+        <KeyboardAvoidingWrapper scrollable={false}>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            refreshControl={
+              <RefreshControl
+                refreshing={detailLoading || isRefetching}
+                onRefresh={() => {
+                  queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(currentTrip.id)) });
+                }}
+                tintColor={colors.primary}
+              />
+            }
+          >
           {/* Header */}
           <View style={styles.detailHeader}>
             <TouchableOpacity
@@ -760,7 +762,8 @@ export default function TripWorkspaceScreen() {
               </ScrollView>
             </>
           )}
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingWrapper>
 
         {/* FAB for quick actions */}
         <FAB
@@ -857,16 +860,17 @@ export default function TripWorkspaceScreen() {
   // Trip List View
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={
-          <RefreshControl
-            refreshing={tripsLoading || isRefetching}
-            onRefresh={refetchTrips}
-            tintColor={colors.primary}
-          />
-        }
-      >
+      <KeyboardAvoidingWrapper scrollable={false}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              refreshing={tripsLoading || isRefetching}
+              onRefresh={refetchTrips}
+              tintColor={colors.primary}
+            />
+          }
+        >
         {/* Header */}
         <View style={styles.header}>
           <View>
@@ -1029,7 +1033,8 @@ export default function TripWorkspaceScreen() {
             </ReAnimated.View>
           ))
         )}
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingWrapper>
 
       {/* Create Trip Modal */}
       <Portal>

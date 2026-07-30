@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import LoadingSpinner from "@/components/Common/LoadingSpinner";
 import { journalService, TravelNote } from "@/services/journal";
 import { colors, spacing } from "@/theme/colors";
@@ -66,7 +67,8 @@ export default function TravelJournalScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingWrapper scrollable={false}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>📔 Travel Journal</Text>
         <Text style={styles.subtitle}>Document your adventures & read others'</Text>
 
@@ -155,7 +157,8 @@ export default function TravelJournalScreen() {
             ))
           )
         )}
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 }

@@ -25,6 +25,7 @@ import {
   TravelClass,
   BudgetInsights,
 } from "@/hooks/useBudgetPlanner";
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
 import { getAnalytics } from "@/core/telemetry/Analytics";
@@ -615,14 +616,15 @@ export default function BudgetScreen() {
   const hasValidDestination = !!formData.destination;
 
   return (
-    <FlatList
-      data={[]}
-      renderItem={() => null}
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-      ListHeaderComponent={
+    <KeyboardAvoidingWrapper scrollable={false}>
+      <FlatList
+        data={[]}
+        renderItem={() => null}
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
         <>
           {/* Header */}
           <View style={styles.header}>
@@ -751,8 +753,9 @@ export default function BudgetScreen() {
             ))}
         </>
       }
-      ListFooterComponent={<View style={styles.bottomSpacer} />}
-    />
+        ListFooterComponent={<View style={styles.bottomSpacer} />}
+      />
+    </KeyboardAvoidingWrapper>
   );
 }
 

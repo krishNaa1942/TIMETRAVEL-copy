@@ -23,6 +23,7 @@ import ReAnimated, {
   Easing as ReEasing,
 } from "react-native-reanimated";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { Destination } from "@/types";
 import { colors, spacing } from "@/theme/colors";
@@ -118,13 +119,14 @@ const SearchOverlay = memo(
           accessibilityLabel="Close search"
         />
 
-        <ReAnimated.View
-          entering={SlideInDown.duration(300).easing(
-            ReEasing.out(ReEasing.cubic),
-          )}
-          exiting={SlideOutDown.duration(200)}
-          style={styles.content}
-        >
+        <KeyboardAvoidingWrapper scrollable={false}>
+          <ReAnimated.View
+            entering={SlideInDown.duration(300).easing(
+              ReEasing.out(ReEasing.cubic),
+            )}
+            exiting={SlideOutDown.duration(200)}
+            style={styles.content}
+          >
           {/* Search Input + Close Button (fix #18) */}
           <View style={styles.inputRow}>
             <View style={styles.inputContainer}>
@@ -305,8 +307,9 @@ const SearchOverlay = memo(
                 ))}
               </>
             )}
-          </ScrollView>
-        </ReAnimated.View>
+            </ScrollView>
+          </ReAnimated.View>
+        </KeyboardAvoidingWrapper>
       </ReAnimated.View>
     );
   },

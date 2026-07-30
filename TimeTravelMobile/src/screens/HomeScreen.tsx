@@ -46,6 +46,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 import ReAnimated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import ErrorMessage from "@/components/Common/ErrorMessage";
 import DestinationCard from "@/components/Features/DestinationCard";
 import {
@@ -705,17 +706,18 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <StatusBar barStyle="light-content" />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor="#667EEA"
-          />
-        }
-      >
+      <KeyboardAvoidingWrapper scrollable={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor="#667EEA"
+            />
+          }
+        >
         {/* Hero Section */}
         <LinearGradient
           colors={["#0F172A", "#1E293B", "#334155"]}
@@ -893,7 +895,8 @@ export default function HomeScreen() {
             icon="currency-inr"
           />
         </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingWrapper>
 
       {/* FAB */}
       <PressableScale

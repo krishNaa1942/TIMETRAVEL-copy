@@ -39,6 +39,7 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
+import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import {
   MapComponent,
   MarkerComponent,
@@ -452,8 +453,9 @@ export default function RoutePlannerScreen() {
   // ───────────────────────────────────────────────────────────
 
   return (
-    <View style={styles.container}>
-      <StatusBar
+    <KeyboardAvoidingWrapper>
+      <View style={styles.container}>
+        <StatusBar
         barStyle="dark-content"
         translucent
         backgroundColor="transparent"
@@ -954,7 +956,8 @@ export default function RoutePlannerScreen() {
           ) : null}
         </SafeAreaView>
       </Animated.View>
-    </View>
+      </View>
+    </KeyboardAvoidingWrapper>
   );
 }
 
