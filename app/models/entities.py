@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 import bcrypt
 from flask_login import UserMixin
+from sqlalchemy import event
 
 from app.models.database import db
 
@@ -704,6 +705,21 @@ class TripTemplate(db.Model):
             "cover_image_url": self.cover_image_url,
             "popularity": self.popularity,
         }
+
+
+# ── Auto-update `updated_at` on any model that has the column ──
+
+_updated_at_models = [
+    cls for cls in db.Model.__subclasses__()
+    if hasattr(cls, "updated_at")
+]
+
+@event.listens_for(db.session, "before_flush")
+def _auto_update_timestamps(session, flush_context, instances):
+    now = datetime.now(timezone.utc)
+    for obj in session.dirty:
+        if hasattr(obj, "updated_at"):
+            obj.updated_at = now
 
 
 class NewsletterSubscriber(db.Model):
