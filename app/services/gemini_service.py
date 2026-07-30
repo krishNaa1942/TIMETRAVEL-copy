@@ -40,9 +40,6 @@ SESSION_TTL = 1800          # 30 minutes of inactivity before expiry
 MAX_SESSIONS = 200          # hard cap on concurrent sessions
 MAX_HISTORY_TURNS = 20      # keep last N user+model turn pairs (40 messages)
 
-# Build destination list string from registry for the system prompt
-_dest_list = ", ".join(sorted(VALID_DESTINATION_NAMES))
-
 # Timeout and retry config
 _GEMINI_TIMEOUT = 25
 _MAX_RETRIES = 2
@@ -83,7 +80,7 @@ SYSTEM_PROMPT = f"""You are **Time Travel AI** – a smart, friendly, and knowle
 Your mission: Help middle-class Indian families plan budget-friendly, safe, and memorable trips.
 
 **Your expertise covers:**
-• {len(VALID_DESTINATION_NAMES)} popular Indian destinations: {_dest_list}
+• Knowledge of {len(VALID_DESTINATION_NAMES)} popular Indian destinations across all states
 • Budget estimation (hotels ₹500-₹8000/night, transport, food, activities)
 • Safety advice (women safety, night safety, scam alerts, medical facilities)
 • Weather & packing recommendations
