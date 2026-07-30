@@ -155,7 +155,38 @@ spec:
           averageUtilization: 80
 ---
 # ──────────────────────────────────────────────────────────
-# API Service
+# Network Policy — deny all ingress except API
+# ──────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: timetravel
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-ingress
+  namespace: timetravel
+spec:
+  podSelector:
+    matchLabels:
+      app: timetravel
+      component: api
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - port: 5001
+  policyTypes:
+    - Ingress
+---
+# ──────────────────────────────────────────────────────────
+# Redis Service
 # ──────────────────────────────────────────────────────────
 apiVersion: v1
 kind: Service
@@ -311,7 +342,21 @@ spec:
               memory: "512Mi"
       volumes:
         - name: redis-storage
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: redis-data
+---
+# Redis PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: timetravel
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
 ---
 # Redis Service
 apiVersion: v1
