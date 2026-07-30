@@ -132,35 +132,17 @@ SECRET_KEY = os.getenv("SECRET_KEY") or secrets.token_hex(32)
 
 **Finding:** `pickle.loads()` was used for cache deserialization. Pickle is vulnerable to arbitrary code execution if the cache is poisoned. A Redis compromise (or MITM on Redis connection) could execute arbitrary Python code on the server.
 
-### 1.8 🟡 KUBERNETES SECRETS IN PLAINTEXT YAML
+### 1.8 🟡 KUBERNETES SECRETS IN PLAINTEXT YAML — FIXED
 
-**File:** `deploy/kubernetes/deployment.yml`
+**File:** `deploy/kubernetes/deployment.yml`, `deploy/kubernetes/setup-secrets.sh`
 
-**Finding:** The Kubernetes Secret object contains hardcoded placeholder credentials:
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: timetravel-secrets
-type: Opaque
-data:
-  DATABASE_URL: <base64 of "CHANGE_ME_IN_PRODUCTION">
-  SECRET_KEY: <base64 of "CHANGE_ME_IN_PRODUCTION">
-```
+**Finding:** (FIXED 2026-07-30) Replaced hardcoded `stringData` with `stringData: {}` and added inline documentation showing the `kubectl create secret generic` command. Created `deploy/kubernetes/setup-secrets.sh` which generates cryptographically random secrets and applies them via `kubectl apply`. No secrets in committed YAML.
 
-**Risk:** While these are placeholders, the pattern means secrets as plaintext in YAML files committed to git. Should be using External Secrets Operator, Sealed Secrets, or Vault.
+### 1.9 🔴 OFFLINE QUEUE NEVER ACTIVATES ON DEVICES — FIXED
 
-### 1.9 🔴 OFFLINE QUEUE NEVER ACTIVATES ON DEVICES
+**Files:** `TimeTravelMobile/src/services/offlineQueue.ts`, `TimeTravelMobile/src/stores/index.ts`
 
-**File:** `TimeTravelMobile/src/services/offlineQueue.ts:26`
-
-```typescript
-const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-```
-
-**Finding:** `typeof navigator` evaluates to `'undefined'` in React Native. The ternary falls to `true`, meaning **offline queue is permanently disabled on physical devices**. The `@react-native-community/netinfo` package is installed but never imported.
-
-**Impact:** Users who lose connectivity during a trip — precisely when they need offline mode most — get silent failures instead of queued mutations.
+**Finding:** (FIXED 2026-07-30) The old `navigator.onLine` code was already replaced — file uses `@react-native-community/netinfo`. The `initialize()` method was never called; added `offlineQueue.initialize()` inside `initializeStores()` in `stores/index.ts`, which is invoked from `App.tsx` `useEffect`. Offline queue now activates on app startup.
 
 ---
 
@@ -200,13 +182,13 @@ const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
 **Finding:** The comparison endpoint has no authentication. Any client can make comparisons without user context.
 
-### 2.5 🟡 AUTH STORE — INITIALIZE NEVER CALLED
+### 2.5 🟡 AUTH STORE — INITIALIZE NEVER CALLED — FIXED
 
 **Files:**
 - `TimeTravelMobile/src/stores/authStore.refactored.ts`
 - `TimeTravelMobile/src/stores/index.ts`
 
-**Finding:** The refactored auth store's `initialize()` method reads tokens from SecureStore and restores authentication state. It is **never called** in `App.tsx` or `NavOS`. On cold app start, the app always shows "unauthenticated" screen until the user manually logs in again.
+**Finding:** (FIXED 2026-07-30) Added `useAuthStore.getState().initialize()` call inside `initializeStores()` in `stores/index.ts`. Auth state (tokens from SecureStore) is now restored on cold app start.
 
 ### 2.6 🟠 TOKEN MANAGER IMPLEMENTATIONS — 3 COPIES
 
