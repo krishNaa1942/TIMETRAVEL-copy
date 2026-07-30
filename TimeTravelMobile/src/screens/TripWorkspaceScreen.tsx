@@ -28,6 +28,7 @@ import {
   UIManager,
   useWindowDimensions,
 } from "react-native";
+import type { CreateTripData } from "@/services/tripPlanner";
 import { Text, TextInput, Chip, FAB, IconButton, Portal, Modal, Menu, Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -234,15 +235,41 @@ export default function TripWorkspaceScreen() {
   // Mutations
   const createTripMutation = useMutation({
     mutationFn: tripPlannerService.createTrip,
+    onMutate: async (tripData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.trips.all });
+      const previousTrips = queryClient.getQueryData(queryKeys.trips.lists());
+      const optimisticTrip = {
+        ...tripData,
+        id: -Date.now(),
+        destination: tripData.destination || "",
+        num_days: tripData.num_days || 0,
+        family_size: tripData.family_size || 0,
+        travel_class: tripData.travel_class || "economy",
+        status: "planning",
+        days: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as TripData;
+      queryClient.setQueryData(queryKeys.trips.lists(), (old: any) => ({
+        ...old,
+        trips: [optimisticTrip, ...(old?.trips || [])],
+      }));
+      return { previousTrips };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.trips.all });
       setShowCreate(false);
       resetCreateForm();
       haptics.notification('success');
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _tripData, context: any) => {
+      if (context?.previousTrips) {
+        queryClient.setQueryData(queryKeys.trips.lists(), context.previousTrips);
+      }
       haptics.notification('error');
       Alert.alert("Error", error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.trips.all });
     },
   });
 
@@ -275,36 +302,111 @@ export default function TripWorkspaceScreen() {
   const updateTripMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<TripData> }) =>
       tripPlannerService.updateTrip(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.trips.all });
-      if (selectedTrip?.id) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.trips.all });
+      const previousTrips = queryClient.getQueryData(queryKeys.trips.lists());
+      queryClient.setQueryData(queryKeys.trips.lists(), (old: any) => ({
+        ...old,
+        trips: old?.trips?.map((t: TripData) =>
+          t.id === id ? { ...t, ...data } : t
+        ) || [],
+      }));
+      queryClient.setQueryData(queryKeys.trips.detail(String(id)), (old: any) => {
+        if (!old) return old;
+        return { ...old, trip: { ...old.trip, ...data } };
+      });
+      return { previousTrips };
+    },
+    onError: (_err: Error, { id }, context: any) => {
+      if (context?.previousTrips) {
+        queryClient.setQueryData(queryKeys.trips.lists(), context.previousTrips);
+        if (selectedTrip?.id) {
+          queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
+        }
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.trips.all });
     },
   });
 
   const updateDayMutation = useMutation({
     mutationFn: ({ tripId, dayId, data }: { tripId: number; dayId: number; data: { title?: string; notes?: string } }) =>
       tripPlannerService.updateDay(tripId, dayId, data),
+    onMutate: async ({ tripId, dayId, data }) => {
+      const detailKey = queryKeys.trips.detail(String(tripId));
+      await queryClient.cancelQueries({ queryKey: detailKey });
+      const previousDetail = queryClient.getQueryData(detailKey);
+      queryClient.setQueryData(detailKey, (old: any) => {
+        if (!old?.trip?.days) return old;
+        return {
+          ...old,
+          trip: {
+            ...old.trip,
+            days: old.trip.days.map((d: TripDay) =>
+              d.id === dayId ? { ...d, ...data } : d
+            ),
+          },
+        };
+      });
+      return { previousDetail };
+    },
     onSuccess: () => {
+      setEditingDay(null);
+      haptics.impact('light');
+    },
+    onError: (_err: Error, { tripId }, context: any) => {
+      if (context?.previousDetail) {
+        queryClient.setQueryData(queryKeys.trips.detail(String(tripId)), context.previousDetail);
+      }
+    },
+    onSettled: () => {
       if (selectedTrip?.id) {
         queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
       }
-      setEditingDay(null);
-      haptics.impact('light');
     },
   });
 
   const addPlaceMutation = useMutation({
     mutationFn: ({ tripId, data }: { tripId: number; data: Partial<TripPlace> }) =>
       tripPlannerService.addPlace(tripId, data),
+    onMutate: async ({ tripId, data }) => {
+      const detailKey = queryKeys.trips.detail(String(tripId));
+      await queryClient.cancelQueries({ queryKey: detailKey });
+      const previousDetail = queryClient.getQueryData(detailKey);
+      const optimisticPlace = {
+        ...data,
+        id: -Date.now(),
+        name: data.name || "",
+        category: data.category || "other",
+        trip_id: tripId,
+      } as TripPlace;
+      queryClient.setQueryData(detailKey, (old: any) => {
+        if (!old?.trip) return old;
+        return {
+          ...old,
+          trip: {
+            ...old.trip,
+            places: [...(old.trip.places || []), optimisticPlace],
+          },
+        };
+      });
+      return { previousDetail };
+    },
     onSuccess: () => {
-      if (selectedTrip?.id) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
-      }
       setShowAddPlace(false);
       resetPlaceForm();
       haptics.impact('light');
+    },
+    onError: (_err: Error, { tripId }, context: any) => {
+      if (context?.previousDetail) {
+        queryClient.setQueryData(queryKeys.trips.detail(String(tripId)), context.previousDetail);
+      }
+    },
+    onSettled: () => {
+      if (selectedTrip?.id) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
+      }
     },
   });
 

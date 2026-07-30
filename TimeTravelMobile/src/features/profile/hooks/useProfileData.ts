@@ -67,6 +67,26 @@ export const useProfileData = (): UseProfileDataReturn => {
     useMutation({
       mutationFn: (payload: ProfileUpdatePayload) =>
         profileService.updateProfile(payload),
+      onMutate: async (payload) => {
+        await queryClient.cancelQueries({
+          queryKey: queryKeys.profile.summary(),
+        });
+        await queryClient.cancelQueries({
+          queryKey: queryKeys.profile.data(),
+        });
+        const previousSummary = queryClient.getQueryData(queryKeys.profile.summary());
+        queryClient.setQueryData(queryKeys.profile.summary(), (old: any) => {
+          if (!old?.data?.profile) return old;
+          return {
+            ...old,
+            data: {
+              ...old.data,
+              profile: { ...old.data.profile, ...payload },
+            },
+          };
+        });
+        return { previousSummary };
+      },
       onSuccess: async () => {
         await queryClient.invalidateQueries({
           queryKey: queryKeys.profile.summary(),
@@ -75,7 +95,10 @@ export const useProfileData = (): UseProfileDataReturn => {
           queryKey: queryKeys.profile.data(),
         });
       },
-      onError: (error) => {
+      onError: (error, _payload, context: any) => {
+        if (context?.previousSummary) {
+          queryClient.setQueryData(queryKeys.profile.summary(), context.previousSummary);
+        }
         console.error("Profile update failed:", error);
       },
     });

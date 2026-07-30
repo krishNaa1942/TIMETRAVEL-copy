@@ -53,17 +53,17 @@ export interface TripData {
   updated_at?: string;
 }
 
+export interface CreateTripData {
+  title: string;
+  destination: string;
+  num_days?: number;
+  family_size?: number;
+  travel_class?: string;
+  notes?: string;
+}
+
 export const tripPlannerService = {
-  async createTrip(data: {
-    title: string;
-    destination: string;
-    num_days?: number;
-    start_date?: string;
-    end_date?: string;
-    family_size?: number;
-    travel_class?: string;
-    notes?: string;
-  }): Promise<{ trip: TripData }> {
+  async createTrip(data: CreateTripData): Promise<{ trip: TripData }> {
     return apiService.post("/trips/planner", data);
   },
 
