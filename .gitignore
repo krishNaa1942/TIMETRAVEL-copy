@@ -69,3 +69,4 @@ TimeTravelMobile/.expo/
 STARTER_*
 SETUP_MOBILE_APP.sh
 *.bak
+*.joblib
