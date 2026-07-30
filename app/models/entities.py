@@ -126,6 +126,7 @@ class Destination(db.Model):
     __tablename__ = "destinations"
     __table_args__ = (
         db.Index("ix_destinations_country", "country"),
+        db.CheckConstraint("safety_score IS NULL OR (safety_score >= 0 AND safety_score <= 10)", name="ck_dest_safety_score"),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -151,6 +152,7 @@ class Favorite(db.Model):
     __table_args__ = (
         db.UniqueConstraint("user_id", "item_type", "item_name", name="uq_user_fav"),
         db.Index("ix_favorites_item_type", "item_type"),
+        db.CheckConstraint("item_type IN ('destination', 'place', 'attraction', 'restaurant')", name="ck_fav_item_type"),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -359,6 +361,8 @@ class Trip(db.Model):
         db.Index("ix_trips_user_status", "user_id", "status"),
         db.Index("ix_trips_user_dest", "user_id", "destination"),
         db.Index("ix_trips_is_public", "is_public"),
+        db.CheckConstraint("status IN ('planning', 'active', 'completed', 'cancelled')", name="ck_trip_status"),
+        db.CheckConstraint("travel_class IN ('economy', 'budget', 'standard', 'premium', 'luxury')", name="ck_trip_travel_class"),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
