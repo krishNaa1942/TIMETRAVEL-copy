@@ -6,11 +6,13 @@ Supports Supabase Storage when configured, falls back to local disk.
 import os
 import re
 import uuid
+from io import BytesIO
 from urllib.parse import urlparse
 
 from flask import Blueprint, request, jsonify, send_from_directory, current_app, redirect
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from PIL import Image
 
 from app.main import limiter
 from app.models.database import db
@@ -28,6 +30,8 @@ uploads_bp = Blueprint("uploads", __name__, url_prefix="/api/uploads")
 ALLOWED_IMAGE_EXTS = {"png", "jpg", "jpeg", "gif", "webp", "heic"}
 ALLOWED_DOC_EXTS = {"pdf", "png", "jpg", "jpeg", "doc", "docx"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+MAX_IMAGE_DIMENSION = 1920
+MAX_FILES_PER_REQUEST = 10
 
 # MIME type mapping for Supabase uploads
 _MIME_TYPES = {
@@ -67,6 +71,24 @@ def _sanitize_text(value: str, max_len: int = 500) -> str:
     return clean.strip()[:max_len]
 
 
+def _optimize_image(file):
+    try:
+        img = Image.open(file)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        if max(img.width, img.height) > MAX_IMAGE_DIMENSION:
+            ratio = MAX_IMAGE_DIMENSION / max(img.width, img.height)
+            new_size = (int(img.width * ratio), int(img.height * ratio))
+            img = img.resize(new_size, Image.LANCZOS)
+        buf = BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        buf.seek(0)
+        return buf
+    except Exception:
+        current_app.logger.warning("Image optimization failed, using original", exc_info=True)
+        return None
+
+
 def _is_safe_redirect(url: str) -> bool:
     """Only allow redirects to the configured Supabase host."""
     supabase_url = current_app.config.get("SUPABASE_URL", "")
@@ -104,7 +126,11 @@ def upload_photo():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded."}), 400
 
-    file = request.files["file"]
+    files = request.files.getlist("file")
+    if len(files) > MAX_FILES_PER_REQUEST:
+        return jsonify({"error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."}), 400
+
+    file = files[0]
     if not file.filename:
         return jsonify({"error": "No file selected."}), 400
 
@@ -122,14 +148,27 @@ def upload_photo():
     ext = file.filename.rsplit(".", 1)[-1].lower()
     stored_name = f"{uuid.uuid4().hex}.{ext}"
 
+    # Optimize image if applicable
+    file_data = None
+    content_type = _MIME_TYPES.get(ext, "application/octet-stream")
+    if file.content_type and file.content_type.startswith("image/"):
+        optimized = _optimize_image(file)
+        if optimized is not None:
+            file_data = optimized.read()
+            content_type = "image/jpeg"
+
+    if file_data is None:
+        file.seek(0)
+        file_data = file.read()
+
     if is_supabase_configured():
         bucket = current_app.config["SUPABASE_STORAGE_BUCKET_PHOTOS"]
         path = _storage_path(current_user.id, stored_name)
-        content_type = _MIME_TYPES.get(ext, "application/octet-stream")
-        upload_file(bucket, path, file.read(), content_type)
+        upload_file(bucket, path, file_data, content_type)
     else:
         upload_dir = get_local_upload_dir("photos")
-        file.save(os.path.join(upload_dir, stored_name))
+        with open(os.path.join(upload_dir, stored_name), "wb") as f:
+            f.write(file_data)
 
     photo = TripPhoto(
         trip_id=trip.id,
@@ -179,7 +218,11 @@ def upload_document():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded."}), 400
 
-    file = request.files["file"]
+    files = request.files.getlist("file")
+    if len(files) > MAX_FILES_PER_REQUEST:
+        return jsonify({"error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."}), 400
+
+    file = files[0]
     if not file.filename:
         return jsonify({"error": "No file selected."}), 400
 
@@ -195,14 +238,18 @@ def upload_document():
     ext = file.filename.rsplit(".", 1)[-1].lower()
     stored_name = f"{uuid.uuid4().hex}.{ext}"
 
+    file.seek(0)
+    file_data = file.read()
+    content_type = _MIME_TYPES.get(ext, "application/octet-stream")
+
     if is_supabase_configured():
         bucket = current_app.config["SUPABASE_STORAGE_BUCKET_DOCS"]
         path = _storage_path(current_user.id, stored_name)
-        content_type = _MIME_TYPES.get(ext, "application/octet-stream")
-        upload_file(bucket, path, file.read(), content_type)
+        upload_file(bucket, path, file_data, content_type)
     else:
         upload_dir = get_local_upload_dir("documents")
-        file.save(os.path.join(upload_dir, stored_name))
+        with open(os.path.join(upload_dir, stored_name), "wb") as f:
+            f.write(file_data)
 
     expiry_date = None
     if request.form.get("expiry_date"):
