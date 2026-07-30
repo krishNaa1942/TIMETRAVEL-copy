@@ -11,7 +11,8 @@ import re
 import threading
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from app.models.schemas import BudgetRequest
 from app.services.ai_security import AIPromptSanitizer
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Module-level state
 # ---------------------------------------------------------------------------
-_model = None
+_client: genai.Client | None = None
 _configured = False
 _configure_lock = threading.Lock()
 _BUDGET_BASELINES_PATH = Path(__file__).resolve().parents[2] / "data" / "budget_baselines.json"
@@ -61,29 +62,14 @@ Generate an itinerary for:
 
 def _configure(api_key: str) -> None:
     """Configure Gemini with the API key (done once)."""
-    global _configured, _model
+    global _configured, _client
     if _configured:
         return
 
     with _configure_lock:
         if _configured:
             return
-        genai.configure(api_key=api_key)
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            generation_config=genai.GenerationConfig(
-                temperature=0.35,
-                top_p=0.85,
-                max_output_tokens=4096,
-                response_mime_type="application/json",
-            ),
-            safety_settings=[
-                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            ],
-        )
+        _client = genai.Client(api_key=api_key)
         _configured = True
     logger.info("Itinerary service: Gemini configured")
 
@@ -381,7 +367,19 @@ def generate_itinerary(
             interests=safe_interests,
         )
 
-        response = _model.generate_content(prompt)
+        gen_config = types.GenerateContentConfig(
+            temperature=0.35,
+            top_p=0.85,
+            max_output_tokens=4096,
+            response_mime_type="application/json",
+            safety_settings=[
+                types.SafetySettingDict(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+                types.SafetySettingDict(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+                types.SafetySettingDict(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+                types.SafetySettingDict(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+            ],
+        )
+        response = _client.models.generate_content(model="gemini-2.5-flash", contents=prompt, config=gen_config)
         raw = response.text.strip()
         logger.debug("Itinerary raw response length: %d chars", len(raw))
 

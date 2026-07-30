@@ -46,12 +46,12 @@ SAMPLE_DAY = {
 
 class TestGenerateItinerary:
     @patch("app.services.itinerary_service._configured", False)
-    @patch("app.services.itinerary_service._model", None)
+    @patch("app.services.itinerary_service._client", None)
     @patch("app.services.itinerary_service.genai")
     def test_successful_generation(self, mock_genai):
-        mock_model = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_model
-        mock_model.generate_content.return_value = MagicMock(
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(
             text=json.dumps([SAMPLE_DAY]),
         )
 
@@ -65,12 +65,12 @@ class TestGenerateItinerary:
         assert result["itinerary"][0]["day"] == 1
 
     @patch("app.services.itinerary_service._configured", False)
-    @patch("app.services.itinerary_service._model", None)
+    @patch("app.services.itinerary_service._client", None)
     @patch("app.services.itinerary_service.genai")
     def test_json_parse_error(self, mock_genai):
-        mock_model = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_model
-        mock_model.generate_content.return_value = MagicMock(text="not json")
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(text="not json")
 
         result = generate_itinerary("Goa", 3, 2, "economy", "", "fake-key")
 
@@ -78,12 +78,12 @@ class TestGenerateItinerary:
         assert "invalid response" in result["error"]
 
     @patch("app.services.itinerary_service._configured", False)
-    @patch("app.services.itinerary_service._model", None)
+    @patch("app.services.itinerary_service._client", None)
     @patch("app.services.itinerary_service.genai")
     def test_empty_itinerary(self, mock_genai):
-        mock_model = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_model
-        mock_model.generate_content.return_value = MagicMock(text="[]")
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(text="[]")
 
         result = generate_itinerary("Goa", 3, 2, "premium", "food", "fake-key")
 
@@ -91,28 +91,28 @@ class TestGenerateItinerary:
         assert "Could not generate" in result["error"]
 
     @patch("app.services.itinerary_service._configured", False)
-    @patch("app.services.itinerary_service._model", None)
+    @patch("app.services.itinerary_service._client", None)
     @patch("app.services.itinerary_service.genai")
     def test_api_exception(self, mock_genai):
-        mock_model = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_model
-        mock_model.generate_content.side_effect = RuntimeError("API down")
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.side_effect = RuntimeError("API down")
 
         result = generate_itinerary("Goa", 3, 2, "economy", "", "fake-key")
 
         assert "error" in result
 
     @patch("app.services.itinerary_service._configured", False)
-    @patch("app.services.itinerary_service._model", None)
+    @patch("app.services.itinerary_service._client", None)
     @patch("app.services.itinerary_service.genai")
     def test_no_interests_uses_default(self, mock_genai):
-        mock_model = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_model
-        mock_model.generate_content.return_value = MagicMock(
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(
             text=json.dumps([SAMPLE_DAY]),
         )
 
         generate_itinerary("Delhi", 2, 4, "economy", "", "fake-key")
 
-        prompt = mock_model.generate_content.call_args[0][0]
+        prompt = mock_client.models.generate_content.call_args[1]["contents"]
         assert "general sightseeing" in prompt
