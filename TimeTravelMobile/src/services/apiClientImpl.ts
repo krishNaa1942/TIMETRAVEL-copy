@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 
 import { API_BASE_URL, API_TIMEOUT } from "@/constants/config";
 import { tokenManager } from "./tokenManagerCore";
+import type { ApiError as ApiErrorInterface } from "@/types/api";
 
 export interface TokenPair {
   access_token: string;
@@ -22,14 +23,18 @@ export interface ApiErrorDetails {
   details?: any;
   retryable: boolean;
   userMessage: string;
+  category?: string;
+  timestamp?: string;
 }
 
-export class ApiError extends Error {
+export class ApiError extends Error implements ApiErrorInterface {
   public code: string;
   public status: number;
   public details?: any;
   public retryable: boolean;
   public userMessage: string;
+  public category?: string;
+  public timestamp?: string;
 
   constructor(details: ApiErrorDetails) {
     super(details.message);
@@ -39,6 +44,8 @@ export class ApiError extends Error {
     this.details = details.details;
     this.retryable = details.retryable;
     this.userMessage = details.userMessage;
+    this.category = details.category;
+    this.timestamp = details.timestamp;
   }
 }
 

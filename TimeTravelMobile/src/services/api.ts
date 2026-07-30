@@ -22,6 +22,7 @@ import { Platform } from "react-native";
 // ─────────────────────────────────────────────────────────────
 import { API_BASE_URL, API_TIMEOUT } from "@/constants/config";
 import { tokenManager } from "./tokenManager";
+import type { ApiError as ApiErrorInterface } from "@/types/api";
 
 export type RequestConfig = AxiosRequestConfig & { skipRetry?: boolean };
 
@@ -48,15 +49,22 @@ function logError(...args: any[]) {
 // ─────────────────────────────────────────────────────────────
 // API ERROR CLASS
 // ─────────────────────────────────────────────────────────────
-export class ApiError extends Error {
+export class ApiError extends Error implements ApiErrorInterface {
+  retryable?: boolean;
+  userMessage?: string;
+  category?: string;
+  timestamp?: string;
+  details?: any;
+
   constructor(
-    public message: string,
+    message: string,
     public status: number,
     public code?: string,
-    public details?: any,
+    details?: any,
   ) {
     super(message);
     this.name = "ApiError";
+    this.details = details;
   }
 }
 

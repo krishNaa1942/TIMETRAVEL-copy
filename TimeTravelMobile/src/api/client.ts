@@ -7,6 +7,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from "axios";
 import { API_BASE_URL } from "../constants/config";
 import { secureStorage } from "../services/secureStorage";
+import { ApiError } from "@/types/api";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -17,13 +18,6 @@ export interface ApiResponse<T = any> {
   data: T | null;
   error: ApiError | null;
   meta: ApiMeta | null;
-}
-
-export interface ApiError {
-  message: string;
-  code: string;
-  details?: Record<string, any>;
-  field?: string;
 }
 
 export interface ApiMeta {
@@ -255,6 +249,7 @@ class ApiClient {
         const apiError = error.response?.data?.error || {
           message: error.message || "An error occurred",
           code: error.code || "UNKNOWN_ERROR",
+          status: 0,
         };
 
         return {
@@ -271,6 +266,7 @@ class ApiClient {
         error: {
           message: "An unexpected error occurred",
           code: "UNKNOWN_ERROR",
+          status: 0,
         },
         meta: null,
       };
