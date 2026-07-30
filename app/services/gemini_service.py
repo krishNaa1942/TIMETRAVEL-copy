@@ -1,11 +1,11 @@
 """
 Gemini AI Service
-==================
+=================
 Integrates Google's Gemini generative AI for intelligent, context-aware
 travel chat. Maintains per-session conversation history for multi-turn
 dialogue.
 
-Uses the google-generativeai SDK with Gemini 2.5 Flash model.
+Uses the google.genai SDK with Gemini 2.5 Flash model.
 
 Session lifecycle:
   - Each session has a TTL (default 30 min); idle sessions are reaped.
@@ -13,14 +13,13 @@ Session lifecycle:
   - Total session count is hard-capped at MAX_SESSIONS.
 """
 
-import functools
 import logging
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from typing import Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from app.services.ai_security import AIPromptSanitizer
 from app.utils.constants import VALID_DESTINATION_NAMES
@@ -28,10 +27,10 @@ from app.utils.constants import VALID_DESTINATION_NAMES
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Module-level session store  {session_id: {"chat": ChatSession, "ts": float}}
+# Module-level session store  {session_id: {"chat": Chat, "ts": float}}
 # ---------------------------------------------------------------------------
 _sessions: dict = {}
-_model = None
+_client: genai.Client | None = None
 _configured = False
 _configure_lock = threading.Lock()
 
@@ -109,29 +108,14 @@ Your mission: Help middle-class Indian families plan budget-friendly, safe, and 
 
 def _configure(api_key: str) -> None:
     """Configure Gemini with the API key (done once)."""
-    global _configured, _model
+    global _configured, _client
     if _configured:
         return
 
     with _configure_lock:
         if _configured:
             return
-        genai.configure(api_key=api_key)
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            system_instruction=SYSTEM_PROMPT,
-            generation_config=genai.GenerationConfig(
-                temperature=0.7,
-                top_p=0.9,
-                max_output_tokens=1024,
-            ),
-            safety_settings=[
-                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            ],
-        )
+        _client = genai.Client(api_key=api_key)
         _configured = True
     logger.info("Gemini AI configured with model: gemini-2.5-flash")
 
@@ -162,11 +146,11 @@ def _enforce_session_cap() -> None:
 
 def _trim_history(chat_session) -> None:
     """Trim conversation history to the last MAX_HISTORY_TURNS turn pairs."""
-    history = chat_session.history
+    history = chat_session._history
     max_messages = MAX_HISTORY_TURNS * 2  # each turn = user + model
     if len(history) > max_messages:
         trimmed = len(history) - max_messages
-        chat_session.history = history[-max_messages:]
+        chat_session._history = history[-max_messages:]
         logger.debug("Trimmed %d old messages from chat history", trimmed)
 
 
@@ -183,7 +167,19 @@ def _get_session(session_id: str):
     _reap_expired_sessions()
     _enforce_session_cap()
 
-    chat = _model.start_chat(history=[])
+    config = types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        temperature=0.7,
+        top_p=0.9,
+        max_output_tokens=1024,
+        safety_settings=[
+            types.SafetySettingDict(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+            types.SafetySettingDict(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+            types.SafetySettingDict(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+            types.SafetySettingDict(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+        ],
+    )
+    chat = _client.chats.create(model="gemini-2.5-flash", config=config, history=[])
     _sessions[session_id] = {"chat": chat, "ts": now}
     return chat
 
