@@ -40,7 +40,7 @@ const ProfileHeaderComponent: React.FC<ProfileHeaderProps> = ({
         ]}
       >
         {user?.avatar ? (
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <Image source={{ uri: user.avatar }} style={styles.avatar} accessible={true} accessibilityLabel="User avatar" />
         ) : (
           <View
             style={[

@@ -7,17 +7,21 @@ interface ImageWithFallbackProps extends ImageProps {
   fallbackIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
   fallbackSize?: number;
   fallbackUrl?: string;
+  accessibilityLabel?: string;
 }
 
 export default function ImageWithFallback({
   fallbackIcon = "image-off",
   fallbackSize = 48,
   fallbackUrl,
+  accessibilityLabel,
   style,
   ...rest
 }: ImageWithFallbackProps) {
   const [hasError, setHasError] = useState(false);
   const [fallbackHasError, setFallbackHasError] = useState(false);
+
+  const label = accessibilityLabel || (typeof rest.source === "object" && "uri" in rest.source ? (rest.source as any).uri : undefined);
 
   if (hasError && fallbackUrl && !fallbackHasError) {
     return (
@@ -25,6 +29,8 @@ export default function ImageWithFallback({
         {...rest}
         source={{ uri: fallbackUrl }}
         style={style}
+        accessible={true}
+        accessibilityLabel={label || "Image"}
         onError={() => setFallbackHasError(true)}
       />
     );
@@ -32,7 +38,12 @@ export default function ImageWithFallback({
 
   if (hasError) {
     return (
-      <View style={[styles.fallback, style]}>
+      <View
+        style={[styles.fallback, style]}
+        accessible={true}
+        accessibilityLabel={label || "Image"}
+        accessibilityRole="image"
+      >
         <MaterialCommunityIcons
           name={fallbackIcon}
           size={fallbackSize}
@@ -46,6 +57,8 @@ export default function ImageWithFallback({
     <Image
       {...rest}
       style={style}
+      accessible={true}
+      accessibilityLabel={label || "Image"}
       onError={() => setHasError(true)}
     />
   );

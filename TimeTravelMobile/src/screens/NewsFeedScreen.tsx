@@ -217,6 +217,8 @@ const FeaturedNewsCard = memo(({ article, onBookmark, onShare, onPress }: Featur
       }}
       style={styles.featuredImage}
       resizeMode="cover"
+      accessible={true}
+      accessibilityLabel="Featured news article image"
     />
     <LinearGradient
       colors={["transparent", "rgba(0,0,0,0.9)"]}
@@ -281,7 +283,7 @@ const NewsCard = memo(({ article, isSafety, onBookmark, onShare, onPress }: News
     <PressableScale style={styles.newsCard} onPress={onPress}>
       <View style={styles.newsCardRow}>
         {article.image_url ? (
-          <Image source={{ uri: article.image_url }} style={styles.newsCardImage} />
+          <Image source={{ uri: article.image_url }} style={styles.newsCardImage} accessible={true} accessibilityLabel="News article image" />
         ) : (
           <View style={[styles.newsCardImage, styles.newsCardImagePlaceholder]}>
             <MaterialCommunityIcons 
