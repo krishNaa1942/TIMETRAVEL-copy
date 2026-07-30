@@ -28,17 +28,26 @@ data:
 # ──────────────────────────────────────────────────────────
 # Secret for Sensitive Data
 # ──────────────────────────────────────────────────────────
+# WARNING: Do NOT hardcode secrets in this file.
+# Create the Secret via kubectl or a sealed-secrets controller.
+# 
+#   kubectl create secret generic timetravel-secrets \
+#     --namespace timetravel \
+#     --from-literal=DATABASE_URL="postgresql://user:password@postgres-service:5432/timetravel" \
+#     --from-literal=REDIS_URL="redis://redis-service:6379/0" \
+#     --from-literal=SECRET_KEY="<generate: python -c 'import secrets; print(secrets.token_hex(32))'>" \
+#     --from-literal=JWT_SECRET_KEY="<generate: python -c 'import secrets; print(secrets.token_urlsafe(64))'>" \
+#     --dry-run=client -o yaml | kubectl apply -f -
+#
+# For production, use SealedSecrets or External Secrets Operator.
+# See deploy/kubernetes/setup-secrets.sh
 apiVersion: v1
 kind: Secret
 metadata:
   name: timetravel-secrets
   namespace: timetravel
 type: Opaque
-stringData:
-  DATABASE_URL: "postgresql://user:password@postgres-service:5432/timetravel"
-  REDIS_URL: "redis://redis-service:6379/0"
-  SECRET_KEY: "CHANGE_ME_IN_PRODUCTION"
-  JWT_SECRET_KEY: "CHANGE_ME_IN_PRODUCTION"
+stringData: {}
 ---
 # ──────────────────────────────────────────────────────────
 # API Deployment

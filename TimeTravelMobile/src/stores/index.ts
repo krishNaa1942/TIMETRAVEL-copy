@@ -39,6 +39,8 @@
 // CLIENT STATE STORES (Zustand)
 // ─────────────────────────────────────────────────────────────
 
+import { offlineQueue } from '@/services/offlineQueue';
+
 // Auth Store - ONLY tokens and auth status (NOT user profile)
 export {
   useAuthStore,
@@ -107,6 +109,8 @@ export { useTravelIntelligence } from './travelIntelligenceStore';
  * Call this in App.tsx before rendering
  */
 export const initializeStores = async (): Promise<void> => {
+  await useAuthStore.getState().initialize();
+  await offlineQueue.initialize();
   console.log('[Stores] All stores initialized');
 };
 
