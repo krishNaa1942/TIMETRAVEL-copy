@@ -22,7 +22,6 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
-  Dimensions,
   LayoutAnimation,
   Platform,
   UIManager,
@@ -1275,8 +1274,6 @@ export default function TripWorkspaceScreen() {
     </SafeAreaView>
   );
 }
-
-const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {

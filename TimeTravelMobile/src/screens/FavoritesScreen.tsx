@@ -28,7 +28,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Dimensions,
   StatusBar,
   Animated,
   Easing,
@@ -54,8 +53,6 @@ import { colors, spacing } from "@/theme/colors";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { GlassCard } from "@/components/UI/GlassCard";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const CARD_WIDTH = SCREEN_WIDTH - spacing.lg * 2;
 const shouldUseNativeDriver = Platform.OS !== "web";
 
 const statsCardShadow = (

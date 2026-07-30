@@ -15,24 +15,16 @@ import {
   View,
   Image,
   StyleSheet,
-  Dimensions,
   Animated,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { Destination } from "@/types";
 import { colors, spacing } from "@/theme/colors";
+import { BREAKPOINTS } from "@/hooks/useResponsive";
 
-// ─────────────────────────────────────────────────────────────
-// CONSTANTS (Stable references - no recreation)
-// ─────────────────────────────────────────────────────────────
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const GRID_CARD_WIDTH = (SCREEN_WIDTH - spacing.md * 3) / 2;
 const HORIZONTAL_CARD_WIDTH = 260;
-
-// Pre-compute styles outside component
-const CARD_WIDTH = { grid: GRID_CARD_WIDTH, horizontal: HORIZONTAL_CARD_WIDTH };
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -130,7 +122,13 @@ const DestinationCard = memo(function DestinationCard({
     return Math.floor(120 + (hash % 4000));
   }, [destination.id]);
 
-  const cardWidth = horizontal ? CARD_WIDTH.horizontal : CARD_WIDTH.grid;
+  const { width: screenWidth } = useWindowDimensions();
+  const gridCardWidth = screenWidth >= BREAKPOINTS.TABLET_LARGE
+    ? (screenWidth - spacing.md * 4) / 3
+    : screenWidth >= BREAKPOINTS.TABLET_SMALL
+      ? (screenWidth - spacing.md * 3) / 2
+      : screenWidth - spacing.md * 2;
+  const cardWidth = horizontal ? HORIZONTAL_CARD_WIDTH : gridCardWidth;
 
   // ───────────────────────────────────────────────────────────
   // MEMOIZED STYLE OBJECTS (No recreation)

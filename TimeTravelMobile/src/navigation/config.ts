@@ -139,7 +139,7 @@ export const defaultStackOptions: NativeStackNavigationOptions = {
   ...headerConfigs.dark,
   ...animations.slideFromRight,
   gestureEnabled: true,
-  orientation: "portrait" as const,
+  orientation: "default" as const,
   statusBarAnimation: "slide" as const,
   statusBarBackgroundColor: "#0F172A",
   statusBarStyle: "light" as const,

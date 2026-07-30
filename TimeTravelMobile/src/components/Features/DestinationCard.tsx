@@ -8,18 +8,17 @@ import {
   View,
   Image,
   StyleSheet,
-  Dimensions,
   Animated,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { Destination } from "@/types";
 import { colors, spacing } from "@/theme/colors";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
+import { BREAKPOINTS } from "@/hooks/useResponsive";
 
-const { width } = Dimensions.get("window");
-const GRID_CARD_WIDTH = (width - spacing.md * 3) / 2;
-const HORIZONTAL_CARD_WIDTH = 260; // Wider for better horizontal scroll view
+const HORIZONTAL_CARD_WIDTH = 260;
 
 interface Props {
   destination: Destination;
@@ -61,7 +60,13 @@ export default React.memo(function DestinationCard({
     globalToggleFavorite(destination);
   };
 
-  const cardWidth = horizontal ? HORIZONTAL_CARD_WIDTH : GRID_CARD_WIDTH;
+  const { width: screenWidth } = useWindowDimensions();
+  const gridCardWidth = screenWidth >= BREAKPOINTS.TABLET_LARGE
+    ? (screenWidth - spacing.md * 4) / 3
+    : screenWidth >= BREAKPOINTS.TABLET_SMALL
+      ? (screenWidth - spacing.md * 3) / 2
+      : screenWidth - spacing.md * 2;
+  const cardWidth = horizontal ? HORIZONTAL_CARD_WIDTH : gridCardWidth;
 
   // Bug C1 fix: deterministic rating/reviewCount from destination ID hash
   // instead of Math.random() which flickers on every re-render
