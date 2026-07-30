@@ -72,19 +72,27 @@ def _train_pipeline() -> Pipeline:
 
     _intent_tags = sorted(set(labels))
 
-    pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(
-            analyzer="char_wb",
-            ngram_range=(2, 4),
-            max_features=5000,
-            sublinear_tf=True,
-        )),
-        ("clf", LogisticRegression(
-            max_iter=1000,
-            C=5.0,
-            solver="lbfgs",
-        )),
-    ])
+    pipeline = Pipeline(
+        [
+            (
+                "tfidf",
+                TfidfVectorizer(
+                    analyzer="char_wb",
+                    ngram_range=(2, 4),
+                    max_features=5000,
+                    sublinear_tf=True,
+                ),
+            ),
+            (
+                "clf",
+                LogisticRegression(
+                    max_iter=1000,
+                    C=5.0,
+                    solver="lbfgs",
+                ),
+            ),
+        ]
+    )
 
     pipeline.fit(texts, labels)
 
@@ -110,7 +118,9 @@ def _get_pipeline() -> Pipeline:
         try:
             _pipeline = joblib.load(_MODEL_PATH)
             _intent_tags = joblib.load(_INTENTS_PATH)
-            logger.info("Chatbot pipeline loaded from disk (%d intents)", len(_intent_tags))
+            logger.info(
+                "Chatbot pipeline loaded from disk (%d intents)", len(_intent_tags)
+            )
             return _pipeline
         except Exception:
             logger.warning("Failed to load persisted pipeline; retraining")
@@ -122,6 +132,7 @@ def _get_pipeline() -> Pipeline:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def classify_intent(message: str) -> Tuple[str, float]:
     """

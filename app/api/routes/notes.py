@@ -14,7 +14,6 @@ from flask_login import login_required, current_user
 
 from app.models.database import db
 from app.models.entities import TravelNote
-from app.utils.constants import VALID_DESTINATION_NAMES as VALID_DESTINATIONS
 
 notes_bp = Blueprint("notes", __name__)
 

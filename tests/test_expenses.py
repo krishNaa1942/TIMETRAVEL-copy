@@ -15,8 +15,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, Expense
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -42,7 +42,10 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
@@ -61,6 +64,7 @@ def _add_expense(client, **overrides):
 # ═══════════════════════════════════════════════════════════
 # Unauthenticated access
 # ═══════════════════════════════════════════════════════════
+
 
 class TestExpensesUnauth:
     def test_add_expense_unauth(self, client):
@@ -83,6 +87,7 @@ class TestExpensesUnauth:
 # ═══════════════════════════════════════════════════════════
 # CRUD
 # ═══════════════════════════════════════════════════════════
+
 
 class TestExpensesCRUD:
     def test_add_expense_success(self, auth_client):
@@ -146,6 +151,7 @@ class TestExpensesCRUD:
 # Summary
 # ═══════════════════════════════════════════════════════════
 
+
 class TestExpenseSummary:
     def test_summary_empty(self, auth_client):
         res = auth_client.get("/api/expenses/summary")
@@ -180,6 +186,7 @@ class TestExpenseSummary:
 # Ownership isolation
 # ═══════════════════════════════════════════════════════════
 
+
 class TestExpenseOwnership:
     def test_cannot_delete_other_users_expense(self, app, client):
         """User B should not be able to delete User A's expense."""
@@ -189,7 +196,10 @@ class TestExpenseOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _add_expense(client)
         expenses = client.get("/api/expenses").get_json()["expenses"]
         eid = expenses[0]["id"]
@@ -201,7 +211,10 @@ class TestExpenseOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.delete(f"/api/expenses/{eid}")
         assert res.status_code == 403
 
@@ -213,7 +226,10 @@ class TestExpenseOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _add_expense(client)
         client.post("/api/auth/logout")
 
@@ -223,6 +239,9 @@ class TestExpenseOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.get("/api/expenses")
         assert res.get_json()["expenses"] == []

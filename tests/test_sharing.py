@@ -15,8 +15,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, SharedTrip, TripQuery
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -41,7 +41,10 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
@@ -57,6 +60,7 @@ def _create_share(client, **overrides):
 # ═══════════════════════════════════════════════════════════
 # Unauthenticated access
 # ═══════════════════════════════════════════════════════════
+
 
 class TestSharingUnauth:
     def test_create_share_unauth(self, client):
@@ -80,6 +84,7 @@ class TestSharingUnauth:
 # ═══════════════════════════════════════════════════════════
 # CRUD
 # ═══════════════════════════════════════════════════════════
+
 
 class TestSharingCRUD:
     def test_create_share_success(self, auth_client):
@@ -149,6 +154,7 @@ class TestSharingCRUD:
 # Ownership
 # ═══════════════════════════════════════════════════════════
 
+
 class TestSharingOwnership:
     def test_cannot_revoke_other_users_share(self, app, client):
         with app.app_context():
@@ -157,7 +163,10 @@ class TestSharingOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         create_res = _create_share(client)
         token = create_res.get_json()["share"]["share_token"]
         client.post("/api/auth/logout")
@@ -168,7 +177,10 @@ class TestSharingOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.delete(f"/api/share/{token}")
         assert res.status_code == 404
 
@@ -179,7 +191,10 @@ class TestSharingOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _create_share(client)
         client.post("/api/auth/logout")
 
@@ -189,6 +204,9 @@ class TestSharingOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.get("/api/share")
         assert res.get_json()["shares"] == []

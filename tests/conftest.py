@@ -3,6 +3,7 @@ Shared test fixtures for the Time Travel test suite.
 """
 
 import os
+
 os.environ.setdefault("TESTING", "1")
 os.environ.setdefault("FLASK_ENV", "testing")
 

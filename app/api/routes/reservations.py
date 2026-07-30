@@ -73,7 +73,16 @@ def update_reservation(res_id):
         return jsonify({"error": "Reservation not found."}), 404
 
     data = request.get_json(silent=True) or {}
-    for field in ["title", "res_type", "confirmation_code", "provider", "location", "notes", "currency", "status"]:
+    for field in [
+        "title",
+        "res_type",
+        "confirmation_code",
+        "provider",
+        "location",
+        "notes",
+        "currency",
+        "status",
+    ]:
         if field in data:
             setattr(res, field, data[field])
     if "amount" in data:
@@ -81,7 +90,11 @@ def update_reservation(res_id):
     for dt_field in ["start_datetime", "end_datetime"]:
         if dt_field in data:
             try:
-                setattr(res, dt_field, datetime.fromisoformat(data[dt_field]) if data[dt_field] else None)
+                setattr(
+                    res,
+                    dt_field,
+                    datetime.fromisoformat(data[dt_field]) if data[dt_field] else None,
+                )
             except ValueError:
                 pass
 
@@ -110,6 +123,9 @@ def list_reservations(trip_id):
     if not trip:
         return jsonify({"error": "Trip not found."}), 404
 
-    reservations = Reservation.query.filter_by(trip_id=trip.id).order_by(
-        Reservation.start_datetime.asc()).all()
+    reservations = (
+        Reservation.query.filter_by(trip_id=trip.id)
+        .order_by(Reservation.start_datetime.asc())
+        .all()
+    )
     return jsonify({"reservations": [r.to_dict() for r in reservations]})

@@ -33,6 +33,7 @@ def client(app):
 # /api/maps/config
 # ═══════════════════════════════════════════════════════════
 
+
 class TestMapConfig:
     def test_config_returns_key_available(self, client):
         res = client.get("/api/maps/config")
@@ -53,6 +54,7 @@ class TestMapConfig:
 # ═══════════════════════════════════════════════════════════
 # /api/maps/destinations
 # ═══════════════════════════════════════════════════════════
+
 
 class TestDestinations:
     def test_returns_all_destinations(self, client):
@@ -75,6 +77,7 @@ class TestDestinations:
 # /api/maps/geocode
 # ═══════════════════════════════════════════════════════════
 
+
 class TestGeocode:
     def test_geocode_missing_query(self, client):
         res = client.get("/api/maps/geocode")
@@ -86,7 +89,11 @@ class TestGeocode:
 
     @patch("app.api.routes.maps.geocode")
     def test_geocode_success(self, mock_geocode, client):
-        mock_geocode.return_value = {"lat": 15.29, "lon": 74.12, "address": "Goa, India"}
+        mock_geocode.return_value = {
+            "lat": 15.29,
+            "lon": 74.12,
+            "address": "Goa, India",
+        }
         res = client.get("/api/maps/geocode?q=Goa")
         assert res.status_code == 200
         data = res.get_json()
@@ -102,6 +109,7 @@ class TestGeocode:
 # ═══════════════════════════════════════════════════════════
 # /api/maps/nearby
 # ═══════════════════════════════════════════════════════════
+
 
 class TestNearby:
     def test_nearby_missing_dest(self, client):
@@ -146,6 +154,7 @@ class TestNearby:
 # ═══════════════════════════════════════════════════════════
 # /api/maps/route
 # ═══════════════════════════════════════════════════════════
+
 
 class TestRoute:
     def test_route_missing_params(self, client):
@@ -262,7 +271,10 @@ class TestSmartSuggestions:
     @patch("app.services.maps_service.requests.get")
     def test_suggest_preserves_category_order(self, mock_get, app):
         """Results should follow SUGGESTION_CATEGORIES order."""
-        from app.services.maps_service import get_smart_suggestions, SUGGESTION_CATEGORIES
+        from app.services.maps_service import (
+            get_smart_suggestions,
+            SUGGESTION_CATEGORIES,
+        )
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200

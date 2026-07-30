@@ -9,7 +9,6 @@ from app.main import create_app
 from app.config import TestingConfig
 from app.models.database import db as _db
 
-
 # ── Fixtures (function-scoped for clean state) ────────────────────
 
 
@@ -29,24 +28,33 @@ def client(app):
     return app.test_client()
 
 
-def _register(client, name="Test User", email="test@example.com", password="Secret123!"):
-    return client.post("/api/auth/register", json={
-        "name": name,
-        "email": email,
-        "password": password,
-    })
+def _register(
+    client, name="Test User", email="test@example.com", password="Secret123!"
+):
+    return client.post(
+        "/api/auth/register",
+        json={
+            "name": name,
+            "email": email,
+            "password": password,
+        },
+    )
 
 
 def _login(client, email="test@example.com", password="Secret123!"):
-    return client.post("/api/auth/login", json={
-        "email": email,
-        "password": password,
-    })
+    return client.post(
+        "/api/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
 
 
 # ═══════════════════════════════════════════════════════════
 # REGISTRATION
 # ═══════════════════════════════════════════════════════════
+
 
 class TestRegister:
     def test_register_success(self, client):
@@ -87,6 +95,7 @@ class TestRegister:
 # ═══════════════════════════════════════════════════════════
 # LOGIN / LOGOUT
 # ═══════════════════════════════════════════════════════════
+
 
 class TestLogin:
     def test_login_success(self, client):
@@ -135,15 +144,19 @@ class TestMe:
 # TRIP HISTORY (requires auth)
 # ═══════════════════════════════════════════════════════════
 
+
 class TestTrips:
     def _create_trip(self, client):
         """Create a budget trip so it appears in trip history."""
-        return client.post("/api/budget/estimate", json={
-            "destination": "Goa",
-            "num_days": 3,
-            "family_size": 4,
-            "travel_class": "economy",
-        })
+        return client.post(
+            "/api/budget/estimate",
+            json={
+                "destination": "Goa",
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
 
     def test_list_trips_unauthenticated(self, client):
         res = client.get("/api/trips")
@@ -211,18 +224,24 @@ class TestTrips:
 
 
 def _v2_register(client):
-    return client.post("/api/auth/v2/register", json={
-        "name": "JWT Test",
-        "email": "jwt-test@example.com",
-        "password": "Secret123!",
-    })
+    return client.post(
+        "/api/auth/v2/register",
+        json={
+            "name": "JWT Test",
+            "email": "jwt-test@example.com",
+            "password": "Secret123!",
+        },
+    )
 
 
 def _v2_login(client):
-    return client.post("/api/auth/v2/login", json={
-        "email": "jwt-test@example.com",
-        "password": "Secret123!",
-    })
+    return client.post(
+        "/api/auth/v2/login",
+        json={
+            "email": "jwt-test@example.com",
+            "password": "Secret123!",
+        },
+    )
 
 
 class TestJWTRefresh:
@@ -232,9 +251,12 @@ class TestJWTRefresh:
         tokens = login_res.get_json()["tokens"]
         refresh_token = tokens["refresh_token"]
 
-        res = client.post("/api/auth/v2/refresh", json={
-            "refresh_token": refresh_token,
-        })
+        res = client.post(
+            "/api/auth/v2/refresh",
+            json={
+                "refresh_token": refresh_token,
+            },
+        )
         assert res.status_code == 200
         new_tokens = res.get_json()["tokens"]
         assert "access_token" in new_tokens
@@ -245,9 +267,12 @@ class TestJWTRefresh:
         login_res = _v2_login(client)
         tokens = login_res.get_json()["tokens"]
 
-        res = client.post("/api/auth/v2/refresh", json={
-            "refresh_token": tokens["refresh_token"],
-        })
+        res = client.post(
+            "/api/auth/v2/refresh",
+            json={
+                "refresh_token": tokens["refresh_token"],
+            },
+        )
         new_tokens = res.get_json()["tokens"]
 
         me_res = client.get(
@@ -262,9 +287,12 @@ class TestJWTRefresh:
         assert res.status_code == 400
 
     def test_refresh_invalid_token(self, client):
-        res = client.post("/api/auth/v2/refresh", json={
-            "refresh_token": "totally-invalid-token",
-        })
+        res = client.post(
+            "/api/auth/v2/refresh",
+            json={
+                "refresh_token": "totally-invalid-token",
+            },
+        )
         assert res.status_code == 401
 
     def test_refresh_tampered_token(self, client):
@@ -290,9 +318,12 @@ class TestJWTRefresh:
             json={"logout_all_devices": False},
         )
 
-        res = client.post("/api/auth/v2/refresh", json={
-            "refresh_token": refresh_token,
-        })
+        res = client.post(
+            "/api/auth/v2/refresh",
+            json={
+                "refresh_token": refresh_token,
+            },
+        )
         assert res.status_code == 401
 
 
@@ -317,38 +348,62 @@ SQL_PAYLOADS = [
 class TestSQLInjection:
     def test_login_sql_injection_email(self, client):
         for payload in SQL_PAYLOADS:
-            res = client.post("/api/auth/login", json={
-                "email": payload,
-                "password": "irrelevant123",
-            })
-            assert res.status_code in (401, 422, 400), f"Payload '{payload}' returned {res.status_code}"
+            res = client.post(
+                "/api/auth/login",
+                json={
+                    "email": payload,
+                    "password": "irrelevant123",
+                },
+            )
+            assert res.status_code in (
+                401,
+                422,
+                400,
+            ), f"Payload '{payload}' returned {res.status_code}"
 
     def test_register_sql_injection(self, client):
         for payload in SQL_PAYLOADS:
-            res = client.post("/api/auth/register", json={
-                "name": payload,
-                "email": f"sqli-{abs(hash(payload))}@test.com",
-                "password": "Secret123!",
-            })
-            assert res.status_code in (201, 422, 400), f"Payload '{payload}' returned {res.status_code}"
+            res = client.post(
+                "/api/auth/register",
+                json={
+                    "name": payload,
+                    "email": f"sqli-{abs(hash(payload))}@test.com",
+                    "password": "Secret123!",
+                },
+            )
+            assert res.status_code in (
+                201,
+                422,
+                400,
+            ), f"Payload '{payload}' returned {res.status_code}"
 
     def test_chat_sql_injection(self, client):
         _register(client)
 
         for payload in SQL_PAYLOADS:
-            res = client.post("/api/chat", json={
-                "message": payload,
-            })
-            assert res.status_code in (200, 400, 422), f"Payload '{payload}' returned {res.status_code}"
+            res = client.post(
+                "/api/chat",
+                json={
+                    "message": payload,
+                },
+            )
+            assert res.status_code in (
+                200,
+                400,
+                422,
+            ), f"Payload '{payload}' returned {res.status_code}"
 
     def test_budget_sql_injection(self, client):
         _register(client)
-        res = client.post("/api/budget/estimate", json={
-            "destination": "Goa' OR 1=1 --",
-            "num_days": 3,
-            "family_size": 2,
-            "travel_class": "economy",
-        })
+        res = client.post(
+            "/api/budget/estimate",
+            json={
+                "destination": "Goa' OR 1=1 --",
+                "num_days": 3,
+                "family_size": 2,
+                "travel_class": "economy",
+            },
+        )
         assert res.status_code in (200, 400, 422)
 
 
@@ -369,10 +424,13 @@ class TestRateLimiting:
     def test_rate_limit_returns_429(self, client):
         RATE_LIMIT = 10
         for i in range(RATE_LIMIT + 2):
-            res = client.post("/api/auth/login", json={
-                "email": f"spam{i}@test.com",
-                "password": "irrelevant",
-            })
+            res = client.post(
+                "/api/auth/login",
+                json={
+                    "email": f"spam{i}@test.com",
+                    "password": "irrelevant",
+                },
+            )
             if i >= RATE_LIMIT:
                 if res.status_code == 429:
                     return

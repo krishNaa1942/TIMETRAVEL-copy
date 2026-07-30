@@ -5,7 +5,6 @@ Small, reusable utility functions used across the application.
 """
 
 import re
-from typing import Optional
 
 
 def sanitise_destination(name: str) -> str:

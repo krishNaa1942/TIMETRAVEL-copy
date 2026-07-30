@@ -57,7 +57,12 @@ def budget_estimate():
             travel_class=data.get("travel_class", "economy"),
         )
     except (TypeError, ValueError):
-        return jsonify({"error": "Invalid input: num_days and family_size must be integers"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid input: num_days and family_size must be integers"}
+            ),
+            400,
+        )
 
     if req.num_days < 1 or req.num_days > 365:
         return jsonify({"error": "num_days must be between 1 and 365"}), 400

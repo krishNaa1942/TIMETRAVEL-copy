@@ -18,8 +18,8 @@ from app.main import create_app
 from app.config import TestingConfig
 from app.models.database import db as _db
 
-
 # ── Fixtures ────────────────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -40,16 +40,26 @@ def client(app):
 
 # ── Helpers ─────────────────────────────────────────────────────────────
 
+
 def _register(client, name="Test User", email="test@example.com", password="Secret123"):
-    return client.post("/api/auth/register", json={
-        "name": name, "email": email, "password": password,
-    })
+    return client.post(
+        "/api/auth/register",
+        json={
+            "name": name,
+            "email": email,
+            "password": password,
+        },
+    )
 
 
 def _login(client, email="test@example.com", password="Secret123"):
-    return client.post("/api/auth/login", json={
-        "email": email, "password": password,
-    })
+    return client.post(
+        "/api/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
 
 
 def _logout(client):
@@ -83,6 +93,7 @@ def _fake_doc(name="passport.pdf", content=b"fake-pdf-data"):
 
 # ── Flow 1: Full Trip Lifecycle ─────────────────────────────────────────
 
+
 class TestFullTripLifecycle:
     """Register → create trip → add day → add place → upload photo → share."""
 
@@ -113,18 +124,24 @@ class TestFullTripLifecycle:
         assert trips[0]["id"] == trip_id
 
         # Step 4: Add a day to the trip
-        res = client.post(f"/api/trips/planner/{trip_id}/days", json={
-            "title": "Beach Day",
-        })
+        res = client.post(
+            f"/api/trips/planner/{trip_id}/days",
+            json={
+                "title": "Beach Day",
+            },
+        )
         assert res.status_code == 201
         day_id = res.get_json()["day"]["id"]
 
         # Step 5: Add a place to that day
-        res = client.post(f"/api/trips/planner/{trip_id}/places", json={
-            "name": "Calangute Beach",
-            "day_id": day_id,
-            "category": "beach",
-        })
+        res = client.post(
+            f"/api/trips/planner/{trip_id}/places",
+            json={
+                "name": "Calangute Beach",
+                "day_id": day_id,
+                "category": "beach",
+            },
+        )
         assert res.status_code == 201
         place = res.get_json()["place"]
         assert place["name"] == "Calangute Beach"
@@ -133,7 +150,8 @@ class TestFullTripLifecycle:
         data = {"trip_id": str(trip_id), "caption": "Sunset"}
         data["file"] = _fake_image()
         res = client.post(
-            "/api/uploads/photos", data=data,
+            "/api/uploads/photos",
+            data=data,
             content_type="multipart/form-data",
         )
         assert res.status_code == 201
@@ -145,10 +163,13 @@ class TestFullTripLifecycle:
         assert res.status_code == 200
 
         # Step 8: Share the trip itinerary
-        res = client.post("/api/share", json={
-            "title": "My Goa Trip",
-            "itinerary_json": {"day1": "Beach", "day2": "Fort"},
-        })
+        res = client.post(
+            "/api/share",
+            json={
+                "title": "My Goa Trip",
+                "itinerary_json": {"day1": "Beach", "day2": "Fort"},
+            },
+        )
         assert res.status_code == 201
         share_token = res.get_json()["share"]["share_token"]
 
@@ -166,21 +187,31 @@ class TestFullTripLifecycle:
         trip_id = _get_trip_id(client)
 
         # Update the trip
-        res = client.put(f"/api/trips/planner/{trip_id}", json={
-            "title": "Updated Trip",
-            "status": "active",
-        })
+        res = client.put(
+            f"/api/trips/planner/{trip_id}",
+            json={
+                "title": "Updated Trip",
+                "status": "active",
+            },
+        )
         assert res.status_code == 200
         assert res.get_json()["trip"]["title"] == "Updated Trip"
 
         # Add a place and a photo so delete cascades them
         res = client.post(f"/api/trips/planner/{trip_id}/days", json={"title": "Day 1"})
         day_id = res.get_json()["day"]["id"]
-        client.post(f"/api/trips/planner/{trip_id}/places", json={
-            "name": "Fort Aguada", "day_id": day_id, "category": "landmark",
-        })
+        client.post(
+            f"/api/trips/planner/{trip_id}/places",
+            json={
+                "name": "Fort Aguada",
+                "day_id": day_id,
+                "category": "landmark",
+            },
+        )
         data = {"trip_id": str(trip_id), "file": _fake_image()}
-        client.post("/api/uploads/photos", data=data, content_type="multipart/form-data")
+        client.post(
+            "/api/uploads/photos", data=data, content_type="multipart/form-data"
+        )
 
         # Delete the trip
         res = client.delete(f"/api/trips/planner/{trip_id}")
@@ -193,6 +224,7 @@ class TestFullTripLifecycle:
 
 # ── Flow 2: Budget → Expenses → Stats ──────────────────────────────────
 
+
 class TestBudgetExpenseFlow:
     """Register → estimate budget → log expenses → check stats."""
 
@@ -200,12 +232,15 @@ class TestBudgetExpenseFlow:
         _register(client)
 
         # Step 1: Get budget estimate (this also creates a trip record)
-        res = client.post("/api/budget/estimate", json={
-            "destination": "Goa",
-            "num_days": 3,
-            "family_size": 4,
-            "travel_class": "economy",
-        })
+        res = client.post(
+            "/api/budget/estimate",
+            json={
+                "destination": "Goa",
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert res.status_code == 200
         budget = res.get_json()
         assert "total" in budget
@@ -216,22 +251,28 @@ class TestBudgetExpenseFlow:
         trip_id = res.get_json()["trip"]["id"]
 
         # Step 3: Add expenses
-        res = client.post("/api/expenses", json={
-            "destination": "Mumbai",
-            "description": "Hotel booking",
-            "amount": 5000,
-            "category": "accommodation",
-            "trip_id": trip_id,
-        })
+        res = client.post(
+            "/api/expenses",
+            json={
+                "destination": "Mumbai",
+                "description": "Hotel booking",
+                "amount": 5000,
+                "category": "accommodation",
+                "trip_id": trip_id,
+            },
+        )
         assert res.status_code == 201
 
-        res = client.post("/api/expenses", json={
-            "destination": "Mumbai",
-            "description": "Train ticket",
-            "amount": 800,
-            "category": "transport",
-            "trip_id": trip_id,
-        })
+        res = client.post(
+            "/api/expenses",
+            json={
+                "destination": "Mumbai",
+                "description": "Train ticket",
+                "amount": 800,
+                "category": "transport",
+                "trip_id": trip_id,
+            },
+        )
         assert res.status_code == 201
 
         # Step 4: List expenses and verify totals
@@ -249,6 +290,7 @@ class TestBudgetExpenseFlow:
 
 # ── Flow 3: Two-User Ownership Isolation ────────────────────────────────
 
+
 class TestOwnershipIsolation:
     """Verify that User B cannot access User A's trips, photos, or docs."""
 
@@ -260,14 +302,18 @@ class TestOwnershipIsolation:
 
         # Upload a photo as Alice
         data = {"trip_id": str(trip_id_a), "file": _fake_image()}
-        res = client.post("/api/uploads/photos", data=data, content_type="multipart/form-data")
+        res = client.post(
+            "/api/uploads/photos", data=data, content_type="multipart/form-data"
+        )
         assert res.status_code == 201
         photo_filename = res.get_json()["photo"]["filename"]
         photo_id = res.get_json()["photo"]["id"]
 
         # Upload a document as Alice
         data = {"file": _fake_doc(), "title": "Alice Passport"}
-        res = client.post("/api/uploads/documents", data=data, content_type="multipart/form-data")
+        res = client.post(
+            "/api/uploads/documents", data=data, content_type="multipart/form-data"
+        )
         assert res.status_code == 201
         doc_filename = res.get_json()["document"]["filename"]
         doc_id = res.get_json()["document"]["id"]
@@ -305,10 +351,13 @@ class TestOwnershipIsolation:
     def test_cross_user_share_isolation(self, app, client):
         """User B cannot revoke User A's shares."""
         _register(client, name="Alice", email="alice@example.com", password="Alice123X")
-        res = client.post("/api/share", json={
-            "title": "Alice's Plan",
-            "itinerary_json": {"day1": "Beach"},
-        })
+        res = client.post(
+            "/api/share",
+            json={
+                "title": "Alice's Plan",
+                "itinerary_json": {"day1": "Beach"},
+            },
+        )
         assert res.status_code == 201
         token = res.get_json()["share"]["share_token"]
 
@@ -326,6 +375,7 @@ class TestOwnershipIsolation:
 
 # ── Flow 4: Document Lifecycle ──────────────────────────────────────────
 
+
 class TestDocumentLifecycle:
     """Upload → list → serve → delete document."""
 
@@ -340,7 +390,8 @@ class TestDocumentLifecycle:
             "notes": "Valid until 2027",
         }
         res = client.post(
-            "/api/uploads/documents", data=data,
+            "/api/uploads/documents",
+            data=data,
             content_type="multipart/form-data",
         )
         assert res.status_code == 201
@@ -372,6 +423,7 @@ class TestDocumentLifecycle:
 
 # ── Flow 5: Auth Edge Cases Across Workflows ───────────────────────────
 
+
 class TestAuthAcrossWorkflows:
     """Verify that logging out properly blocks all subsequent API calls."""
 
@@ -396,7 +448,9 @@ class TestAuthAcrossWorkflows:
                 res = client.get(url)
             else:
                 res = client.post(url, json={})
-            assert res.status_code == 401, f"{method} {url} returned {res.status_code}, expected 401"
+            assert (
+                res.status_code == 401
+            ), f"{method} {url} returned {res.status_code}, expected 401"
 
         # GET /api/trips/planner returns 200 with empty array (graceful degradation)
         res = client.get("/api/trips/planner")
@@ -426,15 +480,19 @@ class TestAuthAcrossWorkflows:
 
 # ── Flow 6: Chatbot in Authenticated Context ───────────────────────────
 
+
 class TestChatbotFlow:
     """Verify chatbot works with/without authentication."""
 
     def test_chatbot_basic_flow(self, app, client):
         # Chatbot should work without login
-        res = client.post("/api/chat", json={
-            "message": "Tell me about Goa",
-            "session_id": "integration-test-session",
-        })
+        res = client.post(
+            "/api/chat",
+            json={
+                "message": "Tell me about Goa",
+                "session_id": "integration-test-session",
+            },
+        )
         assert res.status_code == 200
         data = res.get_json()
         assert "reply" in data
@@ -443,15 +501,19 @@ class TestChatbotFlow:
 
     def test_chatbot_after_login(self, app, client):
         _register(client)
-        res = client.post("/api/chat", json={
-            "message": "What are the best beaches?",
-            "session_id": "auth-test-session",
-        })
+        res = client.post(
+            "/api/chat",
+            json={
+                "message": "What are the best beaches?",
+                "session_id": "auth-test-session",
+            },
+        )
         assert res.status_code == 200
         assert "reply" in res.get_json()
 
 
 # ── Flow 7: Multi-Trip Management ──────────────────────────────────────
+
 
 class TestMultiTripManagement:
     """User creates multiple trips and manages them independently."""
@@ -494,12 +556,16 @@ class TestMultiTripManagement:
 
         # Upload photo to trip A
         data = {"trip_id": str(trip_a), "file": _fake_image("goa.jpg")}
-        res = client.post("/api/uploads/photos", data=data, content_type="multipart/form-data")
+        res = client.post(
+            "/api/uploads/photos", data=data, content_type="multipart/form-data"
+        )
         assert res.status_code == 201
 
         # Upload photo to trip B
         data = {"trip_id": str(trip_b), "file": _fake_image("kerala.jpg")}
-        res = client.post("/api/uploads/photos", data=data, content_type="multipart/form-data")
+        res = client.post(
+            "/api/uploads/photos", data=data, content_type="multipart/form-data"
+        )
         assert res.status_code == 201
 
         # Get trip A details — should only contain its photo

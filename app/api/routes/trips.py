@@ -25,15 +25,19 @@ trips_bp = Blueprint("trips", __name__)
 def list_trips():
     """Return all saved trips for the current user, newest first."""
     trips = (
-        TripQuery.query
-        .filter_by(user_id=current_user.id)
+        TripQuery.query.filter_by(user_id=current_user.id)
         .order_by(TripQuery.created_at.desc())
         .all()
     )
-    return jsonify({
-        "count": len(trips),
-        "trips": [t.to_dict() for t in trips],
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(trips),
+                "trips": [t.to_dict() for t in trips],
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------

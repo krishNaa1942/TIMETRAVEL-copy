@@ -12,8 +12,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, Trip, TripPlace, Expense, Favorite
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -38,13 +38,17 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
 # ═══════════════════════════════════════════════════════════
 # Auth check
 # ═══════════════════════════════════════════════════════════
+
 
 class TestStatsUnauth:
     def test_stats_unauth(self, client):
@@ -55,6 +59,7 @@ class TestStatsUnauth:
 # ═══════════════════════════════════════════════════════════
 # Stats – empty state
 # ═══════════════════════════════════════════════════════════
+
 
 class TestStatsEmpty:
     def test_stats_empty_user(self, auth_client):
@@ -71,6 +76,7 @@ class TestStatsEmpty:
 # Stats – with data
 # ═══════════════════════════════════════════════════════════
 
+
 class TestStatsWithData:
     def test_stats_counts(self, app, auth_client):
         """Create trips, expenses, favorites and verify stats."""
@@ -79,10 +85,20 @@ class TestStatsWithData:
             uid = user.id
 
             # Create trips
-            t1 = Trip(user_id=uid, title="Goa Trip", destination="Goa",
-                       num_days=3, status="completed")
-            t2 = Trip(user_id=uid, title="Delhi Trip", destination="Delhi",
-                       num_days=5, status="planning")
+            t1 = Trip(
+                user_id=uid,
+                title="Goa Trip",
+                destination="Goa",
+                num_days=3,
+                status="completed",
+            )
+            t2 = Trip(
+                user_id=uid,
+                title="Delhi Trip",
+                destination="Delhi",
+                num_days=5,
+                status="planning",
+            )
             _db.session.add_all([t1, t2])
             _db.session.flush()
 
@@ -91,10 +107,20 @@ class TestStatsWithData:
             _db.session.add(place)
 
             # Add expenses
-            e1 = Expense(user_id=uid, destination="Goa", category="food",
-                          description="Lunch", amount=500)
-            e2 = Expense(user_id=uid, destination="Goa", category="transport",
-                          description="Taxi", amount=300)
+            e1 = Expense(
+                user_id=uid,
+                destination="Goa",
+                category="food",
+                description="Lunch",
+                amount=500,
+            )
+            e2 = Expense(
+                user_id=uid,
+                destination="Goa",
+                category="transport",
+                description="Taxi",
+                amount=300,
+            )
             _db.session.add_all([e1, e2])
 
             # Add favorites
@@ -123,10 +149,24 @@ class TestStatsWithData:
             user = User.query.filter_by(email="test@example.com").first()
             uid = user.id
             for i in range(3):
-                _db.session.add(Trip(user_id=uid, title=f"Goa {i}", destination="Goa",
-                                      num_days=3, status="completed"))
-            _db.session.add(Trip(user_id=uid, title="Delhi", destination="Delhi",
-                                  num_days=5, status="completed"))
+                _db.session.add(
+                    Trip(
+                        user_id=uid,
+                        title=f"Goa {i}",
+                        destination="Goa",
+                        num_days=3,
+                        status="completed",
+                    )
+                )
+            _db.session.add(
+                Trip(
+                    user_id=uid,
+                    title="Delhi",
+                    destination="Delhi",
+                    num_days=5,
+                    status="completed",
+                )
+            )
             _db.session.commit()
 
         res = auth_client.get("/api/stats")
@@ -140,6 +180,7 @@ class TestStatsWithData:
 # Stats – isolation
 # ═══════════════════════════════════════════════════════════
 
+
 class TestStatsIsolation:
     def test_stats_only_show_own_data(self, app, client):
         """User B should not see User A's stats."""
@@ -148,8 +189,13 @@ class TestStatsIsolation:
             user_a.set_password("password123")
             _db.session.add(user_a)
             _db.session.commit()
-            t = Trip(user_id=user_a.id, title="A Trip", destination="Goa",
-                      num_days=3, status="completed")
+            t = Trip(
+                user_id=user_a.id,
+                title="A Trip",
+                destination="Goa",
+                num_days=3,
+                status="completed",
+            )
             _db.session.add(t)
             _db.session.commit()
 
@@ -159,7 +205,10 @@ class TestStatsIsolation:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.get("/api/stats")
         assert res.status_code == 200
         data = res.get_json()["stats"]

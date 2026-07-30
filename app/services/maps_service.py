@@ -14,14 +14,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 import requests
 
+from app.utils.constants import DESTINATION_COORDS
 from app.utils.retry import api_retry
 
 logger = logging.getLogger(__name__)
 
 TOMTOM_BASE = "https://api.tomtom.com"
-
-# Destination coordinates imported from central registry
-from app.utils.constants import DESTINATION_COORDS
 
 
 def get_all_destinations() -> list:
@@ -33,6 +31,7 @@ def get_all_destinations() -> list:
 
 
 # ── TomTom Geocode (Fuzzy Search) ──────────────────────────────────────
+
 
 @api_retry
 def geocode(query: str, api_key: str) -> Optional[dict]:
@@ -68,6 +67,7 @@ def geocode(query: str, api_key: str) -> Optional[dict]:
 
 # ── TomTom Nearby POI Search ───────────────────────────────────────────
 
+
 @api_retry
 def search_nearby(
     lat: float,
@@ -89,7 +89,9 @@ def search_nearby(
 
     # Strategy 1: Category search (text-based, better coverage)
     cat_query = category if category else "tourist attraction"
-    url = f"{TOMTOM_BASE}/search/2/categorySearch/{requests.utils.quote(cat_query)}.json"
+    url = (
+        f"{TOMTOM_BASE}/search/2/categorySearch/{requests.utils.quote(cat_query)}.json"
+    )
     params = {
         "key": api_key,
         "lat": lat,
@@ -128,15 +130,17 @@ def search_nearby(
                 cat_str = ", ".join(c.get("name", "") for c in raw_cats)
             else:
                 cat_str = ", ".join(str(c) for c in raw_cats) if raw_cats else category
-            pois.append({
-                "name": poi.get("name", "Unknown"),
-                "category": cat_str,
-                "lat": pos.get("lat"),
-                "lon": pos.get("lon"),
-                "distance_m": round(r.get("dist", 0)),
-                "address": r.get("address", {}).get("freeformAddress", ""),
-                "phone": poi.get("phone", ""),
-            })
+            pois.append(
+                {
+                    "name": poi.get("name", "Unknown"),
+                    "category": cat_str,
+                    "lat": pos.get("lat"),
+                    "lon": pos.get("lon"),
+                    "distance_m": round(r.get("dist", 0)),
+                    "address": r.get("address", {}).get("freeformAddress", ""),
+                    "phone": poi.get("phone", ""),
+                }
+            )
         return pois
     except Exception as e:
         logger.error("TomTom POI search failed: %s", e)
@@ -144,6 +148,7 @@ def search_nearby(
 
 
 # ── TomTom Routing ─────────────────────────────────────────────────────
+
 
 @api_retry
 def calculate_route(
@@ -191,9 +196,7 @@ def calculate_route(
         return {
             "distance_km": round(summary.get("lengthInMeters", 0) / 1000, 1),
             "duration_min": round(summary.get("travelTimeInSeconds", 0) / 60, 0),
-            "traffic_delay_min": round(
-                summary.get("trafficDelayInSeconds", 0) / 60, 0
-            ),
+            "traffic_delay_min": round(summary.get("trafficDelayInSeconds", 0) / 60, 0),
             "departure": summary.get("departureTime", ""),
             "arrival": summary.get("arrivalTime", ""),
             "geometry": geometry,
@@ -204,6 +207,7 @@ def calculate_route(
 
 
 # ── Category mapping (TomTom category IDs) ─────────────────────────────
+
 
 def _category_id(category: str) -> str:
     """Map human-readable category to TomTom category set IDs."""
@@ -224,6 +228,7 @@ def _category_id(category: str) -> str:
 
 
 # ── Reverse Geocode (lat/lon → place name) ─────────────────────────────
+
 
 @api_retry
 def reverse_geocode(lat: float, lon: float, api_key: str) -> Optional[dict]:
@@ -257,6 +262,7 @@ def reverse_geocode(lat: float, lon: float, api_key: str) -> Optional[dict]:
 
 
 # ── Find nearest known destination ─────────────────────────────────────
+
 
 def find_nearest_destination(lat: float, lon: float) -> Optional[dict]:
     """
@@ -361,7 +367,9 @@ def get_smart_suggestions(
                         "pois": pois,
                     }
             except Exception as exc:
-                logger.error("Smart suggestions fetch failed for '%s': %s", futures[future], exc)
+                logger.error(
+                    "Smart suggestions fetch failed for '%s': %s", futures[future], exc
+                )
 
         # Preserve original category order
         for cat_key, _, _ in SUGGESTION_CATEGORIES:

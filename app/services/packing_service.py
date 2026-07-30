@@ -73,7 +73,9 @@ def suggest_packing(
         suggestions.append("Anti-chafing powder or cream")
 
     # ── Rain / snow detection ───────────────────────────────────────
-    if any(word in desc_lower for word in ("rain", "drizzle", "shower", "thunderstorm")):
+    if any(
+        word in desc_lower for word in ("rain", "drizzle", "shower", "thunderstorm")
+    ):
         suggestions.append("Compact foldable umbrella")
         suggestions.append("Waterproof rain jacket / poncho")
         suggestions.append("Waterproof shoe covers or rain boots")

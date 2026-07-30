@@ -99,7 +99,8 @@ def init_db(app):
             if is_pg or was_pg_configured:
                 logger.warning(
                     "Could not create tables on PostgreSQL — check DATABASE_URL "
-                    "and password. Error: %s", exc,
+                    "and password. Error: %s",
+                    exc,
                 )
             else:
                 raise

@@ -54,7 +54,9 @@ class TestChatEndpoint:
         assert data["session_id"] == "test-123"
 
     @patch("app.api.routes.chatbot._google_key", return_value="")
-    def test_chat_falls_back_to_classic_when_gemini_unavailable(self, _mock_key, client):
+    def test_chat_falls_back_to_classic_when_gemini_unavailable(
+        self, _mock_key, client
+    ):
         resp = client.post(
             "/api/chat",
             json={"message": "plan a Goa trip", "mode": "ai"},
@@ -70,12 +72,14 @@ class TestChatEndpoint:
 # Gemini Session Lifecycle (TTL, history cap, eviction)
 # ═══════════════════════════════════════════════════════════
 
+
 class TestGeminiSessionLifecycle:
     """Unit tests for the session management in gemini_service."""
 
     def setup_method(self):
         """Reset module state before each test."""
         from app.services import gemini_service
+
         gemini_service._sessions.clear()
         # Provide a mock model so _get_session can call start_chat
         self._orig_model = gemini_service._model
@@ -85,11 +89,13 @@ class TestGeminiSessionLifecycle:
 
     def teardown_method(self):
         from app.services import gemini_service
+
         gemini_service._sessions.clear()
         gemini_service._model = self._orig_model
 
     def test_session_created_with_timestamp(self):
         from app.services.gemini_service import _get_session, _sessions
+
         _get_session("s1")
         assert "s1" in _sessions
         assert "ts" in _sessions["s1"]
@@ -97,6 +103,7 @@ class TestGeminiSessionLifecycle:
 
     def test_session_timestamp_refreshed_on_access(self):
         from app.services.gemini_service import _get_session, _sessions
+
         _get_session("s1")
         first_ts = _sessions["s1"]["ts"]
         time.sleep(0.05)
@@ -128,9 +135,7 @@ class TestGeminiSessionLifecycle:
 
         now = time.time()
         for i in range(5):
-            gemini_service._sessions[f"s{i}"] = {
-                "chat": MagicMock(), "ts": now + i
-            }
+            gemini_service._sessions[f"s{i}"] = {"chat": MagicMock(), "ts": now + i}
 
         _enforce_session_cap()
         assert len(gemini_service._sessions) == 3

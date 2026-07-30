@@ -101,12 +101,17 @@ def nearby():
         lat, lon = coords["lat"], coords["lon"]
 
     pois = search_nearby(lat, lon, key, category=category, limit=limit)
-    return jsonify({
-        "destination": dest,
-        "category": category,
-        "count": len(pois),
-        "pois": pois,
-    }), 200
+    return (
+        jsonify(
+            {
+                "destination": dest,
+                "category": category,
+                "count": len(pois),
+                "pois": pois,
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -139,19 +144,27 @@ def route():
     if not d:
         geo = geocode(destination, key)
         if not geo:
-            return jsonify({"error": f"Could not locate destination '{destination}'"}), 404
+            return (
+                jsonify({"error": f"Could not locate destination '{destination}'"}),
+                404,
+            )
         d = {"lat": geo["lat"], "lon": geo["lon"]}
 
     result = calculate_route(o["lat"], o["lon"], d["lat"], d["lon"], key, mode)
     if not result:
         return jsonify({"error": "Could not calculate route"}), 502
 
-    return jsonify({
-        "origin": origin,
-        "destination": destination,
-        "travel_mode": mode,
-        **result,
-    }), 200
+    return (
+        jsonify(
+            {
+                "origin": origin,
+                "destination": destination,
+                "travel_mode": mode,
+                **result,
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------

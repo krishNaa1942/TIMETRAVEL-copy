@@ -51,12 +51,16 @@ class TestPackingService:
 
     def test_cold_weather_suggests_jacket(self):
         from app.services.packing_service import suggest_packing
+
         items = suggest_packing(temp_c=3.0, humidity=60, weather_description="Clear")
         labels = " ".join(items).lower()
         assert "jacket" in labels or "coat" in labels
 
     def test_rain_suggests_umbrella(self):
         from app.services.packing_service import suggest_packing
-        items = suggest_packing(temp_c=25.0, humidity=80, weather_description="Light rain")
+
+        items = suggest_packing(
+            temp_c=25.0, humidity=80, weather_description="Light rain"
+        )
         labels = " ".join(items).lower()
         assert "umbrella" in labels

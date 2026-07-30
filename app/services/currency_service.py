@@ -44,10 +44,20 @@ FALLBACK_RATES = {
 }
 
 CURRENCY_SYMBOLS = {
-    "INR": "₹", "USD": "$", "EUR": "€", "GBP": "£",
-    "AUD": "A$", "CAD": "C$", "SGD": "S$", "AED": "د.إ",
-    "THB": "฿", "JPY": "¥", "MYR": "RM", "LKR": "Rs",
-    "NPR": "रू", "BDT": "৳",
+    "INR": "₹",
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "AUD": "A$",
+    "CAD": "C$",
+    "SGD": "S$",
+    "AED": "د.إ",
+    "THB": "฿",
+    "JPY": "¥",
+    "MYR": "RM",
+    "LKR": "Rs",
+    "NPR": "रू",
+    "BDT": "৳",
 }
 
 
@@ -125,7 +135,4 @@ def convert_currency(
 
 def get_supported_currencies() -> list:
     """Return list of currencies we support for conversion."""
-    return [
-        {"code": k, "symbol": v}
-        for k, v in CURRENCY_SYMBOLS.items()
-    ]
+    return [{"code": k, "symbol": v} for k, v in CURRENCY_SYMBOLS.items()]

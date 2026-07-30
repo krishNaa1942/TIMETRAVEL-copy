@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # OpenWeather helper
 # ---------------------------------------------------------------------------
 
+
 @api_retry
 def fetch_weather(
     destination: str,
@@ -46,7 +47,7 @@ def fetch_weather(
     params = {
         "q": destination,
         "appid": api_key,
-        "units": "metric",       # Celsius
+        "units": "metric",  # Celsius
     }
 
     try:

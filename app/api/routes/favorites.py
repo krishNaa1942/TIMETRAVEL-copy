@@ -60,7 +60,12 @@ def add_favorite():
     if not item_name:
         return jsonify({"error": "item_name is required"}), 400
     if item_type not in VALID_TYPES:
-        return jsonify({"error": f"item_type must be one of: {', '.join(sorted(VALID_TYPES))}"}), 400
+        return (
+            jsonify(
+                {"error": f"item_type must be one of: {', '.join(sorted(VALID_TYPES))}"}
+            ),
+            400,
+        )
 
     # Check duplicate
     existing = Favorite.query.filter_by(
@@ -70,7 +75,12 @@ def add_favorite():
     ).first()
 
     if existing:
-        return jsonify({"error": "Already in your wishlist", "favorite": existing.to_dict()}), 409
+        return (
+            jsonify(
+                {"error": "Already in your wishlist", "favorite": existing.to_dict()}
+            ),
+            409,
+        )
 
     fav = Favorite(
         user_id=user.id,
@@ -124,7 +134,12 @@ def check_favorite():
         item_name=item_name,
     ).first()
 
-    return jsonify({
-        "is_favorite": exists is not None,
-        "favorite": exists.to_dict() if exists else None,
-    }), 200
+    return (
+        jsonify(
+            {
+                "is_favorite": exists is not None,
+                "favorite": exists.to_dict() if exists else None,
+            }
+        ),
+        200,
+    )

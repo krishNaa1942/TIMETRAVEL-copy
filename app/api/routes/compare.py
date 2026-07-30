@@ -69,10 +69,26 @@ def compare_destinations():
     weather_url = current_app.config.get("OPENWEATHER_BASE_URL")
 
     result = {
-        "dest1": _build_profile(dest1, num_days, family_size, travel_class,
-                                baselines_path, safety_path, weather_key, weather_url),
-        "dest2": _build_profile(dest2, num_days, family_size, travel_class,
-                                baselines_path, safety_path, weather_key, weather_url),
+        "dest1": _build_profile(
+            dest1,
+            num_days,
+            family_size,
+            travel_class,
+            baselines_path,
+            safety_path,
+            weather_key,
+            weather_url,
+        ),
+        "dest2": _build_profile(
+            dest2,
+            num_days,
+            family_size,
+            travel_class,
+            baselines_path,
+            safety_path,
+            weather_key,
+            weather_url,
+        ),
         "params": {
             "num_days": num_days,
             "family_size": family_size,
@@ -83,8 +99,16 @@ def compare_destinations():
     return jsonify(result), 200
 
 
-def _build_profile(dest, num_days, family_size, travel_class,
-                   baselines_path, safety_path, weather_key, weather_url):
+def _build_profile(
+    dest,
+    num_days,
+    family_size,
+    travel_class,
+    baselines_path,
+    safety_path,
+    weather_key,
+    weather_url,
+):
     """Build a combined budget + safety + weather profile for one destination."""
 
     # Budget
@@ -100,7 +124,9 @@ def _build_profile(dest, num_days, family_size, travel_class,
     safety = get_safety_score(dest, safety_path)
 
     # Weather (may be None if API key missing)
-    weather_data = fetch_weather(dest, weather_key, weather_url) if weather_key else None
+    weather_data = (
+        fetch_weather(dest, weather_key, weather_url) if weather_key else None
+    )
 
     profile = {
         "destination": DESTINATION_LABELS.get(dest, dest.title()),

@@ -51,7 +51,9 @@ def _advisory_text(score: float) -> str:
     elif score >= 4.0:
         return "Moderate risk. Stay in well-known tourist areas and travel in groups."
     elif score >= 2.0:
-        return "Elevated risk. Consider travel insurance and register with your embassy."
+        return (
+            "Elevated risk. Consider travel insurance and register with your embassy."
+        )
     else:
         return "High risk. Travel is not recommended for families at this time."
 

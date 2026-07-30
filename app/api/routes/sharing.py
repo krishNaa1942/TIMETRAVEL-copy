@@ -49,11 +49,16 @@ def create_share():
     db.session.add(share)
     db.session.commit()
 
-    return jsonify({
-        "message": "Share link created",
-        "share": share.to_dict(),
-        "share_url": f"/shared/{share.share_token}",
-    }), 201
+    return (
+        jsonify(
+            {
+                "message": "Share link created",
+                "share": share.to_dict(),
+                "share_url": f"/shared/{share.share_token}",
+            }
+        ),
+        201,
+    )
 
 
 @sharing_bp.route("/api/share/<token>", methods=["GET"])
@@ -90,9 +95,11 @@ def view_shared(token):
 @login_required
 def list_shares():
     """List current user's shared links."""
-    shares = SharedTrip.query.filter_by(
-        user_id=current_user.id
-    ).order_by(SharedTrip.created_at.desc()).all()
+    shares = (
+        SharedTrip.query.filter_by(user_id=current_user.id)
+        .order_by(SharedTrip.created_at.desc())
+        .all()
+    )
 
     return jsonify({"shares": [s.to_dict() for s in shares]})
 

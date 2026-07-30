@@ -10,23 +10,19 @@ Docs: https://newsapi.org/docs/endpoints
 
 import logging
 import time
-from typing import Optional
-
 import requests
 
+from app.utils.constants import DESTINATION_NEWS_KW as DESTINATION_KEYWORDS
 from app.utils.retry import api_retry
 
 logger = logging.getLogger(__name__)
 
 NEWSAPI_BASE = "https://newsapi.org/v2"
 
+
 # ── In-memory cache ──────────────────────────────────────────────────
 _cache: dict = {}
 CACHE_TTL = 900  # 15 minutes (news updates frequently)
-
-
-# Destination keywords imported from central registry
-from app.utils.constants import DESTINATION_NEWS_KW as DESTINATION_KEYWORDS
 
 
 def _cache_key(prefix: str, *args) -> str:
@@ -42,6 +38,7 @@ def _is_cached(key: str) -> bool:
 # ══════════════════════════════════════════════════════════════════════
 # TRAVEL NEWS
 # ══════════════════════════════════════════════════════════════════════
+
 
 @api_retry
 def get_travel_news(
@@ -111,17 +108,19 @@ def get_travel_news(
             if art.get("title") == "[Removed]":
                 continue
 
-            articles.append({
-                "title": art.get("title", ""),
-                "description": art.get("description", ""),
-                "content": (art.get("content") or "")[:500],
-                "url": art.get("url", ""),
-                "image_url": art.get("urlToImage"),
-                "source": art.get("source", {}).get("name", "Unknown"),
-                "author": art.get("author"),
-                "published_at": art.get("publishedAt", ""),
-                "destination": destination or "India",
-            })
+            articles.append(
+                {
+                    "title": art.get("title", ""),
+                    "description": art.get("description", ""),
+                    "content": (art.get("content") or "")[:500],
+                    "url": art.get("url", ""),
+                    "image_url": art.get("urlToImage"),
+                    "source": art.get("source", {}).get("name", "Unknown"),
+                    "author": art.get("author"),
+                    "published_at": art.get("publishedAt", ""),
+                    "destination": destination or "India",
+                }
+            )
 
         _cache[ck] = {"ts": time.time(), "data": articles}
         logger.info("NewsAPI: fetched %d articles for '%s'", len(articles), query)
@@ -168,17 +167,19 @@ def get_trending_travel(api_key: str, limit: int = 10) -> list:
         for art in data.get("articles", []):
             if art.get("title") == "[Removed]":
                 continue
-            articles.append({
-                "title": art.get("title", ""),
-                "description": art.get("description", ""),
-                "content": (art.get("content") or "")[:500],
-                "url": art.get("url", ""),
-                "image_url": art.get("urlToImage"),
-                "source": art.get("source", {}).get("name", "Unknown"),
-                "author": art.get("author"),
-                "published_at": art.get("publishedAt", ""),
-                "destination": "India",
-            })
+            articles.append(
+                {
+                    "title": art.get("title", ""),
+                    "description": art.get("description", ""),
+                    "content": (art.get("content") or "")[:500],
+                    "url": art.get("url", ""),
+                    "image_url": art.get("urlToImage"),
+                    "source": art.get("source", {}).get("name", "Unknown"),
+                    "author": art.get("author"),
+                    "published_at": art.get("publishedAt", ""),
+                    "destination": "India",
+                }
+            )
 
         _cache[ck] = {"ts": time.time(), "data": articles}
         return articles
@@ -229,15 +230,17 @@ def get_safety_news(api_key: str, destination: str = "", limit: int = 5) -> list
         for art in data.get("articles", []):
             if art.get("title") == "[Removed]":
                 continue
-            articles.append({
-                "title": art.get("title", ""),
-                "description": art.get("description", ""),
-                "url": art.get("url", ""),
-                "image_url": art.get("urlToImage"),
-                "source": art.get("source", {}).get("name", "Unknown"),
-                "published_at": art.get("publishedAt", ""),
-                "destination": destination or "India",
-            })
+            articles.append(
+                {
+                    "title": art.get("title", ""),
+                    "description": art.get("description", ""),
+                    "url": art.get("url", ""),
+                    "image_url": art.get("urlToImage"),
+                    "source": art.get("source", {}).get("name", "Unknown"),
+                    "published_at": art.get("publishedAt", ""),
+                    "destination": destination or "India",
+                }
+            )
 
         _cache[ck] = {"ts": time.time(), "data": articles}
         return articles
@@ -250,6 +253,7 @@ def get_safety_news(api_key: str, destination: str = "", limit: int = 5) -> list
 # ══════════════════════════════════════════════════════════════════════
 # HELPERS
 # ══════════════════════════════════════════════════════════════════════
+
 
 def _build_query(destination: str, category: str) -> str:
     """Build a NewsAPI search query from destination + category."""

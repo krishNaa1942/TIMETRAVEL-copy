@@ -12,8 +12,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, Trip
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -38,7 +38,10 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
@@ -60,6 +63,7 @@ def _get_trip_id(client):
 # ═══════════════════════════════════════════════════════════
 # Unauthenticated access
 # ═══════════════════════════════════════════════════════════
+
 
 class TestTripPlannerUnauth:
     def test_create_trip_unauth(self, client):
@@ -83,6 +87,7 @@ class TestTripPlannerUnauth:
 # ═══════════════════════════════════════════════════════════
 # Trip CRUD
 # ═══════════════════════════════════════════════════════════
+
 
 class TestTripPlannerCRUD:
     def test_create_trip_success(self, auth_client):
@@ -133,10 +138,13 @@ class TestTripPlannerCRUD:
     def test_update_trip(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.put(f"/api/trips/planner/{trip_id}", json={
-            "title": "Updated Title",
-            "status": "active",
-        })
+        res = auth_client.put(
+            f"/api/trips/planner/{trip_id}",
+            json={
+                "title": "Updated Title",
+                "status": "active",
+            },
+        )
         assert res.status_code == 200
         assert res.get_json()["trip"]["title"] == "Updated Title"
         assert res.get_json()["trip"]["status"] == "active"
@@ -162,13 +170,17 @@ class TestTripPlannerCRUD:
 # Trip Days
 # ═══════════════════════════════════════════════════════════
 
+
 class TestTripDays:
     def test_add_day(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.post(f"/api/trips/planner/{trip_id}/days", json={
-            "title": "Day 4 - Beach",
-        })
+        res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/days",
+            json={
+                "title": "Day 4 - Beach",
+            },
+        )
         assert res.status_code == 201
         assert res.get_json()["day"]["title"] == "Day 4 - Beach"
 
@@ -181,17 +193,22 @@ class TestTripDays:
         trip_id = _get_trip_id(auth_client)
         trip = auth_client.get(f"/api/trips/planner/{trip_id}").get_json()["trip"]
         day_id = trip["days"][0]["id"]
-        res = auth_client.put(f"/api/trips/planner/{trip_id}/days/{day_id}", json={
-            "title": "Beach Day!",
-            "notes": "Don't forget sunscreen",
-        })
+        res = auth_client.put(
+            f"/api/trips/planner/{trip_id}/days/{day_id}",
+            json={
+                "title": "Beach Day!",
+                "notes": "Don't forget sunscreen",
+            },
+        )
         assert res.status_code == 200
         assert res.get_json()["day"]["title"] == "Beach Day!"
 
     def test_update_day_not_found(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.put(f"/api/trips/planner/{trip_id}/days/9999", json={"title": "X"})
+        res = auth_client.put(
+            f"/api/trips/planner/{trip_id}/days/9999", json={"title": "X"}
+        )
         assert res.status_code == 404
 
 
@@ -199,24 +216,30 @@ class TestTripDays:
 # Trip Places
 # ═══════════════════════════════════════════════════════════
 
+
 class TestTripPlaces:
     def test_add_place(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
         trip = auth_client.get(f"/api/trips/planner/{trip_id}").get_json()["trip"]
         day_id = trip["days"][0]["id"]
-        res = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={
-            "name": "Baga Beach",
-            "day_id": day_id,
-            "category": "beach",
-        })
+        res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places",
+            json={
+                "name": "Baga Beach",
+                "day_id": day_id,
+                "category": "beach",
+            },
+        )
         assert res.status_code == 201
         assert res.get_json()["place"]["name"] == "Baga Beach"
 
     def test_add_place_missing_name(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={"category": "beach"})
+        res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places", json={"category": "beach"}
+        )
         assert res.status_code == 400
 
     def test_add_place_trip_not_found(self, auth_client):
@@ -226,19 +249,26 @@ class TestTripPlaces:
     def test_update_place(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        add_res = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={"name": "Beach"})
+        add_res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places", json={"name": "Beach"}
+        )
         place_id = add_res.get_json()["place"]["id"]
-        res = auth_client.put(f"/api/trips/planner/{trip_id}/places/{place_id}", json={
-            "name": "Calangute Beach",
-            "notes": "Great waves",
-        })
+        res = auth_client.put(
+            f"/api/trips/planner/{trip_id}/places/{place_id}",
+            json={
+                "name": "Calangute Beach",
+                "notes": "Great waves",
+            },
+        )
         assert res.status_code == 200
         assert res.get_json()["place"]["name"] == "Calangute Beach"
 
     def test_delete_place(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        add_res = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={"name": "Beach"})
+        add_res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places", json={"name": "Beach"}
+        )
         place_id = add_res.get_json()["place"]["id"]
         res = auth_client.delete(f"/api/trips/planner/{trip_id}/places/{place_id}")
         assert res.status_code == 200
@@ -255,15 +285,22 @@ class TestTripPlaces:
         trip = auth_client.get(f"/api/trips/planner/{trip_id}").get_json()["trip"]
         day_id = trip["days"][0]["id"]
 
-        p1 = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={"name": "A", "day_id": day_id}).get_json()["place"]
-        p2 = auth_client.post(f"/api/trips/planner/{trip_id}/places", json={"name": "B", "day_id": day_id}).get_json()["place"]
+        p1 = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places", json={"name": "A", "day_id": day_id}
+        ).get_json()["place"]
+        p2 = auth_client.post(
+            f"/api/trips/planner/{trip_id}/places", json={"name": "B", "day_id": day_id}
+        ).get_json()["place"]
 
-        res = auth_client.put(f"/api/trips/planner/{trip_id}/places/reorder", json={
-            "order": [
-                {"id": p2["id"], "day_id": day_id, "position": 1},
-                {"id": p1["id"], "day_id": day_id, "position": 2},
-            ]
-        })
+        res = auth_client.put(
+            f"/api/trips/planner/{trip_id}/places/reorder",
+            json={
+                "order": [
+                    {"id": p2["id"], "day_id": day_id, "position": 1},
+                    {"id": p1["id"], "day_id": day_id, "position": 2},
+                ]
+            },
+        )
         assert res.status_code == 200
 
 
@@ -271,15 +308,19 @@ class TestTripPlaces:
 # Companions
 # ═══════════════════════════════════════════════════════════
 
+
 class TestCompanions:
     def test_add_companion(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.post(f"/api/trips/planner/{trip_id}/companions", json={
-            "name": "Alice",
-            "email": "alice@example.com",
-            "role": "traveler",
-        })
+        res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/companions",
+            json={
+                "name": "Alice",
+                "email": "alice@example.com",
+                "role": "traveler",
+            },
+        )
         assert res.status_code == 201
         comp = res.get_json()["companion"]
         assert comp["name"] == "Alice"
@@ -288,17 +329,23 @@ class TestCompanions:
     def test_add_companion_missing_name(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        res = auth_client.post(f"/api/trips/planner/{trip_id}/companions", json={"email": "x@y.com"})
+        res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/companions", json={"email": "x@y.com"}
+        )
         assert res.status_code == 400
 
     def test_add_companion_trip_not_found(self, auth_client):
-        res = auth_client.post("/api/trips/planner/9999/companions", json={"name": "Bob"})
+        res = auth_client.post(
+            "/api/trips/planner/9999/companions", json={"name": "Bob"}
+        )
         assert res.status_code == 404
 
     def test_remove_companion(self, auth_client):
         _create_trip(auth_client)
         trip_id = _get_trip_id(auth_client)
-        add_res = auth_client.post(f"/api/trips/planner/{trip_id}/companions", json={"name": "Alice"})
+        add_res = auth_client.post(
+            f"/api/trips/planner/{trip_id}/companions", json={"name": "Alice"}
+        )
         comp_id = add_res.get_json()["companion"]["id"]
         res = auth_client.delete(f"/api/trips/planner/{trip_id}/companions/{comp_id}")
         assert res.status_code == 200
@@ -314,6 +361,7 @@ class TestCompanions:
 # Ownership isolation
 # ═══════════════════════════════════════════════════════════
 
+
 class TestTripPlannerOwnership:
     def test_cannot_view_other_users_trip(self, app, client):
         with app.app_context():
@@ -322,7 +370,10 @@ class TestTripPlannerOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _create_trip(client)
         trip_id = _get_trip_id(client)
         client.post("/api/auth/logout")
@@ -333,7 +384,10 @@ class TestTripPlannerOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.get(f"/api/trips/planner/{trip_id}")
         assert res.status_code == 404
 
@@ -344,7 +398,10 @@ class TestTripPlannerOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _create_trip(client)
         trip_id = _get_trip_id(client)
         client.post("/api/auth/logout")
@@ -355,6 +412,9 @@ class TestTripPlannerOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.delete(f"/api/trips/planner/{trip_id}")
         assert res.status_code == 404

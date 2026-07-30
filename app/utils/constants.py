@@ -17,8 +17,18 @@ import unicodedata
 # ═══════════════════════════════════════════════════════════════════════════
 
 _MONTH_ABBR = {
-    1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun",
-    7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec",
+    1: "Jan",
+    2: "Feb",
+    3: "Mar",
+    4: "Apr",
+    5: "May",
+    6: "Jun",
+    7: "Jul",
+    8: "Aug",
+    9: "Sep",
+    10: "Oct",
+    11: "Nov",
+    12: "Dec",
 }
 
 
@@ -57,7 +67,8 @@ def _load_destinations() -> dict:
     """Load destinations from india_destinations.json and build DESTINATIONS dict."""
     data_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        "data", "india_destinations.json",
+        "data",
+        "india_destinations.json",
     )
     try:
         with open(data_path, "r") as fh:
@@ -99,9 +110,9 @@ DESTINATIONS = _load_destinations()
 # Maps every accepted name form → canonical lowercase key
 _NAME_TO_KEY: dict[str, str] = {}
 for _k, _d in DESTINATIONS.items():
-    _NAME_TO_KEY[_k] = _k              # "varanasi"
-    _NAME_TO_KEY[_k.title()] = _k      # "Varanasi"
-    _NAME_TO_KEY[_d["label"]] = _k     # "Varanasi (Banaras)"
+    _NAME_TO_KEY[_k] = _k  # "varanasi"
+    _NAME_TO_KEY[_k.title()] = _k  # "Varanasi"
+    _NAME_TO_KEY[_d["label"]] = _k  # "Varanasi (Banaras)"
 
 
 def _normalize_destination_name(name: str) -> str:
@@ -132,7 +143,11 @@ def _candidate_forms(name: str) -> set[str]:
 # Maps normalized names/forms → canonical lowercase key
 _NORMALIZED_TO_KEY: dict[str, str] = {}
 for _k, _d in DESTINATIONS.items():
-    for _name in _candidate_forms(_k) | _candidate_forms(_k.title()) | _candidate_forms(_d["label"]):
+    for _name in (
+        _candidate_forms(_k)
+        | _candidate_forms(_k.title())
+        | _candidate_forms(_d["label"])
+    ):
         _normalized = _normalize_destination_name(_name)
         if _normalized and _normalized not in _NORMALIZED_TO_KEY:
             _NORMALIZED_TO_KEY[_normalized] = _k
@@ -188,6 +203,7 @@ def resolve_destination_key(name: str) -> str | None:
             best_key = candidate_key
 
     return best_key
+
 
 DESTINATION_COORDS: dict = {
     key: {"lat": d["lat"], "lon": d["lon"], "label": d["label"]}

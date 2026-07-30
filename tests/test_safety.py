@@ -31,6 +31,11 @@ class TestSafetyEndpoint:
     def test_safety_has_all_subscores(self, client):
         resp = client.get("/api/safety/Kerala")
         data = resp.get_json()
-        for key in ("crime_score", "health_score", "infrastructure_score", "tourist_friendliness"):
+        for key in (
+            "crime_score",
+            "health_score",
+            "infrastructure_score",
+            "tourist_friendliness",
+        ):
             assert key in data
             assert isinstance(data[key], (int, float))

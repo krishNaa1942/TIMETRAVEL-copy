@@ -9,7 +9,14 @@ import uuid
 from io import BytesIO
 from urllib.parse import urlparse
 
-from flask import Blueprint, request, jsonify, send_from_directory, current_app, redirect
+from flask import (
+    Blueprint,
+    request,
+    jsonify,
+    send_from_directory,
+    current_app,
+    redirect,
+)
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -85,7 +92,9 @@ def _optimize_image(file):
         buf.seek(0)
         return buf
     except Exception:
-        current_app.logger.warning("Image optimization failed, using original", exc_info=True)
+        current_app.logger.warning(
+            "Image optimization failed, using original", exc_info=True
+        )
         return None
 
 
@@ -110,6 +119,7 @@ def _safe_serve(upload_dir: str, db_filename: str):
 
 # ── Photo Upload ────────────────────────────────────────────────────────
 
+
 @uploads_bp.route("/photos", methods=["POST"])
 @limiter.limit("10 per minute")
 @login_required
@@ -128,14 +138,24 @@ def upload_photo():
 
     files = request.files.getlist("file")
     if len(files) > MAX_FILES_PER_REQUEST:
-        return jsonify({"error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."
+                }
+            ),
+            400,
+        )
 
     file = files[0]
     if not file.filename:
         return jsonify({"error": "No file selected."}), 400
 
     if not _allowed_file(file.filename, ALLOWED_IMAGE_EXTS):
-        return jsonify({"error": f"Allowed formats: {', '.join(ALLOWED_IMAGE_EXTS)}"}), 400
+        return (
+            jsonify({"error": f"Allowed formats: {', '.join(ALLOWED_IMAGE_EXTS)}"}),
+            400,
+        )
 
     # Read and check size
     file.seek(0, 2)
@@ -210,6 +230,7 @@ def delete_photo(photo_id):
 
 # ── Document Upload ─────────────────────────────────────────────────────
 
+
 @uploads_bp.route("/documents", methods=["POST"])
 @limiter.limit("10 per minute")
 @login_required
@@ -220,14 +241,24 @@ def upload_document():
 
     files = request.files.getlist("file")
     if len(files) > MAX_FILES_PER_REQUEST:
-        return jsonify({"error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Too many files. Maximum {MAX_FILES_PER_REQUEST} per request."
+                }
+            ),
+            400,
+        )
 
     file = files[0]
     if not file.filename:
         return jsonify({"error": "No file selected."}), 400
 
     if not _allowed_file(file.filename, ALLOWED_DOC_EXTS):
-        return jsonify({"error": f"Allowed formats: {', '.join(ALLOWED_DOC_EXTS)}"}), 400
+        return (
+            jsonify({"error": f"Allowed formats: {', '.join(ALLOWED_DOC_EXTS)}"}),
+            400,
+        )
 
     file.seek(0, 2)
     size = file.tell()
@@ -255,6 +286,7 @@ def upload_document():
     if request.form.get("expiry_date"):
         try:
             from datetime import date
+
             expiry_date = date.fromisoformat(request.form["expiry_date"])
         except ValueError:
             pass
@@ -320,6 +352,7 @@ def delete_document(doc_id):
 
 # ── Serve uploaded files ────────────────────────────────────────────────
 
+
 @uploads_bp.route("/serve/photos/<path:filename>", methods=["GET"])
 @limiter.limit("60 per minute")
 @login_required
@@ -329,7 +362,9 @@ def serve_photo(filename):
     When Supabase is configured, redirects to a signed URL.
     Otherwise serves from the local uploads directory.
     """
-    photo = TripPhoto.query.filter_by(filename=filename, user_id=current_user.id).first()
+    photo = TripPhoto.query.filter_by(
+        filename=filename, user_id=current_user.id
+    ).first()
     if not photo:
         return jsonify({"error": "Access denied."}), 403
 
@@ -354,7 +389,9 @@ def serve_document(filename):
     When Supabase is configured, redirects to a signed URL.
     Otherwise serves from the local uploads directory.
     """
-    doc = TripDocument.query.filter_by(filename=filename, user_id=current_user.id).first()
+    doc = TripDocument.query.filter_by(
+        filename=filename, user_id=current_user.id
+    ).first()
     if not doc:
         return jsonify({"error": "Access denied."}), 403
 

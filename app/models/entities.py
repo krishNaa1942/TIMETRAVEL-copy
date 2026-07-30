@@ -13,8 +13,8 @@ from sqlalchemy import event
 
 from app.models.database import db
 
-
 # ── User ────────────────────────────────────────────────────────────────────
+
 
 class User(UserMixin, db.Model):
     """Registered user with hashed password."""
@@ -25,9 +25,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(256), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     trips = db.relationship("TripQuery", backref="user", lazy="dynamic")
@@ -65,7 +63,9 @@ class TripQuery(db.Model):
     __tablename__ = "trip_queries"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True, index=True
+    )
     user_session = db.Column(db.String(64), nullable=True, index=True)
     destination = db.Column(db.String(128), nullable=False)
     num_days = db.Column(db.Integer, nullable=False, default=1)
@@ -77,9 +77,7 @@ class TripQuery(db.Model):
     transport = db.Column(db.Float, nullable=True)
     activities = db.Column(db.Float, nullable=True)
     miscellaneous = db.Column(db.Float, nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
         return {
@@ -107,14 +105,14 @@ class ChatMessage(db.Model):
     __tablename__ = "chat_messages"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True, index=True
+    )
     user_session = db.Column(db.String(64), nullable=True, index=True)
-    role = db.Column(db.String(16), nullable=False)       # "user" or "bot"
+    role = db.Column(db.String(16), nullable=False)  # "user" or "bot"
     message = db.Column(db.Text, nullable=False)
     detected_intent = db.Column(db.String(64), nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<ChatMessage [{self.role}] {self.message[:40]}>"
@@ -126,7 +124,10 @@ class Destination(db.Model):
     __tablename__ = "destinations"
     __table_args__ = (
         db.Index("ix_destinations_country", "country"),
-        db.CheckConstraint("safety_score IS NULL OR (safety_score >= 0 AND safety_score <= 10)", name="ck_dest_safety_score"),
+        db.CheckConstraint(
+            "safety_score IS NULL OR (safety_score >= 0 AND safety_score <= 10)",
+            name="ck_dest_safety_score",
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -134,12 +135,10 @@ class Destination(db.Model):
     country = db.Column(db.String(64), nullable=False, default="India")
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
-    safety_score = db.Column(db.Float, nullable=True)     # 0.0 – 10.0
-    avg_daily_cost = db.Column(db.Float, nullable=True)    # in INR
+    safety_score = db.Column(db.Float, nullable=True)  # 0.0 – 10.0
+    avg_daily_cost = db.Column(db.Float, nullable=True)  # in INR
     best_season = db.Column(db.String(64), nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<Destination {self.name}, {self.country}>"
@@ -152,17 +151,22 @@ class Favorite(db.Model):
     __table_args__ = (
         db.UniqueConstraint("user_id", "item_type", "item_name", name="uq_user_fav"),
         db.Index("ix_favorites_item_type", "item_type"),
-        db.CheckConstraint("item_type IN ('destination', 'place', 'attraction', 'restaurant')", name="ck_fav_item_type"),
+        db.CheckConstraint(
+            "item_type IN ('destination', 'place', 'attraction', 'restaurant')",
+            name="ck_fav_item_type",
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    item_type = db.Column(db.String(32), nullable=False, default="destination")  # destination | place
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    item_type = db.Column(
+        db.String(32), nullable=False, default="destination"
+    )  # destination | place
     item_name = db.Column(db.String(256), nullable=False)
     notes = db.Column(db.Text, nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
         return {
@@ -179,6 +183,7 @@ class Favorite(db.Model):
 
 # ── Travel Notes / Journal ──────────────────────────────────────────────
 
+
 class TravelNote(db.Model):
     """User's travel journal entries – notes, impressions, memories."""
 
@@ -189,22 +194,25 @@ class TravelNote(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     destination = db.Column(db.String(128), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    mood = db.Column(db.String(32), nullable=True)       # happy, excited, relaxed, etc.
-    rating = db.Column(db.Integer, nullable=True)          # 1-5 stars
-    is_public = db.Column(db.Boolean, default=False)       # community visibility
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    mood = db.Column(db.String(32), nullable=True)  # happy, excited, relaxed, etc.
+    rating = db.Column(db.Integer, nullable=True)  # 1-5 stars
+    is_public = db.Column(db.Boolean, default=False)  # community visibility
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc),
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    user = db.relationship("User", lazy="joined", backref=db.backref("notes", lazy="dynamic"))
+    user = db.relationship(
+        "User", lazy="joined", backref=db.backref("notes", lazy="dynamic")
+    )
 
     def to_dict(self):
         return {
@@ -227,29 +235,31 @@ class TravelNote(db.Model):
 
 # ── Shared Trip (collaborative sharing) ─────────────────────────────────
 
+
 class SharedTrip(db.Model):
     """Shareable trip link allowing others to view a user's trip plan."""
 
     __tablename__ = "shared_trips"
-    __table_args__ = (
-        db.Index("ix_shared_trips_trip", "trip_id"),
-    )
+    __table_args__ = (db.Index("ix_shared_trips_trip", "trip_id"),)
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     share_token = db.Column(
-        db.String(36), unique=True, nullable=False, index=True,
+        db.String(36),
+        unique=True,
+        nullable=False,
+        index=True,
         default=lambda: str(uuid.uuid4()),
     )
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     trip_id = db.Column(db.Integer, db.ForeignKey("trip_queries.id"), nullable=True)
     title = db.Column(db.String(256), nullable=False, default="My Trip")
-    itinerary_json = db.Column(db.Text, nullable=True)     # stored JSON of itinerary
+    itinerary_json = db.Column(db.Text, nullable=True)  # stored JSON of itinerary
     notes = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     view_count = db.Column(db.Integer, default=0)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("shared_trips", lazy="dynamic"))
     trip = db.relationship("TripQuery", backref=db.backref("shares", lazy="dynamic"))
@@ -273,6 +283,7 @@ class SharedTrip(db.Model):
 
 # ── Expense Tracker ─────────────────────────────────────────────────────
 
+
 class Expense(db.Model):
     """Individual expense entries for real-time trip spending tracking."""
 
@@ -284,17 +295,19 @@ class Expense(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     trip_id = db.Column(db.Integer, db.ForeignKey("trip_queries.id"), nullable=True)
     destination = db.Column(db.String(128), nullable=False)
-    category = db.Column(db.String(64), nullable=False)    # food, transport, accommodation, activity, misc
+    category = db.Column(
+        db.String(64), nullable=False
+    )  # food, transport, accommodation, activity, misc
     description = db.Column(db.String(256), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(8), default="INR")
     date = db.Column(db.Date, nullable=True)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("expenses", lazy="dynamic"))
     trip = db.relationship("TripQuery", backref=db.backref("expenses", lazy="dynamic"))
@@ -317,6 +330,7 @@ class Expense(db.Model):
 
 # ── Packing Checklist ───────────────────────────────────────────────────
 
+
 class PackingItem(db.Model):
     """Interactive packing checklist with user-added items and check states."""
 
@@ -327,14 +341,14 @@ class PackingItem(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     destination = db.Column(db.String(128), nullable=False)
     item_text = db.Column(db.String(256), nullable=False)
     is_checked = db.Column(db.Boolean, default=False)
-    is_custom = db.Column(db.Boolean, default=False)       # user-added vs auto-generated
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    is_custom = db.Column(db.Boolean, default=False)  # user-added vs auto-generated
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("packing_items", lazy="dynamic"))
 
@@ -353,6 +367,7 @@ class PackingItem(db.Model):
 
 # ── Trip (full planning entity) ─────────────────────────────────────────
 
+
 class Trip(db.Model):
     """Full trip planning entity — central workspace for a travel plan."""
 
@@ -361,12 +376,20 @@ class Trip(db.Model):
         db.Index("ix_trips_user_status", "user_id", "status"),
         db.Index("ix_trips_user_dest", "user_id", "destination"),
         db.Index("ix_trips_is_public", "is_public"),
-        db.CheckConstraint("status IN ('planning', 'active', 'completed', 'cancelled')", name="ck_trip_status"),
-        db.CheckConstraint("travel_class IN ('economy', 'budget', 'standard', 'premium', 'luxury')", name="ck_trip_travel_class"),
+        db.CheckConstraint(
+            "status IN ('planning', 'active', 'completed', 'cancelled')",
+            name="ck_trip_status",
+        ),
+        db.CheckConstraint(
+            "travel_class IN ('economy', 'budget', 'standard', 'premium', 'luxury')",
+            name="ck_trip_travel_class",
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     title = db.Column(db.String(256), nullable=False)
     destination = db.Column(db.String(128), nullable=False)
     start_date = db.Column(db.Date, nullable=True)
@@ -375,28 +398,38 @@ class Trip(db.Model):
     family_size = db.Column(db.Integer, default=1)
     travel_class = db.Column(db.String(16), default="economy")
     cover_image_url = db.Column(db.String(512), nullable=True)
-    status = db.Column(db.String(20), default="planning")   # planning, active, completed
+    status = db.Column(db.String(20), default="planning")  # planning, active, completed
     budget_total = db.Column(db.Float, nullable=True)
     notes = db.Column(db.Text, nullable=True)
-    itinerary_json = db.Column(db.Text, nullable=True)      # AI-generated itinerary
+    itinerary_json = db.Column(db.Text, nullable=True)  # AI-generated itinerary
     is_public = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc),
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
     user = db.relationship("User", backref=db.backref("planned_trips", lazy="dynamic"))
-    days = db.relationship("TripDay", backref="trip", lazy="selectin",
-                           cascade="all, delete-orphan", order_by="TripDay.day_number")
-    places = db.relationship("TripPlace", backref="trip", lazy="selectin",
-                             cascade="all, delete-orphan")
-    reservations = db.relationship("Reservation", backref="trip", lazy="selectin",
-                                   cascade="all, delete-orphan")
-    photos = db.relationship("TripPhoto", backref="trip", lazy="selectin",
-                             cascade="all, delete-orphan")
-    companions = db.relationship("Companion", backref="trip", lazy="selectin",
-                                 cascade="all, delete-orphan")
+    days = db.relationship(
+        "TripDay",
+        backref="trip",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        order_by="TripDay.day_number",
+    )
+    places = db.relationship(
+        "TripPlace", backref="trip", lazy="selectin", cascade="all, delete-orphan"
+    )
+    reservations = db.relationship(
+        "Reservation", backref="trip", lazy="selectin", cascade="all, delete-orphan"
+    )
+    photos = db.relationship(
+        "TripPhoto", backref="trip", lazy="selectin", cascade="all, delete-orphan"
+    )
+    companions = db.relationship(
+        "Companion", backref="trip", lazy="selectin", cascade="all, delete-orphan"
+    )
 
     def to_dict(self, include_days=False, include_places=False):
         d = {
@@ -436,14 +469,21 @@ class TripDay(db.Model):
     __tablename__ = "trip_days"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+    )
     day_number = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=True)
     title = db.Column(db.String(256), nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    places = db.relationship("TripPlace", backref="day", lazy="selectin",
-                             cascade="all, delete-orphan", order_by="TripPlace.position_order")
+    places = db.relationship(
+        "TripPlace",
+        backref="day",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        order_by="TripPlace.position_order",
+    )
 
     def to_dict(self, include_places=True):
         d = {
@@ -469,16 +509,22 @@ class TripPlace(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
-    day_id = db.Column(db.Integer, db.ForeignKey("trip_days.id"), nullable=True, index=True)
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+    )
+    day_id = db.Column(
+        db.Integer, db.ForeignKey("trip_days.id"), nullable=True, index=True
+    )
     name = db.Column(db.String(256), nullable=False)
     address = db.Column(db.String(512), nullable=True)
     lat = db.Column(db.Float, nullable=True)
     lon = db.Column(db.Float, nullable=True)
-    category = db.Column(db.String(64), nullable=True)      # restaurant, hotel, attraction, etc.
+    category = db.Column(
+        db.String(64), nullable=True
+    )  # restaurant, hotel, attraction, etc.
     notes = db.Column(db.Text, nullable=True)
-    start_time = db.Column(db.String(16), nullable=True)    # "09:00"
-    end_time = db.Column(db.String(16), nullable=True)      # "11:00"
+    start_time = db.Column(db.String(16), nullable=True)  # "09:00"
+    end_time = db.Column(db.String(16), nullable=True)  # "11:00"
     duration_minutes = db.Column(db.Integer, nullable=True)
     estimated_cost = db.Column(db.Float, nullable=True)
     position_order = db.Column(db.Integer, default=0)
@@ -519,19 +565,27 @@ class Reservation(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    res_type = db.Column(db.String(32), nullable=False)     # flight, hotel, restaurant, transport, activity
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+    )
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    res_type = db.Column(
+        db.String(32), nullable=False
+    )  # flight, hotel, restaurant, transport, activity
     title = db.Column(db.String(256), nullable=False)
     confirmation_code = db.Column(db.String(128), nullable=True)
-    provider = db.Column(db.String(128), nullable=True)     # airline/hotel/platform name
+    provider = db.Column(db.String(128), nullable=True)  # airline/hotel/platform name
     start_datetime = db.Column(db.DateTime, nullable=True)
     end_datetime = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(256), nullable=True)
     notes = db.Column(db.Text, nullable=True)
     amount = db.Column(db.Float, nullable=True)
     currency = db.Column(db.String(8), default="INR")
-    status = db.Column(db.String(20), default="confirmed")  # confirmed, pending, cancelled
+    status = db.Column(
+        db.String(20), default="confirmed"
+    )  # confirmed, pending, cancelled
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("reservations", lazy="dynamic"))
@@ -544,8 +598,12 @@ class Reservation(db.Model):
             "title": self.title,
             "confirmation_code": self.confirmation_code,
             "provider": self.provider,
-            "start_datetime": self.start_datetime.isoformat() if self.start_datetime else None,
-            "end_datetime": self.end_datetime.isoformat() if self.end_datetime else None,
+            "start_datetime": (
+                self.start_datetime.isoformat() if self.start_datetime else None
+            ),
+            "end_datetime": (
+                self.end_datetime.isoformat() if self.end_datetime else None
+            ),
             "location": self.location,
             "notes": self.notes,
             "amount": self.amount,
@@ -561,14 +619,18 @@ class TripPhoto(db.Model):
     __tablename__ = "trip_photos"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    filename = db.Column(db.String(256), nullable=False)     # stored filename (UUID-based)
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+    )
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    filename = db.Column(db.String(256), nullable=False)  # stored filename (UUID-based)
     original_name = db.Column(db.String(256), nullable=True)
     caption = db.Column(db.String(512), nullable=True)
     place_name = db.Column(db.String(256), nullable=True)
     taken_at = db.Column(db.DateTime, nullable=True)
-    file_size = db.Column(db.Integer, nullable=True)         # bytes
+    file_size = db.Column(db.Integer, nullable=True)  # bytes
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("photos", lazy="dynamic"))
@@ -577,9 +639,12 @@ class TripPhoto(db.Model):
         """Return Supabase public URL or local serve path."""
         try:
             from flask import current_app
+
             url = current_app.config.get("SUPABASE_URL", "")
             if url:
-                bucket = current_app.config.get("SUPABASE_STORAGE_BUCKET_PHOTOS", "photos")
+                bucket = current_app.config.get(
+                    "SUPABASE_STORAGE_BUCKET_PHOTOS", "photos"
+                )
                 return f"{url}/storage/v1/object/public/{bucket}/{self.user_id}/{self.filename}"
         except RuntimeError:
             pass  # outside app context
@@ -606,9 +671,15 @@ class TripDocument(db.Model):
     __tablename__ = "trip_documents"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=True, index=True)
-    doc_type = db.Column(db.String(32), nullable=False)      # passport, visa, insurance, ticket, other
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=True, index=True
+    )
+    doc_type = db.Column(
+        db.String(32), nullable=False
+    )  # passport, visa, insurance, ticket, other
     title = db.Column(db.String(256), nullable=False)
     filename = db.Column(db.String(256), nullable=False)
     original_name = db.Column(db.String(256), nullable=True)
@@ -624,9 +695,12 @@ class TripDocument(db.Model):
         """Return Supabase public URL or local serve path."""
         try:
             from flask import current_app
+
             url = current_app.config.get("SUPABASE_URL", "")
             if url:
-                bucket = current_app.config.get("SUPABASE_STORAGE_BUCKET_DOCS", "documents")
+                bucket = current_app.config.get(
+                    "SUPABASE_STORAGE_BUCKET_DOCS", "documents"
+                )
                 return f"{url}/storage/v1/object/public/{bucket}/{self.user_id}/{self.filename}"
         except RuntimeError:
             pass  # outside app context
@@ -654,12 +728,16 @@ class Companion(db.Model):
     __tablename__ = "companions"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+    )
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
     name = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(256), nullable=True)
     phone = db.Column(db.String(32), nullable=True)
-    role = db.Column(db.String(20), default="traveler")      # organizer, traveler
+    role = db.Column(db.String(20), default="traveler")  # organizer, traveler
     avatar_color = db.Column(db.String(16), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -691,8 +769,10 @@ class TripTemplate(db.Model):
     destination = db.Column(db.String(128), nullable=False)
     num_days = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    template_json = db.Column(db.Text, nullable=False)       # JSON itinerary
-    category = db.Column(db.String(64), nullable=True)       # honeymoon, family, adventure, budget, luxury
+    template_json = db.Column(db.Text, nullable=False)  # JSON itinerary
+    category = db.Column(
+        db.String(64), nullable=True
+    )  # honeymoon, family, adventure, budget, luxury
     cover_image_url = db.Column(db.String(512), nullable=True)
     popularity = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -714,9 +794,9 @@ class TripTemplate(db.Model):
 # ── Auto-update `updated_at` on any model that has the column ──
 
 _updated_at_models = [
-    cls for cls in db.Model.__subclasses__()
-    if hasattr(cls, "updated_at")
+    cls for cls in db.Model.__subclasses__() if hasattr(cls, "updated_at")
 ]
+
 
 @event.listens_for(db.session, "before_flush")
 def _auto_update_timestamps(session, flush_context, instances):

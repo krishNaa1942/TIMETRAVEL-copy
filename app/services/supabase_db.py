@@ -51,9 +51,8 @@ def _get_db_client():
     host does not resolve (prevents a ~30s hang on stale DNS).
     """
     url = current_app.config.get("SUPABASE_URL", "")
-    key = (
-        current_app.config.get("SUPABASE_SERVICE_KEY", "")
-        or current_app.config.get("SUPABASE_KEY", "")
+    key = current_app.config.get("SUPABASE_SERVICE_KEY", "") or current_app.config.get(
+        "SUPABASE_KEY", ""
     )
     if not url or not key:
         return None

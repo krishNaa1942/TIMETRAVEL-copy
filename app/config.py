@@ -15,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 DB_DIR = BASE_DIR / "instance"
 
+
 # ---------------------------------------------------------------------------
 # Base Configuration
 # ---------------------------------------------------------------------------
@@ -27,7 +28,7 @@ class Config:
         if env == "production":
             raise RuntimeError(
                 "SECRET_KEY environment variable is required in production. "
-                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+                'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
             )
         SECRET_KEY = "dev-secret-key-change-in-production-min-32-chars!"
     DEBUG = False
@@ -43,10 +44,14 @@ class Config:
 
     # Supabase
     SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-    SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")               # anon / public key
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")  # anon / public key
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")  # service_role key
-    SUPABASE_STORAGE_BUCKET_PHOTOS = os.getenv("SUPABASE_STORAGE_BUCKET_PHOTOS", "photos")
-    SUPABASE_STORAGE_BUCKET_DOCS = os.getenv("SUPABASE_STORAGE_BUCKET_DOCS", "documents")
+    SUPABASE_STORAGE_BUCKET_PHOTOS = os.getenv(
+        "SUPABASE_STORAGE_BUCKET_PHOTOS", "photos"
+    )
+    SUPABASE_STORAGE_BUCKET_DOCS = os.getenv(
+        "SUPABASE_STORAGE_BUCKET_DOCS", "documents"
+    )
 
     # OpenWeather API
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
@@ -78,7 +83,7 @@ class Config:
     BUDGET_DATA_PATH = str(DATA_DIR / "budget_baselines.json")
 
     # Session cookie security
-    SESSION_COOKIE_HTTPONLY = True   # Prevent JS access to session cookie
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JS access to session cookie
     SESSION_COOKIE_SAMESITE = "Lax"  # CSRF mitigation for cross-site requests
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Lax"
@@ -92,11 +97,13 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development-specific overrides."""
+
     DEBUG = True
 
 
 class TestingConfig(Config):
     """Testing-specific overrides."""
+
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False  # Disable CSRF in tests
@@ -105,8 +112,9 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     """Production-specific overrides."""
+
     DEBUG = False
-    SESSION_COOKIE_SECURE = True     # Cookies only over HTTPS
+    SESSION_COOKIE_SECURE = True  # Cookies only over HTTPS
     REMEMBER_COOKIE_SECURE = True
 
 

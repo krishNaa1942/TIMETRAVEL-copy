@@ -13,8 +13,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, Trip, TripTemplate
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -39,13 +39,17 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
 # ═══════════════════════════════════════════════════════════
 # List Templates
 # ═══════════════════════════════════════════════════════════
+
 
 class TestListTemplates:
     def test_list_templates_no_auth(self, client):
@@ -81,6 +85,7 @@ class TestListTemplates:
 # ═══════════════════════════════════════════════════════════
 # Clone Template
 # ═══════════════════════════════════════════════════════════
+
 
 class TestCloneTemplate:
     def test_clone_template_unauth(self, client):

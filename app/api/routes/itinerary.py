@@ -35,7 +35,10 @@ Response JSON:
 
 from flask import Blueprint, request, jsonify, current_app
 from app.services.itinerary_service import generate_itinerary
-from app.utils.constants import VALID_DESTINATION_NAMES as VALID_DESTINATIONS, resolve_destination_key
+from app.utils.constants import (
+    VALID_DESTINATION_NAMES as VALID_DESTINATIONS,
+    resolve_destination_key,
+)
 from app.main import limiter
 
 itinerary_bp = Blueprint("itinerary", __name__)
@@ -55,7 +58,14 @@ def itinerary_generate():
     # free-text from NLP (e.g. "munnar") maps correctly to the whitelist entry.
     destination = resolve_destination_key(destination)
     if not destination or destination not in VALID_DESTINATIONS:
-        return jsonify({"error": f"Invalid destination. Choose from: {', '.join(sorted(VALID_DESTINATIONS))}"}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid destination. Choose from: {', '.join(sorted(VALID_DESTINATIONS))}"
+                }
+            ),
+            400,
+        )
 
     try:
         num_days = int(data.get("num_days", 0))
@@ -75,13 +85,19 @@ def itinerary_generate():
 
     travel_class = data.get("travel_class", "economy")
     if travel_class not in ("economy", "comfort", "premium"):
-        return jsonify({"error": "travel_class must be economy, comfort, or premium"}), 400
+        return (
+            jsonify({"error": "travel_class must be economy, comfort, or premium"}),
+            400,
+        )
 
     interests = (data.get("interests") or "").strip()
 
     api_key = current_app.config.get("GOOGLE_API_KEY", "")
     if not api_key:
-        return jsonify({"error": "Gemini AI is not configured. Set GOOGLE_API_KEY."}), 503
+        return (
+            jsonify({"error": "Gemini AI is not configured. Set GOOGLE_API_KEY."}),
+            503,
+        )
 
     result = generate_itinerary(
         destination=destination,

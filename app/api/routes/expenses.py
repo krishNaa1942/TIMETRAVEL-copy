@@ -35,7 +35,14 @@ def add_expense():
         return jsonify({"error": "Invalid amount"}), 400
 
     if not destination or not category or not description or amount <= 0:
-        return jsonify({"error": "destination, category, description, and positive amount are required"}), 400
+        return (
+            jsonify(
+                {
+                    "error": "destination, category, description, and positive amount are required"
+                }
+            ),
+            400,
+        )
 
     expense = Expense(
         user_id=current_user.id,
@@ -96,12 +103,14 @@ def expense_summary():
     total_expenses = sum(r["total"] for r in by_category)
     total_count = sum(r["count"] for r in by_category)
 
-    return jsonify({
-        "destination": dest or "all",
-        "total": round(total_expenses, 2),
-        "count": total_count,
-        "by_category": by_category,
-    })
+    return jsonify(
+        {
+            "destination": dest or "all",
+            "total": round(total_expenses, 2),
+            "count": total_count,
+            "by_category": by_category,
+        }
+    )
 
 
 @expenses_bp.route("/api/expenses/<int:expense_id>", methods=["DELETE"])

@@ -34,9 +34,13 @@ def _load_baselines(path: str) -> dict:
             try:
                 with open(path, "r") as fh:
                     _BASELINE_CACHE = json.load(fh)
-                logger.info("Budget baselines loaded (%d destinations)", len(_BASELINE_CACHE))
+                logger.info(
+                    "Budget baselines loaded (%d destinations)", len(_BASELINE_CACHE)
+                )
             except FileNotFoundError:
-                logger.warning("Budget baselines file not found at %s – using defaults", path)
+                logger.warning(
+                    "Budget baselines file not found at %s – using defaults", path
+                )
                 _BASELINE_CACHE = {}
     return _BASELINE_CACHE
 

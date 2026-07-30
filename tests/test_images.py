@@ -82,6 +82,7 @@ class TestHeroImage:
 
         # Clear cache
         from app.services import unsplash_service
+
         unsplash_service._cache.clear()
         unsplash_service._configured = False
 
@@ -110,6 +111,7 @@ class TestDestinationImages:
         app.config["UNSPLASH_ACCESS_KEY"] = "test-key-12345678"
 
         from app.services import unsplash_service
+
         unsplash_service._cache.clear()
 
         mock_get.return_value.status_code = 200
@@ -147,6 +149,7 @@ class TestAllDestinations:
         app.config["UNSPLASH_ACCESS_KEY"] = "test-key-12345678"
 
         from app.services import unsplash_service
+
         unsplash_service._cache.clear()
 
         mock_get.return_value.status_code = 200
@@ -162,12 +165,13 @@ class TestAllDestinations:
 
     @pytest.mark.skipif(
         not __import__("os").environ.get("RUN_PERF_TESTS"),
-        reason="Performance benchmark — set RUN_PERF_TESTS=1 to run"
+        reason="Performance benchmark — set RUN_PERF_TESTS=1 to run",
     )
     @patch("app.services.unsplash_service.requests.get")
     def test_parallel_fetch_is_faster_than_sequential(self, mock_get, app):
         """Verify get_all_destination_images fetches in parallel (perf benchmark)."""
         from app.services import unsplash_service
+
         unsplash_service._cache.clear()
 
         call_count = 0
@@ -191,7 +195,9 @@ class TestAllDestinations:
             elapsed = time.time() - start
 
         # 201 destinations × 0.1s each = 20.1s sequential; parallel should be <15.0s
-        assert elapsed < 15.0, f"Parallel fetch took {elapsed:.2f}s — may not be parallel"
+        assert (
+            elapsed < 15.0
+        ), f"Parallel fetch took {elapsed:.2f}s — may not be parallel"
         assert call_count == 201
         assert len(result) == 201
 
@@ -199,6 +205,7 @@ class TestAllDestinations:
     def test_parallel_fetch_handles_partial_failure(self, mock_get, app):
         """If some destinations fail, others still succeed."""
         from app.services import unsplash_service
+
         unsplash_service._cache.clear()
 
         call_idx = 0

@@ -41,6 +41,7 @@ class ApiError:
 
     def to_response(self):
         from flask import jsonify
+
         return jsonify(self.to_dict()), self.status_code
 
 
@@ -67,7 +68,9 @@ def _code_from_status(status: int) -> str:
 
 
 # Convenience factories
-def bad_request(message: str = "Bad request", details: Optional[list] = None) -> ApiError:
+def bad_request(
+    message: str = "Bad request", details: Optional[list] = None
+) -> ApiError:
     return ApiError(message, 400, "bad_request", details)
 
 
@@ -83,7 +86,9 @@ def conflict(message: str = "Resource already exists") -> ApiError:
     return ApiError(message, 409, "conflict")
 
 
-def validation_error(message: str = "Validation failed", details: Optional[list] = None) -> ApiError:
+def validation_error(
+    message: str = "Validation failed", details: Optional[list] = None
+) -> ApiError:
     return ApiError(message, 422, "validation_error", details)
 
 

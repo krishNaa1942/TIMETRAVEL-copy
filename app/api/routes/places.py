@@ -73,11 +73,16 @@ def places_search():
 
     places = search_places(lat, lon, creds, category, radius, limit, query)
 
-    return jsonify({
-        "count": len(places),
-        "category": category,
-        "places": places,
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(places),
+                "category": category,
+                "places": places,
+            }
+        ),
+        200,
+    )
 
 
 # ── Smart recommendation logic ────────────────────────────
@@ -123,14 +128,31 @@ _SITUATION_PROFILES = {
 
 # Time-of-day heuristics
 _TIME_CATEGORIES = {
-    "morning":   {"categories": ["cafe", "restaurant", "park"], "label": "Morning Picks"},
-    "afternoon": {"categories": ["tourist attraction", "museum", "shopping", "restaurant"], "label": "Afternoon Picks"},
-    "evening":   {"categories": ["restaurant", "nightlife", "cafe"], "label": "Evening Picks"},
-    "night":     {"categories": ["nightlife", "restaurant", "hotel"], "label": "Late Night Picks"},
+    "morning": {"categories": ["cafe", "restaurant", "park"], "label": "Morning Picks"},
+    "afternoon": {
+        "categories": ["tourist attraction", "museum", "shopping", "restaurant"],
+        "label": "Afternoon Picks",
+    },
+    "evening": {
+        "categories": ["restaurant", "nightlife", "cafe"],
+        "label": "Evening Picks",
+    },
+    "night": {
+        "categories": ["nightlife", "restaurant", "hotel"],
+        "label": "Late Night Picks",
+    },
 }
 
 # Weather-based adjustments
-_WEATHER_INDOOR = {"museum", "shopping", "cafe", "restaurant", "spa", "nightlife", "hotel"}
+_WEATHER_INDOOR = {
+    "museum",
+    "shopping",
+    "cafe",
+    "restaurant",
+    "spa",
+    "nightlife",
+    "hotel",
+}
 _WEATHER_OUTDOOR = {"tourist attraction", "beach", "park", "temple"}
 
 
@@ -174,9 +196,14 @@ def _build_recommendation_context(situation, weather_condition):
     # Weather-based filtering
     if weather_condition:
         wc = weather_condition.lower()
-        is_bad = any(w in wc for w in ("rain", "storm", "thunder", "snow", "drizzle", "fog", "mist"))
+        is_bad = any(
+            w in wc
+            for w in ("rain", "storm", "thunder", "snow", "drizzle", "fog", "mist")
+        )
         if is_bad:
-            categories = [c for c in categories if c in _WEATHER_INDOOR] or list(_WEATHER_INDOOR)[:4]
+            categories = [c for c in categories if c in _WEATHER_INDOOR] or list(
+                _WEATHER_INDOOR
+            )[:4]
             reasons.append(f"Indoor places preferred — weather: {weather_condition}")
         elif any(w in wc for w in ("clear", "sunny", "fair")):
             # Boost outdoor activities
@@ -226,7 +253,9 @@ def places_recommend():
     limit = min(request.args.get("limit", 6, type=int), 20)
     radius = min(request.args.get("radius", 15000, type=int), 50000)
 
-    categories, reasons, time_slot = _build_recommendation_context(situation, weather_condition)
+    categories, reasons, time_slot = _build_recommendation_context(
+        situation, weather_condition
+    )
 
     # Fetch places for each recommended category
     all_places = []
@@ -248,15 +277,20 @@ def places_recommend():
 
     all_places.sort(key=sort_key)
 
-    return jsonify({
-        "count": len(all_places),
-        "situation": situation or "general",
-        "time_slot": time_slot,
-        "weather": weather_condition or None,
-        "reasons": reasons,
-        "categories_searched": categories[:4],
-        "places": all_places,
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(all_places),
+                "situation": situation or "general",
+                "time_slot": time_slot,
+                "weather": weather_condition or None,
+                "reasons": reasons,
+                "categories_searched": categories[:4],
+                "places": all_places,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/places/detail/<fsq_id> ──────────────────────
@@ -273,7 +307,14 @@ def place_detail(fsq_id: str):
 
     detail = get_place_details(fsq_id, creds)
     if not detail:
-        return jsonify({"error": "Could not retrieve place details. The service may be temporarily unavailable."}), 502
+        return (
+            jsonify(
+                {
+                    "error": "Could not retrieve place details. The service may be temporarily unavailable."
+                }
+            ),
+            502,
+        )
 
     return jsonify({"place": detail}), 200
 
@@ -293,11 +334,16 @@ def place_photos(fsq_id: str):
     limit = request.args.get("limit", 6, type=int)
     photos = get_place_photos(fsq_id, creds, limit)
 
-    return jsonify({
-        "fsq_id": fsq_id,
-        "count": len(photos),
-        "photos": photos,
-    }), 200
+    return (
+        jsonify(
+            {
+                "fsq_id": fsq_id,
+                "count": len(photos),
+                "photos": photos,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/places/tips/<fsq_id> ────────────────────────
@@ -315,11 +361,16 @@ def place_tips(fsq_id: str):
     limit = request.args.get("limit", 5, type=int)
     tips = get_place_tips(fsq_id, creds, limit)
 
-    return jsonify({
-        "fsq_id": fsq_id,
-        "count": len(tips),
-        "tips": tips,
-    }), 200
+    return (
+        jsonify(
+            {
+                "fsq_id": fsq_id,
+                "count": len(tips),
+                "tips": tips,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/places/categories ────────────────────────────
@@ -334,7 +385,12 @@ def places_categories():
 def places_status():
     """Check if the Foursquare Places service is available."""
     creds = _fsq_creds()
-    return jsonify({
-        "available": is_available(creds),
-        "provider": "Foursquare",
-    }), 200
+    return (
+        jsonify(
+            {
+                "available": is_available(creds),
+                "provider": "Foursquare",
+            }
+        ),
+        200,
+    )

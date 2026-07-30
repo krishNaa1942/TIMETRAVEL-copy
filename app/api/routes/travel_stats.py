@@ -7,7 +7,12 @@ from sqlalchemy import func
 
 from app.models.database import db
 from app.models.entities import (
-    Trip, TripPlace, Reservation, TripPhoto, Expense, Favorite
+    Trip,
+    TripPlace,
+    Reservation,
+    TripPhoto,
+    Expense,
+    Favorite,
 )
 from app.utils.auth import resolve_user_id
 
@@ -62,9 +67,7 @@ def get_travel_stats():
 
     # Total travel days
     total_days = (
-        db.session.query(func.sum(Trip.num_days))
-        .filter(Trip.user_id == uid)
-        .scalar()
+        db.session.query(func.sum(Trip.num_days)).filter(Trip.user_id == uid).scalar()
     ) or 0
 
     # Spending stats (from Expense model)
@@ -130,32 +133,34 @@ def get_travel_stats():
         .all()
     )
 
-    return jsonify({
-        "stats": {
-            "trips": {
-                "total": total_trips,
-                "planning": planning,
-                "active": active,
-                "completed": completed,
-            },
-            "destinations_visited": destinations,
-            "places_visited": places_count,
-            "total_travel_days": int(total_days),
-            "total_spent": round(float(total_spent), 2),
-            "spending_breakdown": spending_breakdown,
-            "reservations": {
-                "total": reservation_count,
-                "by_type": {t: c for t, c in reservation_by_type},
-            },
-            "photos_uploaded": photos_count,
-            "favorites_count": favorites_count,
-            "top_destinations": [
-                {"destination": d, "trips": c} for d, c in top_destinations
-            ],
-            "budget_by_trip": [
-                {"trip": t, "budget": float(b) if b else 0}
-                for t, b in budget_by_trip
-            ],
-            "place_categories": {c: n for c, n in category_breakdown},
+    return jsonify(
+        {
+            "stats": {
+                "trips": {
+                    "total": total_trips,
+                    "planning": planning,
+                    "active": active,
+                    "completed": completed,
+                },
+                "destinations_visited": destinations,
+                "places_visited": places_count,
+                "total_travel_days": int(total_days),
+                "total_spent": round(float(total_spent), 2),
+                "spending_breakdown": spending_breakdown,
+                "reservations": {
+                    "total": reservation_count,
+                    "by_type": {t: c for t, c in reservation_by_type},
+                },
+                "photos_uploaded": photos_count,
+                "favorites_count": favorites_count,
+                "top_destinations": [
+                    {"destination": d, "trips": c} for d, c in top_destinations
+                ],
+                "budget_by_trip": [
+                    {"trip": t, "budget": float(b) if b else 0}
+                    for t, b in budget_by_trip
+                ],
+                "place_categories": {c: n for c, n in category_breakdown},
+            }
         }
-    })
+    )

@@ -15,8 +15,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, Favorite
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -56,6 +56,7 @@ def auth_client(app, client):
 # Unauthenticated access tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestFavoritesUnauth:
     """Unauthenticated requests should be rejected."""
 
@@ -84,6 +85,7 @@ class TestFavoritesUnauth:
 # Add favorite
 # ═══════════════════════════════════════════════════════════
 
+
 class TestAddFavorite:
 
     def test_add_destination(self, auth_client):
@@ -109,11 +111,13 @@ class TestAddFavorite:
     def test_add_with_notes(self, auth_client):
         res = auth_client.post(
             "/api/favorites",
-            data=json.dumps({
-                "item_name": "Goa",
-                "item_type": "destination",
-                "notes": "Beach trip in December",
-            }),
+            data=json.dumps(
+                {
+                    "item_name": "Goa",
+                    "item_type": "destination",
+                    "notes": "Beach trip in December",
+                }
+            ),
             content_type="application/json",
         )
         assert res.status_code == 201
@@ -166,6 +170,7 @@ class TestAddFavorite:
 # List favorites
 # ═══════════════════════════════════════════════════════════
 
+
 class TestListFavorites:
 
     def test_list_empty(self, auth_client):
@@ -210,6 +215,7 @@ class TestListFavorites:
 # Delete favorite
 # ═══════════════════════════════════════════════════════════
 
+
 class TestDeleteFavorite:
 
     def test_delete_existing(self, auth_client):
@@ -236,10 +242,13 @@ class TestDeleteFavorite:
 # Check favorite
 # ═══════════════════════════════════════════════════════════
 
+
 class TestCheckFavorite:
 
     def test_check_not_favorited(self, auth_client):
-        res = auth_client.get("/api/favorites/check?item_name=Goa&item_type=destination")
+        res = auth_client.get(
+            "/api/favorites/check?item_name=Goa&item_type=destination"
+        )
         data = res.get_json()
         assert data["is_favorite"] is False
         assert data["favorite"] is None
@@ -250,7 +259,9 @@ class TestCheckFavorite:
             data=json.dumps({"item_name": "Goa", "item_type": "destination"}),
             content_type="application/json",
         )
-        res = auth_client.get("/api/favorites/check?item_name=Goa&item_type=destination")
+        res = auth_client.get(
+            "/api/favorites/check?item_name=Goa&item_type=destination"
+        )
         data = res.get_json()
         assert data["is_favorite"] is True
         assert data["favorite"]["item_name"] == "Goa"
@@ -264,6 +275,7 @@ class TestCheckFavorite:
 # Model tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestFavoriteModel:
 
     def test_to_dict(self, app):
@@ -273,7 +285,12 @@ class TestFavoriteModel:
             _db.session.add(user)
             _db.session.commit()
 
-            fav = Favorite(user_id=user.id, item_type="destination", item_name="Goa", notes="Beaches!")
+            fav = Favorite(
+                user_id=user.id,
+                item_type="destination",
+                item_name="Goa",
+                notes="Beaches!",
+            )
             _db.session.add(fav)
             _db.session.commit()
 

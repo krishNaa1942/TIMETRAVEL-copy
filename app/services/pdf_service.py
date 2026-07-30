@@ -12,20 +12,20 @@ Uses fpdf2 for lightweight, pure-Python PDF generation.
 import io
 import logging
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from fpdf import FPDF
 
 logger = logging.getLogger(__name__)
 
 # ── Brand colours (RGB) ────────────────────────────────────────────────────
-PRIMARY = (67, 56, 202)       # indigo-600
+PRIMARY = (67, 56, 202)  # indigo-600
 PRIMARY_LIGHT = (99, 102, 241)
-ACCENT = (236, 72, 153)       # pink-500
+ACCENT = (236, 72, 153)  # pink-500
 DARK = (30, 27, 75)
 MUTED = (120, 120, 140)
 WHITE = (255, 255, 255)
-LIGHT_BG = (243, 244, 246)    # gray-100
+LIGHT_BG = (243, 244, 246)  # gray-100
 SUCCESS = (16, 185, 129)
 WARNING = (245, 158, 11)
 DANGER = (239, 68, 68)
@@ -49,8 +49,12 @@ class TripPDF(FPDF):
         self.set_y(-15)
         self.set_font("Helvetica", "I", 8)
         self.set_text_color(*MUTED)
-        self.cell(0, 10, f"Generated on {date.today().strftime('%d %B %Y')}  |  Page {self.page_no()}/{{nb}}",
-                  align="C")
+        self.cell(
+            0,
+            10,
+            f"Generated on {date.today().strftime('%d %B %Y')}  |  Page {self.page_no()}/{{nb}}",
+            align="C",
+        )
 
     @staticmethod
     def _safe(text: str) -> str:
@@ -58,15 +62,14 @@ class TripPDF(FPDF):
         if not text:
             return ""
         return (
-            text
-            .replace("\u2013", "-")   # en-dash
+            text.replace("\u2013", "-")  # en-dash
             .replace("\u2014", "--")  # em-dash
-            .replace("\u2018", "'")   # left single quote
-            .replace("\u2019", "'")   # right single quote
-            .replace("\u201c", '"')   # left double quote
-            .replace("\u201d", '"')   # right double quote
-            .replace("\u2026", "...") # ellipsis
-            .replace("\u20b9", "\u20B9") # rupee sign preserved
+            .replace("\u2018", "'")  # left single quote
+            .replace("\u2019", "'")  # right single quote
+            .replace("\u201c", '"')  # left double quote
+            .replace("\u201d", '"')  # right double quote
+            .replace("\u2026", "...")  # ellipsis
+            .replace("\u20b9", "\u20b9")  # rupee sign preserved
         )
 
     def normalize_text(self, text):
@@ -119,6 +122,7 @@ class TripPDF(FPDF):
 # ═══════════════════════════════════════════════════════════════════════════
 # 1.  ITINERARY PDF
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def generate_itinerary_pdf(data: Dict[str, Any]) -> bytes:
     """
@@ -179,8 +183,14 @@ def generate_itinerary_pdf(data: Dict[str, Any]) -> bytes:
         pdf.set_font("Helvetica", "B", 10)
         day_num = day.get("day", "?")
         title = day.get("title", f"Day {day_num}")
-        pdf.cell(0, 8, f"  Day {day_num}  –  {title}", fill=True,
-                 new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(
+            0,
+            8,
+            f"  Day {day_num}  –  {title}",
+            fill=True,
+            new_x="LMARGIN",
+            new_y="NEXT",
+        )
         pdf.spacer(2)
 
         for period in ("morning", "afternoon", "evening"):
@@ -219,9 +229,10 @@ def generate_itinerary_pdf(data: Dict[str, Any]) -> bytes:
         if day.get("tip"):
             pdf.set_fill_color(255, 251, 235)  # amber-50
             pdf.set_font("Helvetica", "I", 8)
-            pdf.set_text_color(146, 64, 14)    # amber-800
-            pdf.cell(0, 5, f"  Tip: {day['tip']}", fill=True,
-                     new_x="LMARGIN", new_y="NEXT")
+            pdf.set_text_color(146, 64, 14)  # amber-800
+            pdf.cell(
+                0, 5, f"  Tip: {day['tip']}", fill=True, new_x="LMARGIN", new_y="NEXT"
+            )
 
         pdf.spacer(4)
 
@@ -233,6 +244,7 @@ def generate_itinerary_pdf(data: Dict[str, Any]) -> bytes:
 # ═══════════════════════════════════════════════════════════════════════════
 # 2.  BUDGET PDF
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def generate_budget_pdf(data: Dict[str, Any]) -> bytes:
     """
@@ -278,8 +290,15 @@ def generate_budget_pdf(data: Dict[str, Any]) -> bytes:
     pdf.set_text_color(*WHITE)
     pdf.set_font("Helvetica", "B", 10)
     pdf.cell(100, 8, "  Category", fill=True)
-    pdf.cell(0, 8, f"Amount ({currency})", fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        0,
+        8,
+        f"Amount ({currency})",
+        fill=True,
+        align="R",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
 
     alt = False
     for label, key in ITEMS:
@@ -290,8 +309,9 @@ def generate_budget_pdf(data: Dict[str, Any]) -> bytes:
         pdf.cell(100, 7, f"  {label}", fill=True)
         pdf.set_font("Helvetica", "", 9)
         val = data.get(key, 0)
-        pdf.cell(0, 7, _fmt_inr(val), fill=True, align="R",
-                 new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(
+            0, 7, _fmt_inr(val), fill=True, align="R", new_x="LMARGIN", new_y="NEXT"
+        )
         alt = not alt
 
     # Total row
@@ -299,8 +319,15 @@ def generate_budget_pdf(data: Dict[str, Any]) -> bytes:
     pdf.set_text_color(*WHITE)
     pdf.set_font("Helvetica", "B", 11)
     pdf.cell(100, 9, "  TOTAL", fill=True)
-    pdf.cell(0, 9, _fmt_inr(data.get("total", 0)), fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        0,
+        9,
+        _fmt_inr(data.get("total", 0)),
+        fill=True,
+        align="R",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
 
     pdf.spacer(10)
     pdf.muted_text(
@@ -316,6 +343,7 @@ def generate_budget_pdf(data: Dict[str, Any]) -> bytes:
 # ═══════════════════════════════════════════════════════════════════════════
 # 3.  COMPARISON PDF
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def generate_comparison_pdf(data: Dict[str, Any]) -> bytes:
     """
@@ -344,9 +372,7 @@ def generate_comparison_pdf(data: Dict[str, Any]) -> bytes:
     pdf.add_page()
 
     # Title
-    pdf.section_title(
-        f"{p1.get('destination', '?')}  vs  {p2.get('destination', '?')}"
-    )
+    pdf.section_title(f"{p1.get('destination', '?')}  vs  {p2.get('destination', '?')}")
     pdf.muted_text(
         f"{params.get('num_days', '?')} days  |  {params.get('family_size', '?')} people  |  "
         f"{(params.get('travel_class') or 'economy').capitalize()} class"
@@ -393,8 +419,15 @@ def _comparison_budget_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
     pdf.set_font("Helvetica", "B", 9)
     pdf.cell(60, 7, "  Category", fill=True)
     pdf.cell(col_w - 30, 7, p1.get("destination", "Dest 1"), fill=True, align="R")
-    pdf.cell(col_w - 30, 7, p2.get("destination", "Dest 2"), fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        col_w - 30,
+        7,
+        p2.get("destination", "Dest 2"),
+        fill=True,
+        align="R",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
 
     alt = False
     for label, key in ITEMS:
@@ -406,8 +439,15 @@ def _comparison_budget_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
         v1 = b1.get(key, 0)
         v2 = b2.get(key, 0)
         pdf.cell(col_w - 30, 6, _fmt_inr(v1), fill=True, align="R")
-        pdf.cell(col_w - 30, 6, _fmt_inr(v2), fill=True, align="R",
-                 new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(
+            col_w - 30,
+            6,
+            _fmt_inr(v2),
+            fill=True,
+            align="R",
+            new_x="LMARGIN",
+            new_y="NEXT",
+        )
         alt = not alt
 
     # Totals
@@ -429,8 +469,9 @@ def _comparison_budget_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
         pdf.set_text_color(*SUCCESS)
     else:
         pdf.set_text_color(*WHITE)
-    pdf.cell(col_w - 30, 7, _fmt_inr(t2), fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        col_w - 30, 7, _fmt_inr(t2), fill=True, align="R", new_x="LMARGIN", new_y="NEXT"
+    )
 
 
 def _comparison_safety_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
@@ -452,8 +493,15 @@ def _comparison_safety_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
     pdf.set_font("Helvetica", "B", 9)
     pdf.cell(60, 7, "  Metric", fill=True)
     pdf.cell(col_w - 30, 7, p1.get("destination", "Dest 1"), fill=True, align="R")
-    pdf.cell(col_w - 30, 7, p2.get("destination", "Dest 2"), fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        col_w - 30,
+        7,
+        p2.get("destination", "Dest 2"),
+        fill=True,
+        align="R",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
 
     alt = False
     for label, key in SCORES:
@@ -467,8 +515,15 @@ def _comparison_safety_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
         pdf.set_text_color(*_score_color(v1))
         pdf.cell(col_w - 30, 6, f"{v1}/10", fill=True, align="R")
         pdf.set_text_color(*_score_color(v2))
-        pdf.cell(col_w - 30, 6, f"{v2}/10", fill=True, align="R",
-                 new_x="LMARGIN", new_y="NEXT")
+        pdf.cell(
+            col_w - 30,
+            6,
+            f"{v2}/10",
+            fill=True,
+            align="R",
+            new_x="LMARGIN",
+            new_y="NEXT",
+        )
         alt = not alt
 
     # Advisory lines
@@ -504,8 +559,15 @@ def _comparison_weather_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
     pdf.set_font("Helvetica", "B", 9)
     pdf.cell(60, 7, "  Metric", fill=True)
     pdf.cell(col_w - 30, 7, p1.get("destination", "Dest 1"), fill=True, align="R")
-    pdf.cell(col_w - 30, 7, p2.get("destination", "Dest 2"), fill=True, align="R",
-             new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        col_w - 30,
+        7,
+        p2.get("destination", "Dest 2"),
+        fill=True,
+        align="R",
+        new_x="LMARGIN",
+        new_y="NEXT",
+    )
 
     alt = False
     for label, key, suffix in METRICS:
@@ -530,6 +592,7 @@ def _comparison_weather_table(pdf: TripPDF, p1: dict, p2: dict, col_w: float):
 # ═══════════════════════════════════════════════════════════════════════════
 # Utilities
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 def _fmt_inr(val) -> str:
     """Format a number as ₹ Indian Rupees with commas."""

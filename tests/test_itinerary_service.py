@@ -37,9 +37,24 @@ class TestExtractJson:
 SAMPLE_DAY = {
     "day": 1,
     "title": "Arrival in Goa",
-    "morning": {"activity": "Check-in", "description": "Hotel check-in", "duration": "1 hour", "cost": "₹0"},
-    "afternoon": {"activity": "Beach", "description": "Visit Baga Beach", "duration": "3 hours", "cost": "₹500"},
-    "evening": {"activity": "Dinner", "description": "Seafood at Britto's", "duration": "2 hours", "cost": "₹1500"},
+    "morning": {
+        "activity": "Check-in",
+        "description": "Hotel check-in",
+        "duration": "1 hour",
+        "cost": "₹0",
+    },
+    "afternoon": {
+        "activity": "Beach",
+        "description": "Visit Baga Beach",
+        "duration": "3 hours",
+        "cost": "₹500",
+    },
+    "evening": {
+        "activity": "Dinner",
+        "description": "Seafood at Britto's",
+        "duration": "2 hours",
+        "cost": "₹1500",
+    },
     "tip": "Carry sunscreen",
 }
 

@@ -48,12 +48,17 @@ def travel_news():
 
     articles = get_travel_news(key, destination, category, limit)
 
-    return jsonify({
-        "count": len(articles),
-        "destination": destination or "India",
-        "category": category,
-        "articles": articles,
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(articles),
+                "destination": destination or "India",
+                "category": category,
+                "articles": articles,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/news/trending ────────────────────────────────
@@ -67,10 +72,15 @@ def trending_news():
     limit = request.args.get("limit", 10, type=int)
     articles = get_trending_travel(key, limit)
 
-    return jsonify({
-        "count": len(articles),
-        "articles": articles,
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(articles),
+                "articles": articles,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/news/safety ──────────────────────────────────
@@ -85,11 +95,16 @@ def safety_news():
     limit = request.args.get("limit", 5, type=int)
     articles = get_safety_news(key, destination, limit)
 
-    return jsonify({
-        "count": len(articles),
-        "destination": destination or "India",
-        "articles": articles,
-    }), 200
+    return (
+        jsonify(
+            {
+                "count": len(articles),
+                "destination": destination or "India",
+                "articles": articles,
+            }
+        ),
+        200,
+    )
 
 
 # ── GET /api/news/destinations ────────────────────────────
@@ -104,7 +119,12 @@ def news_destinations():
 def news_status():
     """Check if NewsAPI is available."""
     key = _news_key()
-    return jsonify({
-        "available": is_available(key),
-        "provider": "NewsAPI",
-    }), 200
+    return (
+        jsonify(
+            {
+                "available": is_available(key),
+                "provider": "NewsAPI",
+            }
+        ),
+        200,
+    )

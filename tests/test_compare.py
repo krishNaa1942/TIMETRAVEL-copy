@@ -94,6 +94,7 @@ class TestCompareSuccess:
     @patch("app.api.routes.compare.fetch_weather")
     def test_compare_weather_when_available(self, mock_weather, client, app):
         from app.models.schemas import WeatherResponse
+
         mock_weather.return_value = WeatherResponse(
             destination="Goa",
             temperature_c=32.5,
@@ -109,8 +110,9 @@ class TestCompareSuccess:
         data = resp.get_json()
 
         # At least one profile should have weather data
-        assert data["dest1"]["weather"] is not None or \
-               data["dest2"]["weather"] is not None
+        assert (
+            data["dest1"]["weather"] is not None or data["dest2"]["weather"] is not None
+        )
 
     @patch("app.services.weather_service.fetch_weather")
     def test_compare_weather_null_when_no_key(self, mock_weather, client, app):
@@ -126,9 +128,21 @@ class TestCompareSuccess:
         """Verify all valid destinations work in comparison."""
         mock_weather.return_value = None
         dests = [
-            "Goa", "Jaipur", "Manali", "Munnar", "Shimla",
-            "Varanasi", "Udaipur", "Mumbai", "Delhi", "Agra",
-            "Rishikesh", "Ooty", "Darjeeling", "Pondicherry", "Andaman",
+            "Goa",
+            "Jaipur",
+            "Manali",
+            "Munnar",
+            "Shimla",
+            "Varanasi",
+            "Udaipur",
+            "Mumbai",
+            "Delhi",
+            "Agra",
+            "Rishikesh",
+            "Ooty",
+            "Darjeeling",
+            "Pondicherry",
+            "Andaman",
         ]
         # Test first vs last
         resp = client.get(f"/api/compare?dest1={dests[0]}&dest2={dests[-1]}")

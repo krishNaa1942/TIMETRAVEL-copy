@@ -19,7 +19,9 @@ from urllib.parse import quote
 logger = logging.getLogger(__name__)
 
 
-def get_booking_links(destination: str, checkin: str = "", checkout: str = "", guests: int = 2) -> dict:
+def get_booking_links(
+    destination: str, checkin: str = "", checkout: str = "", guests: int = 2
+) -> dict:
     """
     Generate search/booking URLs for a destination.
 
@@ -104,7 +106,7 @@ def get_booking_links(destination: str, checkin: str = "", checkout: str = "", g
         "trains": [
             {
                 "platform": "IRCTC",
-                "url": f"https://www.irctc.co.in/nget/train-search",
+                "url": "https://www.irctc.co.in/nget/train-search",
                 "icon": "fas fa-train",
                 "color": "#1A237E",
                 "description": "Indian Railways official booking",

@@ -36,6 +36,7 @@ class TestFetchWeather:
     @patch("app.services.weather_service.requests.get")
     def test_api_error_returns_none(self, mock_get):
         import requests
+
         mock_get.side_effect = requests.RequestException("API down")
         result = fetch_weather("Jaipur", api_key="key")
         assert result is None
@@ -61,6 +62,7 @@ class TestFetchWeather:
     def test_http_error_returns_none(self, mock_get):
         mock_resp = MagicMock()
         import requests
+
         mock_resp.raise_for_status.side_effect = requests.HTTPError("404")
         mock_get.return_value = mock_resp
         result = fetch_weather("Nowhere", api_key="key")

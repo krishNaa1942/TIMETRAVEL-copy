@@ -15,10 +15,10 @@ from app.utils.constants import (
     DESTINATION_LABELS,
 )
 
-
 # ═══════════════════════════════════════════════════════════
 # Registry unit tests
 # ═══════════════════════════════════════════════════════════
+
 
 class TestDestinationsRegistry:
     """Verify the central DESTINATIONS dict and derived helpers."""
@@ -76,17 +76,36 @@ class TestDestinationsRegistry:
             assert DESTINATION_LABELS[key] == DESTINATIONS[key]["label"]
 
     def test_known_destinations_present(self):
-        expected = {"goa", "jaipur", "manali", "shimla",
-                    "varanasi", "udaipur", "mumbai", "delhi", "agra",
-                    "rishikesh", "ooty", "darjeeling", "pondicherry", "andaman",
-                    "munnar", "mysore", "amritsar", "leh_ladakh", "coorg",
-                    "jaisalmer", "alleppey"}
+        expected = {
+            "goa",
+            "jaipur",
+            "manali",
+            "shimla",
+            "varanasi",
+            "udaipur",
+            "mumbai",
+            "delhi",
+            "agra",
+            "rishikesh",
+            "ooty",
+            "darjeeling",
+            "pondicherry",
+            "andaman",
+            "munnar",
+            "mysore",
+            "amritsar",
+            "leh_ladakh",
+            "coorg",
+            "jaisalmer",
+            "alleppey",
+        }
         assert expected.issubset(set(DESTINATIONS.keys()))
 
 
 # ═══════════════════════════════════════════════════════════
 # API endpoint tests
 # ═══════════════════════════════════════════════════════════
+
 
 class TestDestinationsAPI:
     """GET /api/destinations should return the full destination list."""
@@ -135,25 +154,31 @@ class TestDestinationsAPI:
 # Integration: services import from registry
 # ═══════════════════════════════════════════════════════════
 
+
 class TestServicesUseRegistry:
     """Verify that services import destination data from the central registry."""
 
     def test_maps_service_uses_registry_coords(self):
         from app.services.maps_service import DESTINATION_COORDS as maps_coords
+
         assert maps_coords is DESTINATION_COORDS
 
     def test_unsplash_service_uses_registry_keywords(self):
         from app.services.unsplash_service import DESTINATION_KEYWORDS
+
         assert DESTINATION_KEYWORDS is DESTINATION_UNSPLASH_KW
 
     def test_news_service_uses_registry_keywords(self):
         from app.services.news_service import DESTINATION_KEYWORDS
+
         assert DESTINATION_KEYWORDS is DESTINATION_NEWS_KW
 
     def test_itinerary_route_uses_registry_names(self):
         from app.api.routes.itinerary import VALID_DESTINATIONS
+
         assert VALID_DESTINATIONS is VALID_DESTINATION_NAMES
 
     def test_compare_route_uses_registry_names(self):
         from app.api.routes.compare import VALID_DESTINATIONS
+
         assert VALID_DESTINATIONS is VALID_DESTINATION_NAMES

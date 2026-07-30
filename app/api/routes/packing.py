@@ -70,11 +70,13 @@ def generate_checklist():
         items.append(item)
 
     db.session.commit()
-    return jsonify({
-        "message": f"Generated {len(items)} packing items",
-        "items": [i.to_dict() for i in items],
-        "weather_available": weather is not None,
-    })
+    return jsonify(
+        {
+            "message": f"Generated {len(items)} packing items",
+            "items": [i.to_dict() for i in items],
+            "weather_available": weather is not None,
+        }
+    )
 
 
 @packing_bp.route("/api/packing", methods=["GET"])
@@ -90,12 +92,14 @@ def get_checklist():
     items = query.order_by(PackingItem.is_custom, PackingItem.id).all()
     checked = sum(1 for i in items if i.is_checked)
 
-    return jsonify({
-        "items": [i.to_dict() for i in items],
-        "total": len(items),
-        "checked": checked,
-        "progress": round(checked / len(items) * 100) if items else 0,
-    })
+    return jsonify(
+        {
+            "items": [i.to_dict() for i in items],
+            "total": len(items),
+            "checked": checked,
+            "progress": round(checked / len(items) * 100) if items else 0,
+        }
+    )
 
 
 @packing_bp.route("/api/packing/<int:item_id>/toggle", methods=["PUT"])

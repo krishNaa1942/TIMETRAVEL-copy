@@ -5,7 +5,7 @@ Provides a single `resolve_authenticated_user()` that handles both
 Flask-Login session auth (v1) and JWT bearer token auth (v2).
 """
 
-from typing import Optional, Union
+from typing import Optional
 
 from flask import g, request
 from flask_login import current_user

@@ -35,42 +35,43 @@ CACHE_TTL = 1800  # 30 minutes
 
 # ── Foursquare category IDs for Indian tourism ───────────────────────
 CATEGORY_MAP = {
-    "tourist attraction": "16000",   # Landmarks and Outdoors
-    "restaurant":         "13000",   # Dining and Drinking
-    "hotel":              "19014",   # Hotels and Motels
-    "temple":             "12098",   # Temples
-    "hospital":           "15014",   # Hospitals
-    "beach":              "16003",   # Beaches
-    "museum":             "10027",   # Museums
-    "shopping":           "17000",   # Retail
-    "atm":                "11044",   # ATMs
-    "cafe":               "13032",   # Cafes
-    "nightlife":          "10032",   # Nightlife
-    "park":               "16032",   # Parks
-    "spa":                "11192",   # Spas
-    "pharmacy":           "17035",   # Pharmacies
+    "tourist attraction": "16000",  # Landmarks and Outdoors
+    "restaurant": "13000",  # Dining and Drinking
+    "hotel": "19014",  # Hotels and Motels
+    "temple": "12098",  # Temples
+    "hospital": "15014",  # Hospitals
+    "beach": "16003",  # Beaches
+    "museum": "10027",  # Museums
+    "shopping": "17000",  # Retail
+    "atm": "11044",  # ATMs
+    "cafe": "13032",  # Cafes
+    "nightlife": "10032",  # Nightlife
+    "park": "16032",  # Parks
+    "spa": "11192",  # Spas
+    "pharmacy": "17035",  # Pharmacies
 }
 
 # v2 needs different category IDs (Foursquare v2 uses full IDs)
 CATEGORY_MAP_V2 = {
     "tourist attraction": "4bf58dd8d48988d12d941735",
-    "restaurant":         "4d4b7105d754a06374d81259",
-    "hotel":              "4bf58dd8d48988d1fa931735",
-    "temple":             "4bf58dd8d48988d131941735",
-    "hospital":           "4bf58dd8d48988d196941735",
-    "beach":              "4bf58dd8d48988d1e2941735",
-    "museum":             "4bf58dd8d48988d181941735",
-    "shopping":           "4d4b7105d754a06378d81259",
-    "atm":                "52f2ab2ebcbc57f1066b8b56",
-    "cafe":               "4bf58dd8d48988d16d941735",
-    "nightlife":          "4d4b7105d754a06376d81259",
-    "park":               "4bf58dd8d48988d163941735",
-    "spa":                "4bf58dd8d48988d1ed941735",
-    "pharmacy":           "4bf58dd8d48988d10f951735",
+    "restaurant": "4d4b7105d754a06374d81259",
+    "hotel": "4bf58dd8d48988d1fa931735",
+    "temple": "4bf58dd8d48988d131941735",
+    "hospital": "4bf58dd8d48988d196941735",
+    "beach": "4bf58dd8d48988d1e2941735",
+    "museum": "4bf58dd8d48988d181941735",
+    "shopping": "4d4b7105d754a06378d81259",
+    "atm": "52f2ab2ebcbc57f1066b8b56",
+    "cafe": "4bf58dd8d48988d16d941735",
+    "nightlife": "4d4b7105d754a06376d81259",
+    "park": "4bf58dd8d48988d163941735",
+    "spa": "4bf58dd8d48988d1ed941735",
+    "pharmacy": "4bf58dd8d48988d10f951735",
 }
 
 
 # ── Credential helpers ────────────────────────────────────────────────
+
 
 def _extract_creds(creds: Union[str, dict]) -> dict:
     """Normalise credentials to a dict with api_key, client_id, client_secret."""
@@ -90,8 +91,12 @@ def _use_v3(c: dict) -> bool:
 
 def _use_v2(c: dict) -> bool:
     """Return True when v2 client credentials are available."""
-    return bool(c["client_id"] and c["client_secret"]
-                and len(c["client_id"]) > 10 and len(c["client_secret"]) > 10)
+    return bool(
+        c["client_id"]
+        and c["client_secret"]
+        and len(c["client_id"]) > 10
+        and len(c["client_secret"]) > 10
+    )
 
 
 def _v3_headers(api_key: str) -> dict:
@@ -99,7 +104,11 @@ def _v3_headers(api_key: str) -> dict:
 
 
 def _v2_params(c: dict) -> dict:
-    return {"client_id": c["client_id"], "client_secret": c["client_secret"], "v": V2_VERSION}
+    return {
+        "client_id": c["client_id"],
+        "client_secret": c["client_secret"],
+        "v": V2_VERSION,
+    }
 
 
 def _cache_key(prefix: str, *args) -> str:
@@ -115,6 +124,7 @@ def _is_cached(key: str) -> bool:
 # ══════════════════════════════════════════════════════════════════════
 # PLACE SEARCH
 # ══════════════════════════════════════════════════════════════════════
+
 
 def search_places(
     lat: float,
@@ -161,7 +171,7 @@ def _search_v3(lat, lon, api_key, category, radius, limit, query):
         "limit": min(limit, 50),
         "sort": "RELEVANCE",
         "fields": "fsq_id,name,categories,location,distance,price,rating,"
-                  "popularity,verified,website,tel,hours,closed_bucket",
+        "popularity,verified,website,tel,hours,closed_bucket",
     }
     cat_id = CATEGORY_MAP.get(category.lower())
     if cat_id:
@@ -177,7 +187,9 @@ def _search_v3(lat, lon, api_key, category, radius, limit, query):
             timeout=10,
         )
         if resp.status_code in (401, 403):
-            logger.warning("Foursquare v3 auth failed (%s), will try v2", resp.status_code)
+            logger.warning(
+                "Foursquare v3 auth failed (%s), will try v2", resp.status_code
+            )
             return None  # signal to try v2
         resp.raise_for_status()
         return _parse_v3_results(resp.json().get("results", []), category, lat, lon)
@@ -189,11 +201,13 @@ def _search_v3(lat, lon, api_key, category, radius, limit, query):
 @api_retry
 def _search_v2(lat, lon, c, category, radius, limit, query):
     """Search via Foursquare API v2 (client_id + client_secret)."""
-    params = {**_v2_params(c),
-              "ll": f"{lat},{lon}",
-              "radius": min(radius, 100000),
-              "limit": min(limit, 50),
-              "intent": "browse"}
+    params = {
+        **_v2_params(c),
+        "ll": f"{lat},{lon}",
+        "radius": min(radius, 100000),
+        "limit": min(limit, 50),
+        "intent": "browse",
+    }
 
     cat_id = CATEGORY_MAP_V2.get(category.lower())
     if cat_id:
@@ -223,26 +237,28 @@ def _parse_v3_results(results, category, lat, lon):
         cat_names = [c.get("short_name", c.get("name", "")) for c in cats]
         hours_info = r.get("hours", {})
 
-        places.append({
-            "fsq_id": r.get("fsq_id", ""),
-            "name": r.get("name", "Unknown"),
-            "category": cat_names[0] if cat_names else category,
-            "categories": cat_names,
-            "address": loc.get("formatted_address", loc.get("address", "")),
-            "locality": loc.get("locality", ""),
-            "region": loc.get("region", ""),
-            "lat": loc.get("latitude") or lat,
-            "lon": loc.get("longitude") or lon,
-            "distance_m": r.get("distance", 0),
-            "price_tier": r.get("price"),
-            "rating": r.get("rating"),
-            "popularity": r.get("popularity"),
-            "verified": r.get("verified", False),
-            "website": r.get("website"),
-            "phone": r.get("tel"),
-            "hours_display": hours_info.get("display") if hours_info else None,
-            "is_open": _parse_open_status(r.get("closed_bucket")),
-        })
+        places.append(
+            {
+                "fsq_id": r.get("fsq_id", ""),
+                "name": r.get("name", "Unknown"),
+                "category": cat_names[0] if cat_names else category,
+                "categories": cat_names,
+                "address": loc.get("formatted_address", loc.get("address", "")),
+                "locality": loc.get("locality", ""),
+                "region": loc.get("region", ""),
+                "lat": loc.get("latitude") or lat,
+                "lon": loc.get("longitude") or lon,
+                "distance_m": r.get("distance", 0),
+                "price_tier": r.get("price"),
+                "rating": r.get("rating"),
+                "popularity": r.get("popularity"),
+                "verified": r.get("verified", False),
+                "website": r.get("website"),
+                "phone": r.get("tel"),
+                "hours_display": hours_info.get("display") if hours_info else None,
+                "is_open": _parse_open_status(r.get("closed_bucket")),
+            }
+        )
     logger.info("Foursquare v3: found %d places for '%s'", len(places), category)
     return places
 
@@ -257,26 +273,32 @@ def _parse_v2_venues(venues, category, lat, lon):
         addr_parts = loc.get("formattedAddress", [])
         address = ", ".join(addr_parts) if addr_parts else loc.get("address", "")
 
-        places.append({
-            "fsq_id": v.get("id", ""),
-            "name": v.get("name", "Unknown"),
-            "category": cat_names[0] if cat_names else category,
-            "categories": cat_names,
-            "address": address,
-            "locality": loc.get("city", ""),
-            "region": loc.get("state", ""),
-            "lat": loc.get("lat") or lat,
-            "lon": loc.get("lng") or lon,
-            "distance_m": loc.get("distance", 0),
-            "price_tier": v.get("price", {}).get("tier") if v.get("price") else None,
-            "rating": (v.get("rating") or 0) / 1,  # v2 rating is 0-10
-            "popularity": None,
-            "verified": v.get("verified", False),
-            "website": v.get("url"),
-            "phone": v.get("contact", {}).get("formattedPhone"),
-            "hours_display": v.get("hours", {}).get("status") if v.get("hours") else None,
-            "is_open": v.get("hours", {}).get("isOpen") if v.get("hours") else None,
-        })
+        places.append(
+            {
+                "fsq_id": v.get("id", ""),
+                "name": v.get("name", "Unknown"),
+                "category": cat_names[0] if cat_names else category,
+                "categories": cat_names,
+                "address": address,
+                "locality": loc.get("city", ""),
+                "region": loc.get("state", ""),
+                "lat": loc.get("lat") or lat,
+                "lon": loc.get("lng") or lon,
+                "distance_m": loc.get("distance", 0),
+                "price_tier": (
+                    v.get("price", {}).get("tier") if v.get("price") else None
+                ),
+                "rating": (v.get("rating") or 0) / 1,  # v2 rating is 0-10
+                "popularity": None,
+                "verified": v.get("verified", False),
+                "website": v.get("url"),
+                "phone": v.get("contact", {}).get("formattedPhone"),
+                "hours_display": (
+                    v.get("hours", {}).get("status") if v.get("hours") else None
+                ),
+                "is_open": v.get("hours", {}).get("isOpen") if v.get("hours") else None,
+            }
+        )
     logger.info("Foursquare v2: found %d places for '%s'", len(places), category)
     return places
 
@@ -291,6 +313,7 @@ def _parse_open_status(bucket: Optional[str]) -> Optional[bool]:
 # ══════════════════════════════════════════════════════════════════════
 # PLACE DETAILS
 # ══════════════════════════════════════════════════════════════════════
+
 
 def get_place_details(fsq_id: str, creds: Union[str, dict]) -> Optional[dict]:
     """Get detailed info about a specific place (tries v3 then v2)."""
@@ -400,11 +423,15 @@ def _build_detail_from_v3(data, fsq_id):
         "total_tips": stats.get("total_tips", 0),
         "tastes": data.get("tastes", []),
         "features": _flatten_features(data.get("features", {})),
-        "social_media": {
-            "facebook": social.get("facebook_id"),
-            "instagram": social.get("instagram"),
-            "twitter": social.get("twitter"),
-        } if social else {},
+        "social_media": (
+            {
+                "facebook": social.get("facebook_id"),
+                "instagram": social.get("instagram"),
+                "twitter": social.get("twitter"),
+            }
+            if social
+            else {}
+        ),
     }
 
 
@@ -426,7 +453,9 @@ def _build_detail_from_v2(venue, fsq_id):
         "region": loc.get("state", ""),
         "lat": loc.get("lat"),
         "lon": loc.get("lng"),
-        "price_tier": venue.get("price", {}).get("tier") if venue.get("price") else None,
+        "price_tier": (
+            venue.get("price", {}).get("tier") if venue.get("price") else None
+        ),
         "rating": venue.get("rating"),
         "popularity": None,
         "verified": venue.get("verified", False),
@@ -436,10 +465,19 @@ def _build_detail_from_v2(venue, fsq_id):
         "hours_display": hours_info.get("status") if hours_info else None,
         "hours_open_now": hours_info.get("isOpen") if hours_info else None,
         "menu_url": venue.get("menu", {}).get("url") if venue.get("menu") else None,
-        "total_photos": stats.get("photos", 0) if isinstance(stats.get("photos"), int) else 0,
+        "total_photos": (
+            stats.get("photos", 0) if isinstance(stats.get("photos"), int) else 0
+        ),
         "total_ratings": 0,
         "total_tips": stats.get("tips", 0) if isinstance(stats.get("tips"), int) else 0,
-        "tastes": venue.get("attributes", {}).get("groups", [{}])[0].get("summary", "").split(", ") if venue.get("attributes", {}).get("groups") else [],
+        "tastes": (
+            venue.get("attributes", {})
+            .get("groups", [{}])[0]
+            .get("summary", "")
+            .split(", ")
+            if venue.get("attributes", {}).get("groups")
+            else []
+        ),
         "features": [],
         "social_media": {},
     }
@@ -467,6 +505,7 @@ def _flatten_features(features: dict) -> list:
 # ══════════════════════════════════════════════════════════════════════
 # PLACE TIPS
 # ══════════════════════════════════════════════════════════════════════
+
 
 def get_place_tips(fsq_id: str, creds: Union[str, dict], limit: int = 5) -> list:
     """Get user tips/reviews for a place (v3 then v2 fallback)."""
@@ -498,7 +537,11 @@ def _tips_v3(fsq_id, api_key, limit):
             return None
         resp.raise_for_status()
         return [
-            {"text": t.get("text", ""), "created_at": t.get("created_at", ""), "agree_count": t.get("agree_count", 0)}
+            {
+                "text": t.get("text", ""),
+                "created_at": t.get("created_at", ""),
+                "agree_count": t.get("agree_count", 0),
+            }
             for t in resp.json()
         ]
     except requests.exceptions.RequestException as e:
@@ -519,7 +562,11 @@ def _tips_v2(fsq_id, c, limit):
         resp.raise_for_status()
         items = resp.json().get("response", {}).get("tips", {}).get("items", [])
         return [
-            {"text": t.get("text", ""), "created_at": t.get("createdAt", ""), "agree_count": t.get("agreeCount", 0)}
+            {
+                "text": t.get("text", ""),
+                "created_at": t.get("createdAt", ""),
+                "agree_count": t.get("agreeCount", 0),
+            }
             for t in items
         ]
     except requests.exceptions.RequestException as e:
@@ -530,6 +577,7 @@ def _tips_v2(fsq_id, c, limit):
 # ══════════════════════════════════════════════════════════════════════
 # PLACE PHOTOS
 # ══════════════════════════════════════════════════════════════════════
+
 
 def get_place_photos(fsq_id: str, creds: Union[str, dict], limit: int = 6) -> list:
     """Get photos for a place (v3 then v2 fallback)."""
@@ -565,14 +613,16 @@ def _photos_v3(fsq_id, api_key, limit):
             prefix = p.get("prefix", "")
             suffix = p.get("suffix", "")
             if prefix and suffix:
-                photos.append({
-                    "url": f"{prefix}original{suffix}",
-                    "url_medium": f"{prefix}440x440{suffix}",
-                    "url_thumb": f"{prefix}120x120{suffix}",
-                    "width": p.get("width", 0),
-                    "height": p.get("height", 0),
-                    "created_at": p.get("created_at", ""),
-                })
+                photos.append(
+                    {
+                        "url": f"{prefix}original{suffix}",
+                        "url_medium": f"{prefix}440x440{suffix}",
+                        "url_thumb": f"{prefix}120x120{suffix}",
+                        "width": p.get("width", 0),
+                        "height": p.get("height", 0),
+                        "created_at": p.get("created_at", ""),
+                    }
+                )
         return photos
     except requests.exceptions.RequestException as e:
         logger.error("v3 photos error for %s: %s", fsq_id, e)
@@ -596,14 +646,16 @@ def _photos_v2(fsq_id, c, limit):
             prefix = p.get("prefix", "")
             suffix = p.get("suffix", "")
             if prefix and suffix:
-                photos.append({
-                    "url": f"{prefix}original{suffix}",
-                    "url_medium": f"{prefix}440x440{suffix}",
-                    "url_thumb": f"{prefix}120x120{suffix}",
-                    "width": p.get("width", 0),
-                    "height": p.get("height", 0),
-                    "created_at": p.get("createdAt", ""),
-                })
+                photos.append(
+                    {
+                        "url": f"{prefix}original{suffix}",
+                        "url_medium": f"{prefix}440x440{suffix}",
+                        "url_thumb": f"{prefix}120x120{suffix}",
+                        "width": p.get("width", 0),
+                        "height": p.get("height", 0),
+                        "created_at": p.get("createdAt", ""),
+                    }
+                )
         return photos
     except requests.exceptions.RequestException as e:
         logger.error("v2 photos error for %s: %s", fsq_id, e)
@@ -613,6 +665,7 @@ def _photos_v2(fsq_id, c, limit):
 # ══════════════════════════════════════════════════════════════════════
 # CATEGORIES & STATUS
 # ══════════════════════════════════════════════════════════════════════
+
 
 def get_categories() -> list:
     """Return the supported category keys and labels."""

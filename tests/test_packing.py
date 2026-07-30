@@ -17,8 +17,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, PackingItem
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -43,13 +43,17 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
 # ═══════════════════════════════════════════════════════════
 # Unauthenticated access
 # ═══════════════════════════════════════════════════════════
+
 
 class TestPackingUnauth:
     def test_generate_unauth(self, client):
@@ -65,7 +69,9 @@ class TestPackingUnauth:
         assert res.status_code == 401
 
     def test_add_custom_unauth(self, client):
-        res = client.post("/api/packing/custom", json={"destination": "Goa", "item_text": "Hat"})
+        res = client.post(
+            "/api/packing/custom", json={"destination": "Goa", "item_text": "Hat"}
+        )
         assert res.status_code == 401
 
     def test_delete_unauth(self, client):
@@ -76,6 +82,7 @@ class TestPackingUnauth:
 # ═══════════════════════════════════════════════════════════
 # Generate Checklist
 # ═══════════════════════════════════════════════════════════
+
 
 class TestPackingGenerate:
     @patch("app.api.routes.packing.fetch_weather")
@@ -90,7 +97,9 @@ class TestPackingGenerate:
 
     @patch("app.api.routes.packing.fetch_weather")
     @patch("app.api.routes.packing.suggest_packing")
-    def test_generate_checklist_with_weather(self, mock_suggest, mock_weather, auth_client):
+    def test_generate_checklist_with_weather(
+        self, mock_suggest, mock_weather, auth_client
+    ):
         """When weather available, should use suggest_packing result."""
         weather = MagicMock()
         weather.temp_c = 32
@@ -113,6 +122,7 @@ class TestPackingGenerate:
 # Get / Toggle / Custom / Delete
 # ═══════════════════════════════════════════════════════════
 
+
 class TestPackingCRUD:
     def test_get_checklist_empty(self, auth_client):
         res = auth_client.get("/api/packing")
@@ -123,10 +133,13 @@ class TestPackingCRUD:
         assert data["progress"] == 0
 
     def test_add_custom_item(self, auth_client):
-        res = auth_client.post("/api/packing/custom", json={
-            "destination": "Goa",
-            "item_text": "Snorkeling mask",
-        })
+        res = auth_client.post(
+            "/api/packing/custom",
+            json={
+                "destination": "Goa",
+                "item_text": "Snorkeling mask",
+            },
+        )
         assert res.status_code == 201
         item = res.get_json()["item"]
         assert item["item_text"] == "Snorkeling mask"
@@ -139,10 +152,13 @@ class TestPackingCRUD:
 
     def test_toggle_item(self, auth_client):
         # Add an item first
-        add_res = auth_client.post("/api/packing/custom", json={
-            "destination": "Goa",
-            "item_text": "Flip flops",
-        })
+        add_res = auth_client.post(
+            "/api/packing/custom",
+            json={
+                "destination": "Goa",
+                "item_text": "Flip flops",
+            },
+        )
         item_id = add_res.get_json()["item"]["id"]
 
         # Toggle to checked
@@ -156,10 +172,13 @@ class TestPackingCRUD:
         assert res.get_json()["item"]["is_checked"] is False
 
     def test_delete_custom_item(self, auth_client):
-        add_res = auth_client.post("/api/packing/custom", json={
-            "destination": "Goa",
-            "item_text": "Extra towel",
-        })
+        add_res = auth_client.post(
+            "/api/packing/custom",
+            json={
+                "destination": "Goa",
+                "item_text": "Extra towel",
+            },
+        )
         item_id = add_res.get_json()["item"]["id"]
         res = auth_client.delete(f"/api/packing/{item_id}")
         assert res.status_code == 200
@@ -183,8 +202,12 @@ class TestPackingCRUD:
         assert res.status_code == 400
 
     def test_get_checklist_with_progress(self, auth_client):
-        auth_client.post("/api/packing/custom", json={"destination": "Goa", "item_text": "A"})
-        add_res = auth_client.post("/api/packing/custom", json={"destination": "Goa", "item_text": "B"})
+        auth_client.post(
+            "/api/packing/custom", json={"destination": "Goa", "item_text": "A"}
+        )
+        add_res = auth_client.post(
+            "/api/packing/custom", json={"destination": "Goa", "item_text": "B"}
+        )
         item_id = add_res.get_json()["item"]["id"]
         auth_client.put(f"/api/packing/{item_id}/toggle")
 
@@ -199,6 +222,7 @@ class TestPackingCRUD:
 # Ownership
 # ═══════════════════════════════════════════════════════════
 
+
 class TestPackingOwnership:
     def test_cannot_toggle_other_users_item(self, app, client):
         with app.app_context():
@@ -207,8 +231,13 @@ class TestPackingOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
-        add_res = client.post("/api/packing/custom", json={"destination": "Goa", "item_text": "X"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
+        add_res = client.post(
+            "/api/packing/custom", json={"destination": "Goa", "item_text": "X"}
+        )
         item_id = add_res.get_json()["item"]["id"]
         client.post("/api/auth/logout")
 
@@ -218,6 +247,9 @@ class TestPackingOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.put(f"/api/packing/{item_id}/toggle")
         assert res.status_code == 403

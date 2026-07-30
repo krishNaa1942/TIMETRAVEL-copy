@@ -71,6 +71,7 @@ def create_app(config_class=None):
     sentry_dsn = os.environ.get("SENTRY_DSN", "")
     if sentry_dsn:
         import sentry_sdk
+
         traces_rate = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.0"))
         sentry_sdk.init(
             dsn=sentry_dsn,
@@ -84,10 +85,12 @@ def create_app(config_class=None):
 
     # ── Initialise database ─────────────────────────────────────────
     from app.models.database import init_db, db
+
     init_db(app)
 
     # ── Initialise CSRF protection ──────────────────────────────────
     csrf.init_app(app)
+
     # ── Initialise CORS for mobile app support ──────────────────
     # Allow requests from mobile app running via Expo Go or built APK
     # NOTE: When using credentials, we must specify explicit origins (not "*")
@@ -108,30 +111,35 @@ def create_app(config_class=None):
         # Add LAN origins from environment (for mobile/Expo Go)
         lan_ip = os.environ.get("LAN_IP")
         if lan_ip:
-            origins.extend([
-                f"http://{lan_ip}:8081",
-                f"http://{lan_ip}:8083",
-                f"http://{lan_ip}:3000",
-            ])
+            origins.extend(
+                [
+                    f"http://{lan_ip}:8081",
+                    f"http://{lan_ip}:8083",
+                    f"http://{lan_ip}:3000",
+                ]
+            )
         return origins
 
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": get_cors_origin(),
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-            "allow_headers": [
-                "Content-Type",
-                "Authorization",
-                "X-Requested-With",
-                "X-Device-ID",
-                "X-Platform",
-                "X-App-Version",
-            ],
-            "supports_credentials": True,
-            "expose_headers": ["Set-Cookie"],
-            "max_age": 3600
-        }
-    })
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": get_cors_origin(),
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+                "allow_headers": [
+                    "Content-Type",
+                    "Authorization",
+                    "X-Requested-With",
+                    "X-Device-ID",
+                    "X-Platform",
+                    "X-App-Version",
+                ],
+                "supports_credentials": True,
+                "expose_headers": ["Set-Cookie"],
+                "max_age": 3600,
+            }
+        },
+    )
     # ── Initialise rate limiting ────────────────────────────────────
     limiter.init_app(app)
 
@@ -142,11 +150,13 @@ def create_app(config_class=None):
     @login_manager.user_loader
     def load_user(user_id):
         from app.models.entities import User
+
         return db.session.get(User, int(user_id))
 
     @login_manager.unauthorized_handler
     def unauthorized():
         from flask import jsonify
+
         return jsonify({"error": "Authentication required"}), 401
 
     # ── Bridge JWT Bearer tokens to Flask-Login sessions ───────────
@@ -160,9 +170,11 @@ def create_app(config_class=None):
     @login_manager.request_loader
     def load_user_from_request(request):
         from flask import g
+
         user = getattr(g, "user", None)
         if user:
             from app.models.entities import User as UserModel
+
             return UserModel.query.get(user["user_id"])
         return None
 
@@ -194,8 +206,10 @@ def create_app(config_class=None):
     @app.before_request
     def exempt_api_from_csrf():
         from flask import request
-        if request.path.startswith('/api/'):
-            request.environ['CSRF_EXEMPT'] = True
+
+        if request.path.startswith("/api/"):
+            request.environ["CSRF_EXEMPT"] = True
+
     # ── Register API blueprints ─────────────────────────────────────
     from app.api.routes.health import health_bp
     from app.api.routes.auth import auth_bp
@@ -232,12 +246,37 @@ def create_app(config_class=None):
     # ── Exempt all API blueprints from CSRF ────────────────────────
     # Mobile apps cannot send CSRF tokens; they rely on CORS + session cookies.
     api_blueprints = [
-        auth_bp, auth_v2_bp, chatbot_bp, budget_bp, safety_bp, weather_bp, trips_bp,
-        maps_bp, images_bp, places_bp, news_bp, itinerary_bp, compare_bp,
-        export_bp, favorites_bp, destinations_bp, currency_bp, language_bp,
-        booking_bp, notes_bp, sharing_bp, expenses_bp, packing_bp,
-        trip_planner_bp, reservations_bp, uploads_bp, templates_bp,
-        travel_stats_bp, profile_bp, newsletter_bp, health_bp,
+        auth_bp,
+        auth_v2_bp,
+        chatbot_bp,
+        budget_bp,
+        safety_bp,
+        weather_bp,
+        trips_bp,
+        maps_bp,
+        images_bp,
+        places_bp,
+        news_bp,
+        itinerary_bp,
+        compare_bp,
+        export_bp,
+        favorites_bp,
+        destinations_bp,
+        currency_bp,
+        language_bp,
+        booking_bp,
+        notes_bp,
+        sharing_bp,
+        expenses_bp,
+        packing_bp,
+        trip_planner_bp,
+        reservations_bp,
+        uploads_bp,
+        templates_bp,
+        travel_stats_bp,
+        profile_bp,
+        newsletter_bp,
+        health_bp,
     ]
     for bp in api_blueprints:
         csrf.exempt(bp)
@@ -294,16 +333,16 @@ def _register_security_headers(app: Flask):
     # ── Content-Security-Policy ─────────────────────────────────────
     CSP_DIRECTIVES = {
         "default-src": "'self'",
-        "script-src":  "'self' blob: https://api.tomtom.com https://cdn.jsdelivr.net",
-        "worker-src":  "'self' blob:",
-        "style-src":   "'self' 'unsafe-inline' https://fonts.googleapis.com "
-                       "https://cdnjs.cloudflare.com https://api.tomtom.com",
-        "font-src":    "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-        "img-src":     "'self' data: blob: https://images.unsplash.com https://api.tomtom.com https://*.api.tomtom.com",
+        "script-src": "'self' blob: https://api.tomtom.com https://cdn.jsdelivr.net",
+        "worker-src": "'self' blob:",
+        "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com "
+        "https://cdnjs.cloudflare.com https://api.tomtom.com",
+        "font-src": "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+        "img-src": "'self' data: blob: https://images.unsplash.com https://api.tomtom.com https://*.api.tomtom.com",
         "connect-src": "'self' blob: https://api.tomtom.com https://*.api.tomtom.com",
-        "frame-src":   "'none'",
-        "object-src":  "'none'",
-        "base-uri":    "'self'",
+        "frame-src": "'none'",
+        "object-src": "'none'",
+        "base-uri": "'self'",
         "form-action": "'self'",
     }
     csp_value = "; ".join(f"{k} {v}" for k, v in CSP_DIRECTIVES.items())
@@ -330,11 +369,11 @@ def _validate_env(app):
     """Log which API services are available and which are missing keys."""
     services = {
         "OpenWeatherMap": "OPENWEATHER_API_KEY",
-        "TomTom Maps":    "TOMTOM_API_KEY",
-        "Google Gemini":  "GOOGLE_API_KEY",
-        "Unsplash":       "UNSPLASH_ACCESS_KEY",
-        "Foursquare":     "FOURSQUARE_API_KEY",
-        "NewsAPI":        "NEWSAPI_KEY",
+        "TomTom Maps": "TOMTOM_API_KEY",
+        "Google Gemini": "GOOGLE_API_KEY",
+        "Unsplash": "UNSPLASH_ACCESS_KEY",
+        "Foursquare": "FOURSQUARE_API_KEY",
+        "NewsAPI": "NEWSAPI_KEY",
     }
 
     ready = []
@@ -349,6 +388,7 @@ def _validate_env(app):
 
     # Database backend
     from app.services.supabase_db import get_db_backend
+
     backend = get_db_backend()
     app.logger.info("  Database: %s", backend)
 
@@ -357,6 +397,7 @@ def _validate_env(app):
         app.logger.info("  ✓ Supabase API: connected")
         try:
             from app.services.supabase_db import ensure_storage_buckets
+
             ensure_storage_buckets()
         except Exception as exc:
             app.logger.warning("  Supabase storage bucket setup: %s", exc)
@@ -366,12 +407,8 @@ def _validate_env(app):
     if ready:
         app.logger.info("  ✓ Ready: %s", ", ".join(ready))
     if missing:
-        app.logger.warning(
-            "  ✗ Degraded (no API key): %s", ", ".join(missing)
-        )
-        app.logger.warning(
-            "  Set missing keys in .env — see .env.example for details"
-        )
+        app.logger.warning("  ✗ Degraded (no API key): %s", ", ".join(missing))
+        app.logger.warning("  Set missing keys in .env — see .env.example for details")
     if not missing:
         app.logger.info("  All API services configured!")
     app.logger.info("──────────────────────────────────────────────────")
@@ -395,11 +432,16 @@ def _register_error_handlers(app: Flask):
         retry_after = getattr(error, "retry_after", None)
         if isinstance(retry_after, (int, float)):
             retry_after = int(retry_after)
-        return jsonify({
-            "error": "Rate limit exceeded",
-            "message": "Too many requests – please try again later.",
-            "retry_after": retry_after,
-        }), 429
+        return (
+            jsonify(
+                {
+                    "error": "Rate limit exceeded",
+                    "message": "Too many requests – please try again later.",
+                    "retry_after": retry_after,
+                }
+            ),
+            429,
+        )
 
     @app.errorhandler(500)
     def internal_error(error):

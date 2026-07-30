@@ -28,7 +28,9 @@ logger = logging.getLogger(__name__)
 _client: genai.Client | None = None
 _configured = False
 _configure_lock = threading.Lock()
-_BUDGET_BASELINES_PATH = Path(__file__).resolve().parents[2] / "data" / "budget_baselines.json"
+_BUDGET_BASELINES_PATH = (
+    Path(__file__).resolve().parents[2] / "data" / "budget_baselines.json"
+)
 _ROUTE_POINT_GEOCODE_CACHE: dict[str, dict] = {}
 
 ITINERARY_PROMPT = """You are an expert Indian travel planner. Generate a detailed day-by-day itinerary.
@@ -118,7 +120,9 @@ def _build_budget_estimate(
 
 
 def _destination_coordinates(destination: str) -> dict | None:
-    destination_key = resolve_destination_key(destination) or destination.strip().lower()
+    destination_key = (
+        resolve_destination_key(destination) or destination.strip().lower()
+    )
     info = DESTINATION_COORDS.get(destination_key)
     if not info:
         return None
@@ -161,8 +165,12 @@ def _route_point_coordinates(place: str, destination: str, api_key: str) -> dict
     return coordinates
 
 
-def _build_route_points(destination: str, itinerary_days: list[dict], api_key: str = "") -> list[dict]:
-    destination_key = resolve_destination_key(destination) or destination.strip().lower()
+def _build_route_points(
+    destination: str, itinerary_days: list[dict], api_key: str = ""
+) -> list[dict]:
+    destination_key = (
+        resolve_destination_key(destination) or destination.strip().lower()
+    )
 
     route_points: list[dict] = []
     for day in itinerary_days:
@@ -186,7 +194,9 @@ def _build_route_points(destination: str, itinerary_days: list[dict], api_key: s
                     "cost": slot.get("cost", ""),
                     "destination": destination,
                     "destination_key": destination_key,
-                    "coordinates": _route_point_coordinates(place, destination, api_key),
+                    "coordinates": _route_point_coordinates(
+                        place, destination, api_key
+                    ),
                 }
             )
 
@@ -194,7 +204,9 @@ def _build_route_points(destination: str, itinerary_days: list[dict], api_key: s
 
 
 def _split_interests(interests: str) -> list[str]:
-    parts = [p.strip().lower() for p in re.split(r"[,/;]", interests or "") if p.strip()]
+    parts = [
+        p.strip().lower() for p in re.split(r"[,/;]", interests or "") if p.strip()
+    ]
     return parts[:5] if parts else ["sightseeing", "food", "culture"]
 
 
@@ -316,7 +328,9 @@ def _generate_fallback_itinerary(
         "travel_class": travel_class,
         "interests": interests,
         "itinerary": days,
-        "budget_estimate": _build_budget_estimate(destination, num_days, family_size, travel_class),
+        "budget_estimate": _build_budget_estimate(
+            destination, num_days, family_size, travel_class
+        ),
         "route_points": _build_route_points(destination, days, maps_api_key),
         "destination_coordinates": _destination_coordinates(destination),
         "source": "fallback",
@@ -356,7 +370,9 @@ def generate_itinerary(
             strict_mode=False,
         )
         if sanitized_interests.threats_detected:
-            logger.warning("Itinerary input threats: %s", sanitized_interests.threats_detected)
+            logger.warning(
+                "Itinerary input threats: %s", sanitized_interests.threats_detected
+            )
         safe_interests = sanitized_interests.sanitized_input or "general sightseeing"
 
         prompt = ITINERARY_PROMPT.format(
@@ -373,13 +389,27 @@ def generate_itinerary(
             max_output_tokens=4096,
             response_mime_type="application/json",
             safety_settings=[
-                types.SafetySettingDict(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-                types.SafetySettingDict(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-                types.SafetySettingDict(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-                types.SafetySettingDict(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+                types.SafetySettingDict(
+                    category="HARM_CATEGORY_HARASSMENT",
+                    threshold="BLOCK_MEDIUM_AND_ABOVE",
+                ),
+                types.SafetySettingDict(
+                    category="HARM_CATEGORY_HATE_SPEECH",
+                    threshold="BLOCK_MEDIUM_AND_ABOVE",
+                ),
+                types.SafetySettingDict(
+                    category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    threshold="BLOCK_MEDIUM_AND_ABOVE",
+                ),
+                types.SafetySettingDict(
+                    category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                    threshold="BLOCK_MEDIUM_AND_ABOVE",
+                ),
             ],
         )
-        response = _client.models.generate_content(model="gemini-2.5-flash", contents=prompt, config=gen_config)
+        response = _client.models.generate_content(
+            model="gemini-2.5-flash", contents=prompt, config=gen_config
+        )
         raw = response.text.strip()
         logger.debug("Itinerary raw response length: %d chars", len(raw))
 
@@ -400,10 +430,14 @@ def generate_itinerary(
             # Fill missing top-level keys with safe defaults
             if not REQUIRED_DAY_KEYS.issubset(day.keys()):
                 missing = REQUIRED_DAY_KEYS - day.keys()
-                logger.warning("Day %d missing keys %s — filling defaults", i + 1, missing)
+                logger.warning(
+                    "Day %d missing keys %s — filling defaults", i + 1, missing
+                )
                 for k in missing:
                     if k in ("morning", "afternoon", "evening"):
-                        morning_cost, afternoon_cost, evening_cost = _cost_band(travel_class)
+                        morning_cost, afternoon_cost, evening_cost = _cost_band(
+                            travel_class
+                        )
                         slot_cost = {
                             "morning": morning_cost,
                             "afternoon": afternoon_cost,
@@ -411,7 +445,7 @@ def generate_itinerary(
                         }[k]
                         day[k] = _fallback_slot(
                             k.capitalize(),
-                            f"Activity details not available for this slot.",
+                            "Activity details not available for this slot.",
                             "2-3 hours",
                             slot_cost,
                         )
@@ -441,8 +475,12 @@ def generate_itinerary(
             "travel_class": travel_class,
             "interests": interests,
             "itinerary": validated_days,  # Bug 4.4 fix: use schema-validated list
-            "budget_estimate": _build_budget_estimate(destination, num_days, family_size, travel_class),
-            "route_points": _build_route_points(destination, validated_days, maps_api_key),
+            "budget_estimate": _build_budget_estimate(
+                destination, num_days, family_size, travel_class
+            ),
+            "route_points": _build_route_points(
+                destination, validated_days, maps_api_key
+            ),
             "destination_coordinates": _destination_coordinates(destination),
         }
 
@@ -487,5 +525,7 @@ def generate_itinerary(
             )
 
         fallback["ai_error"] = err_text[:150]
-        fallback["error"] = "Could not generate itinerary from AI. Fallback itinerary generated."
+        fallback["error"] = (
+            "Could not generate itinerary from AI. Fallback itinerary generated."
+        )
         return fallback

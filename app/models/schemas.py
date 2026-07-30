@@ -8,8 +8,8 @@ Keeps the API layer thin and the business logic testable.
 from dataclasses import dataclass, asdict, field
 from typing import Optional, List
 
-
 # ── Chat ────────────────────────────────────────────────────────────────────
+
 
 @dataclass
 class ChatRequest:
@@ -29,6 +29,7 @@ class ChatResponse:
 
 
 # ── Budget ──────────────────────────────────────────────────────────────────
+
 
 @dataclass
 class BudgetRequest:
@@ -71,22 +72,24 @@ class BudgetEstimate:
 
 # ── Safety ──────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class SafetyResponse:
     destination: str
-    overall_score: float          # 0 – 10  (10 = safest)
+    overall_score: float  # 0 – 10  (10 = safest)
     crime_score: float
     health_score: float
     infrastructure_score: float
     tourist_friendliness: float
-    advisory: str                 # human-readable advisory text
-    is_estimated: bool = False    # True when scores are defaults, not real data
+    advisory: str  # human-readable advisory text
+    is_estimated: bool = False  # True when scores are defaults, not real data
 
     def to_dict(self):
         return asdict(self)
 
 
 # ── Weather & Packing ──────────────────────────────────────────────────────
+
 
 @dataclass
 class WeatherResponse:

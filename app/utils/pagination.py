@@ -4,7 +4,7 @@ Pagination Utilities
 Provides pagination helpers for API endpoints.
 """
 
-from typing import Generic, TypeVar, List, Dict, Any, Optional
+from typing import Generic, TypeVar, List, Dict, Any
 from dataclasses import dataclass
 
 T = TypeVar("T")
@@ -13,11 +13,12 @@ T = TypeVar("T")
 @dataclass
 class PaginationParams:
     """Pagination parameters from request"""
+
     page: int = 1
     per_page: int = 20
     sort_by: str = "created_at"
     sort_order: str = "desc"
-    
+
     @classmethod
     def from_request(cls, request) -> "PaginationParams":
         """Extract pagination params from Flask request"""
@@ -27,11 +28,11 @@ class PaginationParams:
             sort_by=request.args.get("sort_by", "created_at"),
             sort_order=request.args.get("sort_order", "desc"),
         )
-    
+
     @property
     def offset(self) -> int:
         return (self.page - 1) * self.per_page
-    
+
     @property
     def limit(self) -> int:
         return self.per_page
@@ -40,23 +41,28 @@ class PaginationParams:
 @dataclass
 class PaginatedResult(Generic[T]):
     """Paginated result with metadata"""
+
     items: List[T]
     total: int
     page: int
     per_page: int
-    
+
     @property
     def total_pages(self) -> int:
-        return (self.total + self.per_page - 1) // self.per_page if self.per_page > 0 else 0
-    
+        return (
+            (self.total + self.per_page - 1) // self.per_page
+            if self.per_page > 0
+            else 0
+        )
+
     @property
     def has_next(self) -> bool:
         return self.page < self.total_pages
-    
+
     @property
     def has_prev(self) -> bool:
         return self.page > 1
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "items": self.items,
@@ -69,12 +75,14 @@ class PaginatedResult(Generic[T]):
         }
 
 
-def paginate_list(items: List[Any], page: int = 1, per_page: int = 20) -> PaginatedResult:
+def paginate_list(
+    items: List[Any], page: int = 1, per_page: int = 20
+) -> PaginatedResult:
     """Paginate a Python list"""
     total = len(items)
     start = (page - 1) * per_page
     end = start + per_page
-    
+
     return PaginatedResult(
         items=items[start:end],
         total=total,

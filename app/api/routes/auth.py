@@ -59,7 +59,9 @@ def _validate_register(data: dict) -> list:
 # POST /api/auth/register
 # ---------------------------------------------------------------------------
 @auth_bp.route("/api/auth/register", methods=["POST"])
-@limiter.limit(lambda: current_app.config.get("AUTH_REGISTER_RATE_LIMIT", "20 per hour"))
+@limiter.limit(
+    lambda: current_app.config.get("AUTH_REGISTER_RATE_LIMIT", "20 per hour")
+)
 def register():
     """Create a new user account."""
     data = request.get_json(silent=True)
@@ -98,10 +100,15 @@ def register():
     # Auto-login after registration
     login_user(user)
 
-    return jsonify({
-        "message": "Account created successfully",
-        "user": user.to_dict(),
-    }), 201
+    return (
+        jsonify(
+            {
+                "message": "Account created successfully",
+                "user": user.to_dict(),
+            }
+        ),
+        201,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -127,20 +134,31 @@ def login():
         logger.exception("Login query failed (database unavailable): %s", exc)
         return jsonify({"error": "Authentication service temporarily unavailable"}), 503
     if not user:
-        logger.warning("Failed login attempt for unknown email from IP: %s", request.remote_addr)
+        logger.warning(
+            "Failed login attempt for unknown email from IP: %s", request.remote_addr
+        )
         return jsonify({"error": "Invalid email or password"}), 401
 
     if not user.check_password(password):
-        logger.warning("Failed login attempt for: %s from IP: %s", email, request.remote_addr)
+        logger.warning(
+            "Failed login attempt for: %s from IP: %s", email, request.remote_addr
+        )
         return jsonify({"error": "Invalid email or password"}), 401
 
     login_user(user, remember=True)
-    logger.info("Successful login for user_id=%s from IP: %s", user.id, request.remote_addr)
+    logger.info(
+        "Successful login for user_id=%s from IP: %s", user.id, request.remote_addr
+    )
 
-    return jsonify({
-        "message": "Login successful",
-        "user": user.to_dict(),
-    }), 200
+    return (
+        jsonify(
+            {
+                "message": "Login successful",
+                "user": user.to_dict(),
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -177,6 +195,7 @@ def refresh_session():
     Used by frontend to keep sessions alive during active use.
     """
     from flask import session
+
     if not current_user.is_authenticated:
         return jsonify({"error": "Session expired", "authenticated": False}), 401
 
@@ -185,11 +204,16 @@ def refresh_session():
         session.permanent = True
         logger.debug("Session refreshed for user: %s", current_user.email)
 
-        return jsonify({
-            "message": "Session refreshed",
-            "user": current_user.to_dict(),
-            "authenticated": True,
-        }), 200
+        return (
+            jsonify(
+                {
+                    "message": "Session refreshed",
+                    "user": current_user.to_dict(),
+                    "authenticated": True,
+                }
+            ),
+            200,
+        )
     except Exception as exc:
         logger.error("Session refresh error: %s", exc, exc_info=True)
         return jsonify({"error": "Session refresh failed"}), 500
@@ -202,10 +226,15 @@ def refresh_session():
 def auth_status():
     """Check authentication status without full user data."""
     is_auth = getattr(current_user, "is_authenticated", False)
-    return jsonify({
-        "authenticated": is_auth,
-        "user_id": current_user.id if is_auth else None,
-    }), 200
+    return (
+        jsonify(
+            {
+                "authenticated": is_auth,
+                "user_id": current_user.id if is_auth else None,
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -240,4 +269,3 @@ def change_password():
         db.session.rollback()
         logger.exception("Password change failed: %s", exc)
         return jsonify({"error": "Password change failed"}), 500
-

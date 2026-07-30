@@ -18,6 +18,7 @@ from typing import Optional
 
 import requests
 
+from app.utils.constants import DESTINATION_UNSPLASH_KW as DESTINATION_KEYWORDS
 from app.utils.retry import api_retry
 
 logger = logging.getLogger(__name__)
@@ -42,11 +43,8 @@ _rate_limited_until = 0.0
 _rate_limit_logged = False
 _rate_limit_lock = threading.Lock()
 
-# Keep bulk gallery fetch under free-tier limits (50 req/hour).
+# Keep bulk fetch under free-tier limits (50 req/hour).
 UNSPLASH_BULK_FETCH_LIMIT = 40
-
-# Destination keywords imported from central registry
-from app.utils.constants import DESTINATION_UNSPLASH_KW as DESTINATION_KEYWORDS
 
 
 def _key_sig(access_key: str) -> str:
@@ -114,13 +112,14 @@ def _is_rate_limited_temporarily() -> bool:
 
         if _rate_limited_until and now >= _rate_limited_until:
             _rate_limited_until = 0.0
-            _rate_limit_logged = False
             return False
 
         return now < _rate_limited_until
 
 
-def _mark_rate_limited(destination: str, retry_in_sec: int = RATE_LIMIT_COOLDOWN) -> None:
+def _mark_rate_limited(
+    destination: str, retry_in_sec: int = RATE_LIMIT_COOLDOWN
+) -> None:
     global _rate_limited_until, _rate_limit_logged
     with _rate_limit_lock:
         _rate_limited_until = time.time() + max(60, retry_in_sec)
@@ -151,7 +150,7 @@ def _is_cached(destination: str) -> bool:
 
 def _generate_fallback_images(destination: str, count: int) -> list:
     """Generate high-quality destination-specific fallback images if API fails or rate limits."""
-    
+
     # Destination-specific curated Unsplash images (direct URLs that don't require API)
     # These are real travel photos that work without authentication
     DESTINATION_IMAGES = {
@@ -175,7 +174,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200",
             "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200",
         ],
-        
         # Hill Stations
         "manali": [
             "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200",
@@ -230,7 +228,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
             "https://images.unsplash.com/photo-1585136917228-c5d620be958e?w=1200",
         ],
-        
         # Major Cities
         "delhi": [
             "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200",
@@ -285,7 +282,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=1200",
             "https://images.unsplash.com/photo-1585136917228-c5d620be958e?w=1200",
         ],
-        
         # Heritage Sites
         "hampi": [
             "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=1200",
@@ -295,7 +291,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200",
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
         ],
-        
         # Wildlife
         "ranthambore": [
             "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=1200",
@@ -305,7 +300,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=1200",
             "https://images.unsplash.com/photo-1456926631375-92c8ce872def?w=1200",
         ],
-        
         # Northeast
         "gangtok": [
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
@@ -323,7 +317,6 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
             "https://images.unsplash.com/photo-1585136917228-c5d620be958e?w=1200",
         ],
-        
         # Adventure
         "rishikesh": [
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
@@ -334,7 +327,7 @@ def _generate_fallback_images(destination: str, count: int) -> list:
             "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200",
         ],
     }
-    
+
     # Generic high-quality travel fallbacks
     GENERIC_FALLBACKS = [
         "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200",  # Adventure travel
@@ -346,41 +339,44 @@ def _generate_fallback_images(destination: str, count: int) -> list:
         "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",  # Forest
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",  # Beach
     ]
-    
+
     # Find destination-specific images
     dest_lower = destination.lower()
     specific_images = None
-    
+
     # Try to match destination
     for key, images in DESTINATION_IMAGES.items():
         if key in dest_lower or dest_lower in key:
             specific_images = images
             break
-    
+
     # Use specific images or generic fallbacks
     image_urls = specific_images if specific_images else GENERIC_FALLBACKS
-    
+
     # Generate results with proper attribution
     results = []
     for i in range(count):
         url = image_urls[i % len(image_urls)]
         # Clean URL for different sizes
-        base_url = url.split('?')[0]
-        results.append({
-            "id": f"fallback-{destination}-{i}",
-            "url_thumb": f"{base_url}?auto=format&fit=crop&w=400&q=80",
-            "url_small": f"{base_url}?auto=format&fit=crop&w=800&q=80",
-            "url_regular": f"{base_url}?auto=format&fit=crop&w=1200&q=80",
-            "url_full": f"{base_url}?auto=format&fit=crop&w=2000&q=80",
-            "alt": f"{destination} travel",
-            "photographer": "Travel Photographer",
-            "photographer_url": "#",
-            "unsplash_url": "#",
-            "color": "#1e293b",
-            "width": 1200,
-            "height": 800,
-        })
+        base_url = url.split("?")[0]
+        results.append(
+            {
+                "id": f"fallback-{destination}-{i}",
+                "url_thumb": f"{base_url}?auto=format&fit=crop&w=400&q=80",
+                "url_small": f"{base_url}?auto=format&fit=crop&w=800&q=80",
+                "url_regular": f"{base_url}?auto=format&fit=crop&w=1200&q=80",
+                "url_full": f"{base_url}?auto=format&fit=crop&w=2000&q=80",
+                "alt": f"{destination} travel",
+                "photographer": "Travel Photographer",
+                "photographer_url": "#",
+                "unsplash_url": "#",
+                "color": "#1e293b",
+                "width": 1200,
+                "height": 800,
+            }
+        )
     return results
+
 
 @api_retry
 def search_destination_images(
@@ -401,13 +397,21 @@ def search_destination_images(
         return _cache[key]["data"][:count]
 
     # If key is missing or circuit breaker is open, return fallbacks immediately
-    if not access_key or _is_auth_temporarily_disabled(access_key) or _is_rate_limited_temporarily():
+    if (
+        not access_key
+        or _is_auth_temporarily_disabled(access_key)
+        or _is_rate_limited_temporarily()
+    ):
         if not access_key:
             logger.warning("Unsplash access key not configured. Using fallbacks.")
         elif _is_rate_limited_temporarily():
-            logger.debug("Unsplash rate-limit circuit open; using fallback images for '%s'", key)
+            logger.debug(
+                "Unsplash rate-limit circuit open; using fallback images for '%s'", key
+            )
         else:
-            logger.debug("Unsplash auth circuit open; using fallback images for '%s'", key)
+            logger.debug(
+                "Unsplash auth circuit open; using fallback images for '%s'", key
+            )
         return _generate_fallback_images(destination, count)
 
     # Build search query
@@ -446,20 +450,24 @@ def search_destination_images(
 
         images = []
         for photo in data.get("results", []):
-            images.append({
-                "id": photo["id"],
-                "url_thumb": photo["urls"]["thumb"],
-                "url_small": photo["urls"]["small"],
-                "url_regular": photo["urls"]["regular"],
-                "url_full": photo["urls"]["full"],
-                "alt": photo.get("alt_description") or photo.get("description") or f"{destination} travel photo",
-                "photographer": photo["user"]["name"],
-                "photographer_url": photo["user"]["links"]["html"],
-                "unsplash_url": photo["links"]["html"],
-                "color": photo.get("color", "#1e293b"),
-                "width": photo.get("width", 0),
-                "height": photo.get("height", 0),
-            })
+            images.append(
+                {
+                    "id": photo["id"],
+                    "url_thumb": photo["urls"]["thumb"],
+                    "url_small": photo["urls"]["small"],
+                    "url_regular": photo["urls"]["regular"],
+                    "url_full": photo["urls"]["full"],
+                    "alt": photo.get("alt_description")
+                    or photo.get("description")
+                    or f"{destination} travel photo",
+                    "photographer": photo["user"]["name"],
+                    "photographer_url": photo["user"]["links"]["html"],
+                    "unsplash_url": photo["links"]["html"],
+                    "color": photo.get("color", "#1e293b"),
+                    "width": photo.get("width", 0),
+                    "height": photo.get("height", 0),
+                }
+            )
 
         # Cache the results if they validly returned images
         if images:
@@ -467,7 +475,7 @@ def search_destination_images(
             logger.info("Unsplash: fetched %d images for '%s'", len(images), key)
             return images
         else:
-             return _generate_fallback_images(destination, count)
+            return _generate_fallback_images(destination, count)
 
     except requests.exceptions.RequestException as e:
         if isinstance(e, requests.exceptions.HTTPError) and e.response is not None:
@@ -481,7 +489,7 @@ def search_destination_images(
                 logger.error("Unsplash API error for '%s': %s", destination, e)
         else:
             logger.error("Unsplash API error for '%s': %s", destination, e)
-        
+
         # Always return fallback data so the UI doesn't crash on network failures
         return _generate_fallback_images(destination, count)
 

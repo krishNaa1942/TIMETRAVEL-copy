@@ -27,7 +27,10 @@ from flask_login import current_user, login_required
 from app.chatbot.engine import chat
 from app.models.database import db
 from app.models.entities import ChatMessage
-from app.services.gemini_service import chat_with_gemini, is_available as gemini_available
+from app.services.gemini_service import (
+    chat_with_gemini,
+    is_available as gemini_available,
+)
 from app.main import limiter
 
 chatbot_bp = Blueprint("chatbot", __name__)
@@ -97,7 +100,9 @@ def chat_endpoint():
 
         # If Gemini is unavailable, always fall back to the classic engine.
         if not key:
-            current_app.logger.info("Gemini API key unavailable; using classic chatbot fallback")
+            current_app.logger.info(
+                "Gemini API key unavailable; using classic chatbot fallback"
+            )
             return _classic_response(message, session_id)
 
         # Try Gemini AI first for auto/ai/travel modes.
@@ -118,17 +123,26 @@ def chat_endpoint():
                     + ai_message
                 )
             if destination_context:
-                ai_message = f"[User is currently exploring {destination_context}] {ai_message}"
+                ai_message = (
+                    f"[User is currently exploring {destination_context}] {ai_message}"
+                )
 
             result = chat_with_gemini(ai_message, session_id, key)
             if result.get("model") != "error":
-                _persist_message(session_id, message, result["reply"], intent="gemini_ai")
-                return jsonify({
-                    **result,
-                    "session_id": session_id,
-                    "intent": "ai_response",
-                    "confidence": 1.0,
-                }), 200
+                _persist_message(
+                    session_id, message, result["reply"], intent="gemini_ai"
+                )
+                return (
+                    jsonify(
+                        {
+                            **result,
+                            "session_id": session_id,
+                            "intent": "ai_response",
+                            "confidence": 1.0,
+                        }
+                    ),
+                    200,
+                )
 
             # Fallback to classic ML
             classic_response, status_code = _classic_response(message, session_id)
@@ -136,14 +150,21 @@ def chat_endpoint():
             payload["fallback_from"] = "gemini"
             return jsonify(payload), status_code
 
-        current_app.logger.warning("Unsupported chat mode '%s'; using classic fallback", mode)
+        current_app.logger.warning(
+            "Unsupported chat mode '%s'; using classic fallback", mode
+        )
         return _classic_response(message, session_id)
 
     except Exception:
         current_app.logger.exception("Unhandled error in /api/chat")
-        return jsonify({
-            "error": "Internal Server Error",
-        }), 500
+        return (
+            jsonify(
+                {
+                    "error": "Internal Server Error",
+                }
+            ),
+            500,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -178,12 +199,17 @@ def chat_ai_endpoint():
 
     _persist_message(session_id, message, result["reply"], intent="gemini_ai")
 
-    return jsonify({
-        **result,
-        "session_id": session_id,
-        "intent": "ai_response",
-        "confidence": 1.0,
-    }), 200
+    return (
+        jsonify(
+            {
+                **result,
+                "session_id": session_id,
+                "intent": "ai_response",
+                "confidence": 1.0,
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -215,16 +241,21 @@ def chat_status():
     """Return which chat engines are available."""
     key = _google_key()
     ai_ok = gemini_available(key) if key else False
-    return jsonify({
-        "engines": {
-            "classic": {"available": True, "model": "tfidf-logreg"},
-            "ai": {
-                "available": ai_ok,
-                "model": "gemini-2.5-flash" if ai_ok else None,
-            },
-        },
-        "default": "ai" if ai_ok else "classic",
-    }), 200
+    return (
+        jsonify(
+            {
+                "engines": {
+                    "classic": {"available": True, "model": "tfidf-logreg"},
+                    "ai": {
+                        "available": ai_ok,
+                        "model": "gemini-2.5-flash" if ai_ok else None,
+                    },
+                },
+                "default": "ai" if ai_ok else "classic",
+            }
+        ),
+        200,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -235,11 +266,16 @@ def _classic_response(message, session_id):
     reply, intent, confidence = chat(message)
     _persist_message(session_id, message, reply, intent=intent)
 
-    return jsonify({
-        "reply": reply,
-        "intent": intent,
-        "confidence": confidence,
-        "model": "tfidf-logreg",
-        "mode": "classic",
-        "session_id": session_id,
-    }), 200
+    return (
+        jsonify(
+            {
+                "reply": reply,
+                "intent": intent,
+                "confidence": confidence,
+                "model": "tfidf-logreg",
+                "mode": "classic",
+                "session_id": session_id,
+            }
+        ),
+        200,
+    )

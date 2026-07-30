@@ -35,9 +35,9 @@ _configured = False
 _configure_lock = threading.Lock()
 
 # Session limits
-SESSION_TTL = 1800          # 30 minutes of inactivity before expiry
-MAX_SESSIONS = 200          # hard cap on concurrent sessions
-MAX_HISTORY_TURNS = 20      # keep last N user+model turn pairs (40 messages)
+SESSION_TTL = 1800  # 30 minutes of inactivity before expiry
+MAX_SESSIONS = 200  # hard cap on concurrent sessions
+MAX_HISTORY_TURNS = 20  # keep last N user+model turn pairs (40 messages)
 
 # Timeout and retry config
 _GEMINI_TIMEOUT = 25
@@ -56,8 +56,11 @@ def _call_with_timeout(fn, timeout_secs=_GEMINI_TIMEOUT, *args, **kwargs):
         raise TimeoutError(f"Gemini call timed out after {timeout_secs}s")
 
 
-def _call_with_retry(fn, max_retries=_MAX_RETRIES, base_delay=_RETRY_BASE_DELAY, *args, **kwargs):
+def _call_with_retry(
+    fn, max_retries=_MAX_RETRIES, base_delay=_RETRY_BASE_DELAY, *args, **kwargs
+):
     import time as _time
+
     last_exc = None
     for attempt in range(max_retries + 1):
         try:
@@ -65,7 +68,7 @@ def _call_with_retry(fn, max_retries=_MAX_RETRIES, base_delay=_RETRY_BASE_DELAY,
         except Exception as e:
             last_exc = e
             if attempt < max_retries:
-                delay = base_delay * (2 ** attempt)
+                delay = base_delay * (2**attempt)
                 logger.warning("Retry %d/%d after: %s", attempt + 1, max_retries, e)
                 _time.sleep(delay)
     raise last_exc
@@ -160,7 +163,7 @@ def _get_session(session_id: str):
 
     if session_id in _sessions:
         entry = _sessions[session_id]
-        entry["ts"] = now          # refresh last-access time
+        entry["ts"] = now  # refresh last-access time
         return entry["chat"]
 
     # Housekeeping before creating a new session
@@ -173,10 +176,20 @@ def _get_session(session_id: str):
         top_p=0.9,
         max_output_tokens=1024,
         safety_settings=[
-            types.SafetySettingDict(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-            types.SafetySettingDict(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-            types.SafetySettingDict(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
-            types.SafetySettingDict(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_MEDIUM_AND_ABOVE"),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_MEDIUM_AND_ABOVE"
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_MEDIUM_AND_ABOVE"
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
         ],
     )
     chat = _client.chats.create(model="gemini-2.5-flash", config=config, history=[])
@@ -207,7 +220,9 @@ def chat_with_gemini(
     try:
         _configure(api_key)
 
-        scan_result = AIPromptSanitizer.sanitize_input(message, context="chat", max_length=2000)
+        scan_result = AIPromptSanitizer.sanitize_input(
+            message, context="chat", max_length=2000
+        )
         if scan_result.threats_detected:
             logger.warning("Gemini input threats: %s", scan_result.threats_detected)
         if scan_result.should_block:
@@ -220,9 +235,7 @@ def chat_with_gemini(
 
         session = _get_session(session_id)
         response = _call_with_retry(
-            lambda: _call_with_timeout(
-                session.send_message, _GEMINI_TIMEOUT, message
-            )
+            lambda: _call_with_timeout(session.send_message, _GEMINI_TIMEOUT, message)
         )
 
         # Cap conversation history to prevent unbounded growth
@@ -231,7 +244,9 @@ def chat_with_gemini(
         reply = response.text.strip()
 
         # Sanitize AI output before returning to user
-        sanitized_output, warnings = AIPromptSanitizer.sanitize_output(reply, context="chat")
+        sanitized_output, warnings = AIPromptSanitizer.sanitize_output(
+            reply, context="chat"
+        )
         if warnings:
             logger.info("Gemini output sanitization warnings: %s", warnings)
 
@@ -243,7 +258,10 @@ def chat_with_gemini(
 
     except Exception as e:
         error_text = str(e).lower()
-        if any(token in error_text for token in ("quota", "resourceexhausted", "resource exhausted", "429")):
+        if any(
+            token in error_text
+            for token in ("quota", "resourceexhausted", "resource exhausted", "429")
+        ):
             logger.warning("Gemini AI quota exhausted: %s", e)
             return {
                 "reply": (
@@ -258,7 +276,7 @@ def chat_with_gemini(
         logger.error("Gemini AI error: %s", e)
         return {
             "reply": "I'm having trouble connecting to AI right now. "
-                     "Please try again in a moment, or the basic assistant will handle your query.",
+            "Please try again in a moment, or the basic assistant will handle your query.",
             "model": "error",
             "mode": "ai",
         }

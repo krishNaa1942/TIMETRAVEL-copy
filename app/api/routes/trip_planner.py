@@ -16,6 +16,7 @@ trip_planner_bp = Blueprint("trip_planner", __name__, url_prefix="/api/trips/pla
 
 # ── Trip CRUD ───────────────────────────────────────────────────────────
 
+
 @trip_planner_bp.route("", methods=["POST"])
 @login_required
 def create_trip():
@@ -65,6 +66,7 @@ def create_trip():
         day_date = None
         if start_date:
             from datetime import timedelta
+
             day_date = start_date + timedelta(days=i - 1)
         day = TripDay(trip_id=trip.id, day_number=i, date=day_date, title=f"Day {i}")
         db.session.add(day)
@@ -79,7 +81,7 @@ def list_trips():
     # For demo: return empty list if not authenticated
     if not current_user.is_authenticated:
         return jsonify({"trips": []})
-    
+
     status_filter = request.args.get("status")
     q = Trip.query.filter_by(user_id=current_user.id).order_by(Trip.updated_at.desc())
     if status_filter:
@@ -115,7 +117,12 @@ def update_trip(trip_id):
     errors = []
 
     # String fields with max length
-    for field, maxlen in [("title", 200), ("destination", 200), ("notes", 5000), ("cover_image_url", 1024)]:
+    for field, maxlen in [
+        ("title", 200),
+        ("destination", 200),
+        ("notes", 5000),
+        ("cover_image_url", 1024),
+    ]:
         if field in data:
             if not isinstance(data[field], str):
                 errors.append(f"{field} must be a string")
@@ -126,7 +133,9 @@ def update_trip(trip_id):
     valid_classes = {"economy", "business", "first", "budget", "luxury"}
     if "travel_class" in data:
         if data["travel_class"] not in valid_classes:
-            errors.append(f"travel_class must be one of: {', '.join(sorted(valid_classes))}")
+            errors.append(
+                f"travel_class must be one of: {', '.join(sorted(valid_classes))}"
+            )
         else:
             trip.travel_class = data["travel_class"]
 
@@ -144,6 +153,7 @@ def update_trip(trip_id):
                 errors.append("itinerary_json must be a string")
             else:
                 import json as _json
+
                 try:
                     _json.loads(data["itinerary_json"])
                     trip.itinerary_json = data["itinerary_json"]
@@ -210,6 +220,7 @@ def delete_trip(trip_id):
 
 # ── Trip Days ───────────────────────────────────────────────────────────
 
+
 @trip_planner_bp.route("/<int:trip_id>/days", methods=["POST"])
 @login_required
 def add_day(trip_id):
@@ -261,6 +272,7 @@ def update_day(trip_id, day_id):
 
 # ── Trip Places ─────────────────────────────────────────────────────────
 
+
 @trip_planner_bp.route("/<int:trip_id>/places", methods=["POST"])
 @login_required
 def add_place(trip_id):
@@ -293,8 +305,12 @@ def add_place(trip_id):
 
     # Set position order
     if data.get("day_id"):
-        max_pos = db.session.query(db.func.max(TripPlace.position_order)).filter_by(
-            day_id=data["day_id"]).scalar() or 0
+        max_pos = (
+            db.session.query(db.func.max(TripPlace.position_order))
+            .filter_by(day_id=data["day_id"])
+            .scalar()
+            or 0
+        )
         place.position_order = max_pos + 1
 
     db.session.add(place)
@@ -315,15 +331,31 @@ def update_place(trip_id, place_id):
         return jsonify({"error": "Place not found."}), 404
 
     data = request.get_json(silent=True) or {}
-    for field in ["name", "address", "category", "notes", "start_time", "end_time", "image_url"]:
+    for field in [
+        "name",
+        "address",
+        "category",
+        "notes",
+        "start_time",
+        "end_time",
+        "image_url",
+    ]:
         if field in data:
             setattr(place, field, data[field])
     for float_field in ["lat", "lon", "estimated_cost", "rating"]:
         if float_field in data:
-            setattr(place, float_field, float(data[float_field]) if data[float_field] is not None else None)
+            setattr(
+                place,
+                float_field,
+                float(data[float_field]) if data[float_field] is not None else None,
+            )
     for int_field in ["day_id", "position_order", "duration_minutes"]:
         if int_field in data:
-            setattr(place, int_field, int(data[int_field]) if data[int_field] is not None else None)
+            setattr(
+                place,
+                int_field,
+                int(data[int_field]) if data[int_field] is not None else None,
+            )
     if "is_booked" in data:
         place.is_booked = bool(data["is_booked"])
 
@@ -360,7 +392,8 @@ def reorder_places(trip_id):
     order = data.get("order", [])  # [{id: place_id, day_id: x, position: y}]
     ids = [item["id"] for item in order]
     places_map = {
-        p.id: p for p in TripPlace.query.filter(
+        p.id: p
+        for p in TripPlace.query.filter(
             TripPlace.id.in_(ids), TripPlace.trip_id == trip.id
         ).all()
     }
@@ -376,6 +409,7 @@ def reorder_places(trip_id):
 
 # ── Companions ──────────────────────────────────────────────────────────
 
+
 @trip_planner_bp.route("/<int:trip_id>/companions", methods=["POST"])
 @login_required
 def add_companion(trip_id):
@@ -389,7 +423,16 @@ def add_companion(trip_id):
     if not name:
         return jsonify({"error": "Companion name is required."}), 400
 
-    COLORS = ["#6366f1", "#ec4899", "#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#ef4444", "#14b8a6"]
+    COLORS = [
+        "#6366f1",
+        "#ec4899",
+        "#10b981",
+        "#f59e0b",
+        "#3b82f6",
+        "#8b5cf6",
+        "#ef4444",
+        "#14b8a6",
+    ]
     comp = Companion(
         trip_id=trip.id,
         user_id=current_user.id,

@@ -9,7 +9,6 @@ POST /api/export/comparison
 import json
 import pytest
 
-
 # Uses app & client fixtures from conftest.py
 
 
@@ -158,6 +157,7 @@ COMPARISON_PAYLOAD = {
 # Itinerary Export Tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestExportItinerary:
     """Tests for POST /api/export/itinerary"""
 
@@ -206,6 +206,7 @@ class TestExportItinerary:
 # Budget Export Tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestExportBudget:
     """Tests for POST /api/export/budget"""
 
@@ -244,6 +245,7 @@ class TestExportBudget:
 # ═══════════════════════════════════════════════════════════
 # Comparison Export Tests
 # ═══════════════════════════════════════════════════════════
+
 
 class TestExportComparison:
     """Tests for POST /api/export/comparison"""
@@ -294,11 +296,13 @@ class TestExportComparison:
 # PDF Service Unit Tests
 # ═══════════════════════════════════════════════════════════
 
+
 class TestPDFService:
     """Direct tests on the PDF-generation functions."""
 
     def test_itinerary_pdf_bytes(self):
         from app.services.pdf_service import generate_itinerary_pdf
+
         result = generate_itinerary_pdf(ITINERARY_PAYLOAD)
         assert isinstance(result, bytes)
         assert len(result) > 100
@@ -306,6 +310,7 @@ class TestPDFService:
 
     def test_budget_pdf_bytes(self):
         from app.services.pdf_service import generate_budget_pdf
+
         result = generate_budget_pdf(BUDGET_PAYLOAD)
         assert isinstance(result, bytes)
         assert len(result) > 100
@@ -313,6 +318,7 @@ class TestPDFService:
 
     def test_comparison_pdf_bytes(self):
         from app.services.pdf_service import generate_comparison_pdf
+
         result = generate_comparison_pdf(COMPARISON_PAYLOAD)
         assert isinstance(result, bytes)
         assert len(result) > 100
@@ -321,6 +327,7 @@ class TestPDFService:
     def test_itinerary_pdf_multipage(self):
         """Itinerary with 2 days should produce a valid multi-content PDF."""
         from app.services.pdf_service import generate_itinerary_pdf
+
         result = generate_itinerary_pdf(ITINERARY_PAYLOAD)
         # PDF must contain pages and end marker
         assert b"%%EOF" in result
@@ -328,12 +335,14 @@ class TestPDFService:
 
     def test_budget_pdf_has_pages(self):
         from app.services.pdf_service import generate_budget_pdf
+
         result = generate_budget_pdf(BUDGET_PAYLOAD)
         assert b"%%EOF" in result
         assert len(result) > 500
 
     def test_comparison_pdf_has_pages(self):
         from app.services.pdf_service import generate_comparison_pdf
+
         result = generate_comparison_pdf(COMPARISON_PAYLOAD)
         assert b"%%EOF" in result
         assert len(result) > 500

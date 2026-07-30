@@ -16,52 +16,87 @@ class TestItineraryValidation:
         assert "JSON" in resp.get_json()["error"]
 
     def test_missing_destination(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "num_days": 3, "family_size": 4, "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
         assert "destination" in resp.get_json()["error"].lower()
 
     def test_invalid_destination(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Mars",
-            "num_days": 3, "family_size": 4, "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Mars",
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
 
     def test_days_too_low(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa", "num_days": 0, "family_size": 4,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 0,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
 
     def test_days_too_high(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa", "num_days": 15, "family_size": 4,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 15,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
 
     def test_invalid_family_size(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa", "num_days": 3, "family_size": 0,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 3,
+                "family_size": 0,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
 
     def test_invalid_travel_class(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa", "num_days": 3, "family_size": 4,
-            "travel_class": "ultra-luxury",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "ultra-luxury",
+            },
+        )
         assert resp.status_code == 400
 
     def test_non_integer_days(self, client):
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa", "num_days": "abc", "family_size": 4,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": "abc",
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 400
 
 
@@ -108,12 +143,15 @@ class TestItineraryGeneration:
         # Need to set GOOGLE_API_KEY so route doesn't return 503
         app.config["GOOGLE_API_KEY"] = "test-key-123"
 
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa",
-            "num_days": 1,
-            "family_size": 4,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 1,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 200
         data = resp.get_json()
         assert data["destination"] == "Goa"
@@ -125,24 +163,30 @@ class TestItineraryGeneration:
         mock_gen.return_value = {"error": "AI returned invalid response"}
         app.config["GOOGLE_API_KEY"] = "test-key-123"
 
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Jaipur",
-            "num_days": 3,
-            "family_size": 2,
-            "travel_class": "comfort",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Jaipur",
+                "num_days": 3,
+                "family_size": 2,
+                "travel_class": "comfort",
+            },
+        )
         assert resp.status_code == 502
         assert "error" in resp.get_json()
 
     def test_no_api_key_returns_503(self, client, app):
         app.config["GOOGLE_API_KEY"] = ""
 
-        resp = client.post("/api/itinerary/generate", json={
-            "destination": "Goa",
-            "num_days": 3,
-            "family_size": 4,
-            "travel_class": "economy",
-        })
+        resp = client.post(
+            "/api/itinerary/generate",
+            json={
+                "destination": "Goa",
+                "num_days": 3,
+                "family_size": 4,
+                "travel_class": "economy",
+            },
+        )
         assert resp.status_code == 503
         assert "configured" in resp.get_json()["error"].lower()
 
@@ -159,13 +203,16 @@ class TestItineraryGeneration:
                 "interests": "backwaters, food",
                 "itinerary": self.SAMPLE_ITINERARY,
             }
-            resp = client.post("/api/itinerary/generate", json={
-                "destination": "Munnar",
-                "num_days": 2,
-                "family_size": 3,
-                "travel_class": "economy",
-                "interests": "backwaters, food",
-            })
+            resp = client.post(
+                "/api/itinerary/generate",
+                json={
+                    "destination": "Munnar",
+                    "num_days": 2,
+                    "family_size": 3,
+                    "travel_class": "economy",
+                    "interests": "backwaters, food",
+                },
+            )
             assert resp.status_code == 200
             # Verify interests were passed to the service
             call_kwargs = mock_gen.call_args

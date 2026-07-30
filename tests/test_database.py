@@ -12,6 +12,7 @@ from app.models.database import _apply_pool_settings, init_db, db
 
 class _FakeConfig(dict):
     """A real dict that allows attribute-style access for MagicMock compat."""
+
     pass
 
 

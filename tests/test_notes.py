@@ -17,8 +17,8 @@ from app.config import TestingConfig
 from app.models.database import db as _db
 from app.models.entities import User, TravelNote
 
-
 # ── Fixtures ────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def app():
@@ -43,7 +43,10 @@ def auth_client(app, client):
         user.set_password("password123")
         _db.session.add(user)
         _db.session.commit()
-        client.post("/api/auth/login", json={"email": "test@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "test@example.com", "password": "password123"},
+        )
     return client
 
 
@@ -62,6 +65,7 @@ def _create_note(client, **overrides):
 # ═══════════════════════════════════════════════════════════
 # Unauthenticated access
 # ═══════════════════════════════════════════════════════════
+
 
 class TestNotesUnauth:
     def test_create_note_unauth(self, client):
@@ -94,6 +98,7 @@ class TestNotesUnauth:
 # ═══════════════════════════════════════════════════════════
 # CRUD
 # ═══════════════════════════════════════════════════════════
+
 
 class TestNotesCRUD:
     def test_create_note_success(self, auth_client):
@@ -144,11 +149,14 @@ class TestNotesCRUD:
         _create_note(auth_client)
         notes = auth_client.get("/api/notes").get_json()["notes"]
         note_id = notes[0]["id"]
-        res = auth_client.put(f"/api/notes/{note_id}", json={
-            "title": "Updated Title",
-            "mood": "excited",
-            "is_public": True,
-        })
+        res = auth_client.put(
+            f"/api/notes/{note_id}",
+            json={
+                "title": "Updated Title",
+                "mood": "excited",
+                "is_public": True,
+            },
+        )
         assert res.status_code == 200
         note = res.get_json()["note"]
         assert note["title"] == "Updated Title"
@@ -169,6 +177,7 @@ class TestNotesCRUD:
 # Community Notes
 # ═══════════════════════════════════════════════════════════
 
+
 class TestCommunityNotes:
     def test_community_shows_public_notes(self, auth_client, client):
         _create_note(auth_client, is_public=True, title="Public Note")
@@ -182,7 +191,9 @@ class TestCommunityNotes:
 
     def test_community_filter_by_destination(self, auth_client, client):
         _create_note(auth_client, is_public=True, destination="Goa")
-        _create_note(auth_client, is_public=True, destination="Delhi", title="Delhi Note")
+        _create_note(
+            auth_client, is_public=True, destination="Delhi", title="Delhi Note"
+        )
         auth_client.post("/api/auth/logout")
         res = client.get("/api/notes/community?destination=Goa")
         notes = res.get_json()["notes"]
@@ -193,6 +204,7 @@ class TestCommunityNotes:
 # Ownership
 # ═══════════════════════════════════════════════════════════
 
+
 class TestNotesOwnership:
     def test_cannot_update_other_users_note(self, app, client):
         with app.app_context():
@@ -201,7 +213,10 @@ class TestNotesOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _create_note(client)
         notes = client.get("/api/notes").get_json()["notes"]
         note_id = notes[0]["id"]
@@ -213,7 +228,10 @@ class TestNotesOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.put(f"/api/notes/{note_id}", json={"title": "Hacked!"})
         assert res.status_code == 403
 
@@ -224,7 +242,10 @@ class TestNotesOwnership:
             _db.session.add(user_a)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "a@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "a@example.com", "password": "password123"},
+        )
         _create_note(client)
         notes = client.get("/api/notes").get_json()["notes"]
         note_id = notes[0]["id"]
@@ -236,6 +257,9 @@ class TestNotesOwnership:
             _db.session.add(user_b)
             _db.session.commit()
 
-        client.post("/api/auth/login", json={"email": "b@example.com", "password": "password123"})
+        client.post(
+            "/api/auth/login",
+            json={"email": "b@example.com", "password": "password123"},
+        )
         res = client.delete(f"/api/notes/{note_id}")
         assert res.status_code == 403

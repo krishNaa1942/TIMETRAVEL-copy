@@ -45,22 +45,24 @@ def get_featured_destinations():
     """Return featured destinations (curated popular destinations)."""
     # Featured destinations are popular tourist spots
     featured_ids = ["goa", "kerala_backwaters", "jaipur", "varanasi", "andaman"]
-    
+
     result = []
     for key, d in DESTINATIONS.items():
         if key in featured_ids or d.get("featured", False):
-            result.append({
-                "id": key,
-                "label": d["label"],
-                "region": d.get("region", ""),
-                "best_season": d.get("best_season", ""),
-                "highlight": d.get("highlight", ""),
-                "tagline": d.get("tagline", ""),
-                "category": d.get("category", []),
-                "lat": d.get("lat", 0),
-                "lon": d.get("lon", 0),
-            })
-    
+            result.append(
+                {
+                    "id": key,
+                    "label": d["label"],
+                    "region": d.get("region", ""),
+                    "best_season": d.get("best_season", ""),
+                    "highlight": d.get("highlight", ""),
+                    "tagline": d.get("tagline", ""),
+                    "category": d.get("category", []),
+                    "lat": d.get("lat", 0),
+                    "lon": d.get("lon", 0),
+                }
+            )
+
     # If no featured found, return first 5 destinations
     if not result:
         all_dests = sorted(
@@ -81,7 +83,7 @@ def get_featured_destinations():
             key=lambda x: x["label"],
         )
         result = all_dests[:5]
-    
+
     return jsonify({"destinations": result}), 200
 
 
@@ -94,9 +96,9 @@ def get_trending_destinations():
 
     # Season-based trending weights: prioritize destinations matching current season
     season_keywords = {
-        "winter": ["hill station", "desert", "heritage"],    # Nov-Feb
-        "summer": ["mountain", "beach", "nature"],            # Mar-Jun
-        "monsoon": ["nature", "spiritual", "culture"],        # Jul-Oct
+        "winter": ["hill station", "desert", "heritage"],  # Nov-Feb
+        "summer": ["mountain", "beach", "nature"],  # Mar-Jun
+        "monsoon": ["nature", "spiritual", "culture"],  # Jul-Oct
     }
     if month in (11, 12, 1, 2):
         preferred = season_keywords["winter"]
@@ -137,34 +139,38 @@ def get_trending_destinations():
 def search_destinations():
     """Search destinations by query string."""
     query = request.args.get("q", "").lower().strip()
-    
+
     if not query or len(query) < 2:
         return jsonify({"destinations": [], "query": query}), 200
-    
+
     result = []
     for key, d in DESTINATIONS.items():
         # Search in label, region, tagline, and category
-        searchable = " ".join([
-            d.get("label", ""),
-            d.get("region", ""),
-            d.get("tagline", ""),
-            " ".join(d.get("category", [])),
-            d.get("highlight", ""),
-        ]).lower()
-        
+        searchable = " ".join(
+            [
+                d.get("label", ""),
+                d.get("region", ""),
+                d.get("tagline", ""),
+                " ".join(d.get("category", [])),
+                d.get("highlight", ""),
+            ]
+        ).lower()
+
         if query in searchable or query in key.lower():
-            result.append({
-                "id": key,
-                "label": d["label"],
-                "region": d.get("region", ""),
-                "best_season": d.get("best_season", ""),
-                "highlight": d.get("highlight", ""),
-                "tagline": d.get("tagline", ""),
-                "category": d.get("category", []),
-                "lat": d.get("lat", 0),
-                "lon": d.get("lon", 0),
-            })
-    
+            result.append(
+                {
+                    "id": key,
+                    "label": d["label"],
+                    "region": d.get("region", ""),
+                    "best_season": d.get("best_season", ""),
+                    "highlight": d.get("highlight", ""),
+                    "tagline": d.get("tagline", ""),
+                    "category": d.get("category", []),
+                    "lat": d.get("lat", 0),
+                    "lon": d.get("lon", 0),
+                }
+            )
+
     return jsonify({"destinations": result, "query": query}), 200
 
 
@@ -172,10 +178,10 @@ def search_destinations():
 def get_destination_detail(destination_id):
     """Return single destination by ID."""
     dest = DESTINATIONS.get(destination_id)
-    
+
     if not dest:
         return jsonify({"error": "Destination not found"}), 404
-    
+
     result = {
         "id": destination_id,
         "label": dest["label"],
@@ -187,26 +193,28 @@ def get_destination_detail(destination_id):
         "lat": dest.get("lat", 0),
         "lon": dest.get("lon", 0),
     }
-    
+
     # Find related destinations (same region or category)
     related = []
     for key, d in DESTINATIONS.items():
         if key == destination_id:
             continue
-        
+
         # Check if same region or overlapping categories
         same_region = d.get("region") == dest.get("region")
         dest_categories = set(dest.get("category", []))
         d_categories = set(d.get("category", []))
         overlapping_categories = bool(dest_categories & d_categories)
-        
+
         if same_region or overlapping_categories:
-            related.append({
-                "id": key,
-                "label": d["label"],
-                "region": d.get("region", ""),
-                "tagline": d.get("tagline", ""),
-                "category": d.get("category", []),
-            })
-    
+            related.append(
+                {
+                    "id": key,
+                    "label": d["label"],
+                    "region": d.get("region", ""),
+                    "tagline": d.get("tagline", ""),
+                    "category": d.get("category", []),
+                }
+            )
+
     return jsonify({"destination": result, "related": related[:4]}), 200

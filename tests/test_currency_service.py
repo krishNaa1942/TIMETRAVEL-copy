@@ -3,7 +3,11 @@ Tests for currency conversion service.
 """
 
 from unittest.mock import patch, MagicMock
-from app.services.currency_service import convert_currency, get_supported_currencies, _cache
+from app.services.currency_service import (
+    convert_currency,
+    get_supported_currencies,
+    _cache,
+)
 
 
 class TestConvertCurrency:
@@ -102,6 +106,7 @@ class TestFetchRates:
         mock_get.return_value = mock_resp
 
         from app.services.currency_service import _fetch_rates
+
         rates = _fetch_rates("USD")
         assert rates is not None
         assert rates["INR"] == 83.5
@@ -109,9 +114,11 @@ class TestFetchRates:
     @patch("app.services.currency_service.requests.get")
     def test_api_error_returns_none(self, mock_get):
         import requests
+
         mock_get.side_effect = requests.RequestException("timeout")
 
         from app.services.currency_service import _fetch_rates
+
         rates = _fetch_rates("USD")
         assert rates is None
 
@@ -123,6 +130,7 @@ class TestFetchRates:
         mock_get.return_value = mock_resp
 
         from app.services.currency_service import _fetch_rates
+
         _fetch_rates("USD")
         _fetch_rates("USD")  # should use cache
         assert mock_get.call_count == 1

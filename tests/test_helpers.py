@@ -4,11 +4,16 @@ Tests for app.utils.helpers
 Unit tests for utility functions.
 """
 
-
-from app.utils.helpers import sanitise_destination, clamp, safe_float, safe_int, truncate
-
+from app.utils.helpers import (
+    sanitise_destination,
+    clamp,
+    safe_float,
+    safe_int,
+    truncate,
+)
 
 # ── sanitise_destination ───────────────────────────────────────────────
+
 
 class TestSanitiseDestination:
     def test_strips_whitespace(self):
@@ -33,6 +38,7 @@ class TestSanitiseDestination:
 
 # ── clamp ──────────────────────────────────────────────────────────────
 
+
 class TestClamp:
     def test_within_bounds(self):
         assert clamp(5, 0, 10) == 5
@@ -56,6 +62,7 @@ class TestClamp:
 
 # ── safe_float ─────────────────────────────────────────────────────────
 
+
 class TestSafeFloat:
     def test_valid_string(self):
         assert safe_float("3.14") == 3.14
@@ -78,6 +85,7 @@ class TestSafeFloat:
 
 # ── safe_int ───────────────────────────────────────────────────────────
 
+
 class TestSafeInt:
     def test_valid_string(self):
         assert safe_int("42") == 42
@@ -99,6 +107,7 @@ class TestSafeInt:
 
 
 # ── truncate ───────────────────────────────────────────────────────────
+
 
 class TestTruncate:
     def test_short_text_unchanged(self):

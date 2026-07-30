@@ -71,7 +71,9 @@ def _calculate_level(total_xp: int) -> dict:
         "Legendary Voyager",
     ]
 
-    progress = int((remaining_xp / xp_for_current_level) * 100) if xp_for_current_level else 0
+    progress = (
+        int((remaining_xp / xp_for_current_level) * 100) if xp_for_current_level else 0
+    )
 
     return {
         "level": level,
@@ -91,7 +93,9 @@ def _build_travel_dna(stats: dict, context_data: dict) -> dict:
     search_activity = len(context_data.get("recent_searches", []))
     places_visited = int(stats.get("places_visited", 0) or 0)
     total_spent = float(stats.get("total_spent", 0) or 0)
-    budget_preference = str(context_data.get("preferences", {}).get("budget_preference", "moderate"))
+    budget_preference = str(
+        context_data.get("preferences", {}).get("budget_preference", "moderate")
+    )
 
     dna = {
         "explorer": min(100, trip_total * 12 + places_visited * 2),
@@ -100,7 +104,14 @@ def _build_travel_dna(stats: dict, context_data: dict) -> dict:
         "adventure": min(100, completed_trips * 10 + active_trips * 8),
         "culture": min(100, places_visited * 3 + favorites_count * 2),
         "relaxation": min(100, 30 + max(0, favorites_count - active_trips) * 4),
-        "budget": min(100, 90 if budget_preference == "budget" else 65 if budget_preference == "moderate" else 35),
+        "budget": min(
+            100,
+            (
+                90
+                if budget_preference == "budget"
+                else 65 if budget_preference == "moderate" else 35
+            ),
+        ),
         "social": min(100, favorites_count * 4 + completed_trips * 3),
     }
 
@@ -108,7 +119,9 @@ def _build_travel_dna(stats: dict, context_data: dict) -> dict:
 
 
 def _build_personality(dna: dict, context_data: dict) -> dict:
-    preference_style = str(context_data.get("preferences", {}).get("travel_style", "")).lower()
+    preference_style = str(
+        context_data.get("preferences", {}).get("travel_style", "")
+    ).lower()
 
     style_map = {
         "adventure": {
@@ -137,7 +150,9 @@ def _build_personality(dna: dict, context_data: dict) -> dict:
         },
     }
 
-    dominant_trait = max(dna.items(), key=lambda item: item[1])[0] if dna else "explorer"
+    dominant_trait = (
+        max(dna.items(), key=lambda item: item[1])[0] if dna else "explorer"
+    )
     trait_map = {
         "explorer": {
             "icon": "🌍",
@@ -189,7 +204,9 @@ def _build_personality(dna: dict, context_data: dict) -> dict:
         },
     }
 
-    return style_map.get(preference_style) or trait_map.get(dominant_trait, trait_map["explorer"])
+    return style_map.get(preference_style) or trait_map.get(
+        dominant_trait, trait_map["explorer"]
+    )
 
 
 def _build_smart_actions(stats: dict) -> list[dict]:
@@ -202,63 +219,73 @@ def _build_smart_actions(stats: dict) -> list[dict]:
     actions: list[dict] = []
 
     if active_trips > 0:
-        actions.append({
-            "id": "resume-planning",
-            "icon": "🗺️",
-            "title": "Resume Planning",
-            "subtitle": "Continue your active trip",
-            "color": "#3B82F6",
-            "route": "TripWorkspace",
-            "priority": 1,
-            "visible": True,
-        })
+        actions.append(
+            {
+                "id": "resume-planning",
+                "icon": "🗺️",
+                "title": "Resume Planning",
+                "subtitle": "Continue your active trip",
+                "color": "#3B82F6",
+                "route": "TripWorkspace",
+                "priority": 1,
+                "visible": True,
+            }
+        )
 
     if favorites_count > 0:
-        actions.append({
-            "id": "view-saved",
-            "icon": "❤️",
-            "title": "Open Saved",
-            "subtitle": "Review destinations you saved",
-            "color": "#EC4899",
-            "route": "Favorites",
-            "priority": 2,
-            "visible": True,
-        })
+        actions.append(
+            {
+                "id": "view-saved",
+                "icon": "❤️",
+                "title": "Open Saved",
+                "subtitle": "Review destinations you saved",
+                "color": "#EC4899",
+                "route": "Favorites",
+                "priority": 2,
+                "visible": True,
+            }
+        )
 
     if places_visited > 0:
-        actions.append({
-            "id": "view-stats",
-            "icon": "📊",
-            "title": "View Travel Stats",
-            "subtitle": "See your travel history",
-            "color": "#10B981",
-            "route": "TravelStats",
-            "priority": 3,
-            "visible": True,
-        })
+        actions.append(
+            {
+                "id": "view-stats",
+                "icon": "📊",
+                "title": "View Travel Stats",
+                "subtitle": "See your travel history",
+                "color": "#10B981",
+                "route": "TravelStats",
+                "priority": 3,
+                "visible": True,
+            }
+        )
 
     if total_spent > 0:
-        actions.append({
-            "id": "plan-budget",
-            "icon": "💰",
-            "title": "Plan Budget",
-            "subtitle": "Track upcoming travel spend",
-            "color": "#F59E0B",
-            "route": "Budget",
-            "priority": 4,
-            "visible": True,
-        })
+        actions.append(
+            {
+                "id": "plan-budget",
+                "icon": "💰",
+                "title": "Plan Budget",
+                "subtitle": "Track upcoming travel spend",
+                "color": "#F59E0B",
+                "route": "Budget",
+                "priority": 4,
+                "visible": True,
+            }
+        )
 
-    actions.append({
-        "id": "discover-new",
-        "icon": "✨",
-        "title": "Discover New Places",
-        "subtitle": "Browse server-ranked recommendations",
-        "color": "#8B5CF6",
-        "route": "Places",
-        "priority": 5,
-        "visible": True,
-    })
+    actions.append(
+        {
+            "id": "discover-new",
+            "icon": "✨",
+            "title": "Discover New Places",
+            "subtitle": "Browse server-ranked recommendations",
+            "color": "#8B5CF6",
+            "route": "Places",
+            "priority": 5,
+            "visible": True,
+        }
+    )
 
     return sorted(actions, key=lambda action: action["priority"])
 
@@ -330,7 +357,9 @@ def _normalize_insight(insight: dict) -> dict:
     }
 
     insight_type = str(insight.get("type", "suggestion"))
-    message = insight.get("content") or insight.get("title") or "Travel insight available."
+    message = (
+        insight.get("content") or insight.get("title") or "Travel insight available."
+    )
 
     return {
         "id": insight.get("id"),
@@ -347,9 +376,13 @@ def _build_user_context(user: User, stats: dict, context_data: dict) -> UserCont
     base_q = Trip.query.filter_by(user_id=user.id).order_by(Trip.created_at.desc())
     completed_trips = base_q.filter(Trip.status == "completed").limit(10).all()
     active_trips = base_q.filter(Trip.status == "active").limit(10).all()
-    upcoming_trips = base_q.filter(Trip.status.in_({"planning", "active"})).limit(10).all()
+    upcoming_trips = (
+        base_q.filter(Trip.status.in_({"planning", "active"})).limit(10).all()
+    )
 
-    search_history = [{"query": query} for query in context_data.get("recent_searches", []) if query]
+    search_history = [
+        {"query": query} for query in context_data.get("recent_searches", []) if query
+    ]
 
     return UserContext(
         user_id=str(user.id),
@@ -359,7 +392,9 @@ def _build_user_context(user: User, stats: dict, context_data: dict) -> UserCont
         saved_destinations=context_data.get("favorite_destinations", []),
         active_trips=[trip.to_dict() for trip in active_trips],
         upcoming_trips=[trip.to_dict() for trip in upcoming_trips],
-        past_destinations=[trip.destination for trip in completed_trips if trip.destination],
+        past_destinations=[
+            trip.destination for trip in completed_trips if trip.destination
+        ],
         budget_range=(0, float("inf")),
         home_location=None,
     )
@@ -384,9 +419,13 @@ def get_profile_summary():
     stats = stats_payload.get("stats", {})
 
     try:
-        context_data = _run_sync(user_preferences_service.get_recommendation_context(str(user.id)))
+        context_data = _run_sync(
+            user_preferences_service.get_recommendation_context(str(user.id))
+        )
     except Exception as exc:  # pragma: no cover - defensive fallback
-        logger.warning("Falling back to empty preference context for profile summary: %s", exc)
+        logger.warning(
+            "Falling back to empty preference context for profile summary: %s", exc
+        )
         context_data = {
             "preferences": {},
             "recent_searches": [],
@@ -399,7 +438,9 @@ def get_profile_summary():
 
     try:
         raw_summary = ai_insights_service.generate_ai_summary(str(user.id), context)
-        raw_insights = ai_insights_service.generate_insights(str(user.id), context, limit=5)
+        raw_insights = ai_insights_service.generate_insights(
+            str(user.id), context, limit=5
+        )
     except Exception as exc:  # pragma: no cover - defensive fallback
         logger.warning("Profile intelligence generation failed: %s", exc)
         raw_summary = {
@@ -415,20 +456,23 @@ def get_profile_summary():
     level = _calculate_level(_calculate_total_xp(stats))
     insights = [_normalize_insight(insight.to_dict()) for insight in raw_insights]
 
-    return jsonify({
-        "success": True,
-        "data": {
-            "profile": user.to_dict(),
-            "stats": stats,
-            "preferences": context_data.get("preferences", {}),
-            "summary": raw_summary.get("summary"),
-            "summary_meta": raw_summary,
-            "level": level,
-            "travel_dna": travel_dna,
-            "personality": personality,
-            "insights": insights,
-            "smart_actions": _build_smart_actions(stats),
-            "quick_actions": _build_quick_actions(stats),
-            "generated_at": raw_summary.get("generated_at") or raw_summary.get("generatedAt"),
-        },
-    })
+    return jsonify(
+        {
+            "success": True,
+            "data": {
+                "profile": user.to_dict(),
+                "stats": stats,
+                "preferences": context_data.get("preferences", {}),
+                "summary": raw_summary.get("summary"),
+                "summary_meta": raw_summary,
+                "level": level,
+                "travel_dna": travel_dna,
+                "personality": personality,
+                "insights": insights,
+                "smart_actions": _build_smart_actions(stats),
+                "quick_actions": _build_quick_actions(stats),
+                "generated_at": raw_summary.get("generated_at")
+                or raw_summary.get("generatedAt"),
+            },
+        }
+    )
