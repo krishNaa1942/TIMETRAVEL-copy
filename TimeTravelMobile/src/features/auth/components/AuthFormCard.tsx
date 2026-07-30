@@ -1,7 +1,10 @@
 import React, { memo } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -146,22 +149,30 @@ export const AuthFormCard = memo(function AuthFormCard({
   const nextMode = mode === "login" ? "signup" : "login";
 
   return (
-    <View style={styles.card}>
-      <FeedbackBanner feedback={feedback} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={styles.flex}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <FeedbackBanner feedback={feedback} />
 
-      {/* Email */}
-      <Field
-        label="Email"
-        value={getAuthValue(values, "email")}
-        error={getAuthFieldError(errors, "email")?.message}
-        onChangeText={(t) => onChangeField("email", t)}
-        placeholder="you@example.com"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+          {/* Email */}
+          <Field
+            label="Email"
+            value={getAuthValue(values, "email")}
+            error={getAuthFieldError(errors, "email")?.message}
+            onChangeText={(t) => onChangeField("email", t)}
+            placeholder="you@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-      {/* Password (not shown in forgot mode) */}
-      {mode !== "forgot" ? (
+          {/* Password (not shown in forgot mode) */}
+          {mode !== "forgot" ? (
         <Field
           label="Password"
           value={getAuthValue(values, "password")}
@@ -262,14 +273,22 @@ export const AuthFormCard = memo(function AuthFormCard({
         <Pressable onPress={() => onChangeMode(nextMode)}>
           <Text style={styles.switchLink}>{switchLabel}</Text>
         </Pressable>
+        </View>
       </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 });
 
 // ─── Styles ─────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
