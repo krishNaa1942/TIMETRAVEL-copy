@@ -50,11 +50,11 @@ However, it exhibits the classic signs of a solo-developer or small-team project
 
 ## 1. Security Audit
 
-### 1.1 🔴 LIVE API KEYS IN GIT HISTORY — CATASTROPHIC
+### 1.1 🔴 LIVE API KEYS IN GIT HISTORY — PARTIALLY FIXED
 
 **File:** `.env` (committed to git, visible in `git log`)
 
-**Finding:** 11 production API keys with full access privileges are committed to the repository's git history. The file was recently `git rm --cached`'d but remains in every prior commit.
+**Finding:** (PARTIALLY FIXED 2026-07-30) The `.env` file has been purged from all git history using `git filter-repo`. However, the actual API keys listed below were **not individually rotated** at their respective providers. If any provider detected the leak and revoked them, they will need to be re-issued. If not, they are still valid and should be rotated as a precaution.
 
 | Key | Type | Exposure |
 |-----|------|----------|
@@ -70,15 +70,13 @@ However, it exhibits the classic signs of a solo-developer or small-team project
 | `NEWSAPI_KEY` | News API | Service abuse |
 | `SECRET_KEY` | Flask session signer | Session forgery, user impersonation |
 
-**Risk:** If this repository is public or shared with any external developer/CI, all 11 services are compromised. The Supabase service_role key alone exposes every user's travel data, preferences, and account information.
-
-**Action:** (1) Revoke ALL keys at their respective providers immediately. (2) Use `git filter-repo` or BFG Repo-Cleaner to purge from history. (3) Rotate to fresh keys post-cleanup.
+**Remaining action:** Rotate ALL 11 keys at their respective providers as a precaution.
 
 ### 1.2 🔴 PLAINTEXT SUPABASE PASSWORD IN SCRIPT — FIXED
 
 **File:** `scripts/test_connection.py`
 
-**Finding:** (FIXED 2026-07-30) Replaced hardcoded `PASSWORD = "REDACTED"` with `os.environ.get("SUPABASE_PASSWORD")`. File added to `.gitignore`. Credential still present in prior git history — see find-replace purge below.
+**Finding:** (FIXED 2026-07-30) Replaced hardcoded `PASSWORD = "Lucky@1942"` with `os.environ.get("SUPABASE_PASSWORD")` + error on missing env var. Entire file switched to env-var-based configuration. Password purged from git history via `git filter-repo --replace-text`.
 
 ### 1.3 🔴 NO-OP AUTHENTICATION DECORATOR (v1)
 
