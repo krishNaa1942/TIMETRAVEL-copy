@@ -35,9 +35,9 @@ def _tomtom_key() -> str:
 # ---------------------------------------------------------------------------
 @maps_bp.route("/api/maps/config", methods=["GET"])
 def map_config():
-    """Return whether TomTom maps are available (key configured server-side only)."""
+    """Return TomTom map config including key for client-side SDK init."""
     key = _tomtom_key()
-    return jsonify({"available": bool(key)}), 200
+    return jsonify({"available": bool(key), "key": key or ""}), 200
 
 
 # ---------------------------------------------------------------------------

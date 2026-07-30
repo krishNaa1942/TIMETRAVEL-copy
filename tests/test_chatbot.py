@@ -9,44 +9,54 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 
+@pytest.fixture()
+def auth(client):
+    """Register and login a test user, returning the authenticated client."""
+    client.post(
+        "/api/auth/register",
+        json={"name": "Tester", "email": "test@example.com", "password": "Test1234!"},
+    )
+    return client
+
+
 class TestChatEndpoint:
     """Tests for POST /api/chat."""
 
-    def test_chat_returns_200_with_valid_message(self, client):
-        resp = client.post("/api/chat", json={"message": "hello"})
+    def test_chat_returns_200_with_valid_message(self, auth):
+        resp = auth.post("/api/chat", json={"message": "hello"})
         assert resp.status_code == 200
         data = resp.get_json()
         assert "reply" in data
         assert "intent" in data
         assert "confidence" in data
 
-    def test_chat_returns_400_without_message(self, client):
-        resp = client.post("/api/chat", json={})
+    def test_chat_returns_400_without_message(self, auth):
+        resp = auth.post("/api/chat", json={})
         assert resp.status_code == 400
 
-    def test_chat_detects_greeting_intent(self, client):
-        resp = client.post("/api/chat", json={"message": "hi there"})
+    def test_chat_detects_greeting_intent(self, auth):
+        resp = auth.post("/api/chat", json={"message": "hi there"})
         data = resp.get_json()
         assert data["intent"] == "greeting"
 
-    def test_chat_detects_budget_intent(self, client):
-        resp = client.post(
+    def test_chat_detects_budget_intent(self, auth):
+        resp = auth.post(
             "/api/chat",
             json={"message": "how much will a trip to Goa cost?"},
         )
         data = resp.get_json()
         assert data["intent"] == "budget"
 
-    def test_chat_detects_safety_intent(self, client):
-        resp = client.post(
+    def test_chat_detects_safety_intent(self, auth):
+        resp = auth.post(
             "/api/chat",
             json={"message": "is it safe to travel to Delhi?"},
         )
         data = resp.get_json()
         assert data["intent"] == "safety"
 
-    def test_chat_returns_session_id(self, client):
-        resp = client.post(
+    def test_chat_returns_session_id(self, auth):
+        resp = auth.post(
             "/api/chat",
             json={"message": "hello", "session_id": "test-123"},
         )
@@ -55,9 +65,9 @@ class TestChatEndpoint:
 
     @patch("app.api.routes.chatbot._google_key", return_value="")
     def test_chat_falls_back_to_classic_when_gemini_unavailable(
-        self, _mock_key, client
+        self, _mock_key, auth
     ):
-        resp = client.post(
+        resp = auth.post(
             "/api/chat",
             json={"message": "plan a Goa trip", "mode": "ai"},
         )
@@ -81,17 +91,17 @@ class TestGeminiSessionLifecycle:
         from app.services import gemini_service
 
         gemini_service._sessions.clear()
-        # Provide a mock model so _get_session can call start_chat
-        self._orig_model = gemini_service._model
-        mock_model = MagicMock()
-        mock_model.start_chat.return_value = MagicMock(history=[])
-        gemini_service._model = mock_model
+        # Provide a mock client so _get_session can call chats.create
+        self._orig_client = gemini_service._client
+        mock_client = MagicMock()
+        mock_client.chats.create.return_value = MagicMock(history=[])
+        gemini_service._client = mock_client
 
     def teardown_method(self):
         from app.services import gemini_service
 
         gemini_service._sessions.clear()
-        gemini_service._model = self._orig_model
+        gemini_service._client = self._orig_client
 
     def test_session_created_with_timestamp(self):
         from app.services.gemini_service import _get_session, _sessions
@@ -155,11 +165,11 @@ class TestGeminiSessionLifecycle:
 
         mock_chat = MagicMock()
         # 10 turn pairs = 20 messages, should be trimmed to 3*2=6
-        mock_chat.history = list(range(20))
+        mock_chat._history = list(range(20))
         _trim_history(mock_chat)
-        assert len(mock_chat.history) == 6
+        assert len(mock_chat._history) == 6
         # Should keep the most recent messages (14..19)
-        assert mock_chat.history == list(range(14, 20))
+        assert mock_chat._history == list(range(14, 20))
 
         gemini_service.MAX_HISTORY_TURNS = orig_max
 
@@ -167,9 +177,9 @@ class TestGeminiSessionLifecycle:
         from app.services.gemini_service import _trim_history
 
         mock_chat = MagicMock()
-        mock_chat.history = list(range(4))
+        mock_chat._history = list(range(4))
         _trim_history(mock_chat)
-        assert len(mock_chat.history) == 4
+        assert len(mock_chat._history) == 4
 
     def test_session_count(self):
         from app.services import gemini_service
