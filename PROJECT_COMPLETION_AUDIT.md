@@ -9,28 +9,29 @@
 
 | Area | Status | Grade |
 |---|---|---|
-| Backend tests | **857 passed, 2 skipped, 0 failed** | 🟢 A |
-| Test coverage | **65.4%** (CI gate 60% — PASSES) | 🟢 A |
+| Backend tests | **894 passed, 2 skipped, 0 failed** | 🟢 A |
+| Test coverage | **66.6%** (CI gate 60% — PASSES) | 🟢 A |
 | flake8 / black | 0 issues, clean | 🟢 A |
 | TypeScript | 0 errors (`tsc --noEmit`) | 🟢 A |
 | CI | lint → test → integration → typescript → ml (validate/audit/smoke-train/eval/chat-QA) | 🟢 A |
 | ML track (Phases 1–3, 5–8) | **Complete, shipped, gated** | 🟢 A |
-| Chat + recommendation integration (Phases 9–10) | **Planned, not yet executed** | 🟡 B |
+| Chat + recommendation integration (Phases 9–10) | **Complete** (real ML metadata on chat, `/api/recommendations`, priors active, HomeScreen wired) | 🟢 A |
 | Seasonality/cost/safety models (Phase 4) | **Blocked — no real data** (audit-verified) | 🔴 D |
-| Explore alignment (Phase 11) + vision backlog (12–17) | Not started | 🔴 D |
+| Explore alignment (Phase 11) | **Complete** (server-side filters, budget/rating enrichment, Hidden Gems + Weekend Escapes) | 🟢 A |
+| Vision backlog (12–17) | Not started | 🟡 B |
 | Deploy path (Docker/VPS/CI/CD) | Ready (certbot, lowmem, monitoring) — needs user actions (domain/VPS/keys) | 🟡 B |
 | Play Store release | **Not done** (keystore/AAB/listing — roadmap item still unchecked) | 🔴 D |
 | Documentation | `IMPLEMENTATION_ROADMAP.md` is a stale starter checklist (3/580+ checked despite the project being built) — needs rewrite | 🔴 D |
 
-**Bottom line:** The ML brain is built, measured, and gated; the product surfaces for it (chat metadata, recommendations route) are planned but not yet wired. The remaining work to "complete the vision" is: execute Phases 9–10 (integration), build a real India QA dataset (12), then personalization/agentic/offline (13–17), plus the non-ML tracks (Play Store, roadmap rewrite, vision doc).
+**Bottom line:** The ML brain is built, measured, and gated; all in-plan product surfaces are now wired (chat metadata, recommendations route + HomeScreen, Explore filters/sections). Remaining work: build a real India QA dataset (12), then personalization/agentic/offline (13–17), plus the non-ML tracks (Play Store, roadmap rewrite, vision doc).
 
 ---
 
 ## Part 1 — Verified Current State
 
-- `python3 -m pytest tests/ -q --cov=app` → **857 passed, 2 skipped, coverage 65.4%** (gate 60%).
+- `python3 -m pytest tests/ -q --cov=app` → **894 passed, 2 skipped, coverage 66.6%** (gate 60%).
 - `flake8 app/ scripts/ tests/ --max-line-length=120` → clean; `black` → clean.
-- `tsc --noEmit` (TimeTravelMobile) → 0 errors (per earlier CI runs; re-verify in Phase 9).
+- `tsc --noEmit` (TimeTravelMobile) → 0 errors.
 - CI `ml` job pipeline: `prepare_training_data.py` → `audit_targets.py` → `train_models.py --smoke` → `evaluate_models.py --smoke --real-only` → `evaluate_chat_qa.py --smoke` — all green.
 - Full model run (local, real data): quality MAE 0.338, popularity MAE 0.494, content same-state precision@5 0.652, intent accuracy 0.820/f1 0.824, chat flow accuracy 0.930, fallback 1%.
 
@@ -47,28 +48,17 @@
 | 6 | Chat QA end-to-end gate (`evaluate_chat_qa.py`) + singleton bugfix | `236aeeb` | full-flow acc 0.840 → 0.930 after Phase 7; gate 0.85 |
 | 7 | Classic chatbot tier trained on 5000 real QA questions (balanced) | `86f94f6` | classic tier 0.177 → 0.933 acc, 11% → 98% coverage; fallback 8% → 1% |
 | 8 | Destination-aware responses (`destinations.py`, template variants, API `destination` field) | `2add0f1` | extraction unit-tested on Indian places; corpus note documented |
+| 9 | Chat ML integration — real ML metadata on both chat paths, `ChatMessage.destination` column + migration, mobile metadata chips | `8750d86` | AI & classic paths return real intent/confidence/destination; persisted for future training |
+| 10 | Recommendation engine exposure — `GET /api/recommendations` (auth, params, pagination), priors activated in `RecommendationService`, HomeScreen carousel API-backed | `f9afc90` | season label now feeds seasonality score; 12 new route/seasonality tests |
+| 11 | Explore alignment — server-side `query/category/region/budget/sortBy` filters, budgetLevel/daily_cost/rating enrichment, Hidden Gems + Weekend Escapes sections | `e162afe` | filters use real budget/safety JSON + learned priors (memoized); 20 new tests |
 
 Artifacts (gitignored, reproducible from committed data): `data/models/*.joblib` (9) + `app/chatbot/model_cache/` (2).
 
 ---
 
-## Part 3 — In-Plan Phases (next to execute)
+## Part 3 — In-Plan Phases: ALL EXECUTED ✅
 
-### Phase 9 — Chat ML Integration (backend + mobile)
-- Backend: Gemini paths return real `intent`/`confidence`/`destination` (`app/api/routes/chatbot.py` ~L130, ~L202); `_persist_message` stores `destination`; new `ChatMessage.destination` column + alembic migration (`app/models/entities.py:102`).
-- Templates: rephrase 4 destination-aware variants to drop dead URLs (`/api/transport|hotels|food|things-to-do` don't exist; weather/safety/budget links live).
-- Mobile: `ChatMessage`/`ChatResponse` types gain metadata (`TimeTravelMobile/src/types/index.ts:55-71`); `useChatAgent.ts:281-286` uses server values (client heuristics stay as offline fallback); `ChatBubble.tsx` metadata row (destination chip + intent chip + model/confidence) between message text and footer (L143–152).
-- Verify: extend `tests/test_chatbot.py` (AI-path fields, DB persistence), `tsc --noEmit`, full suite + coverage.
-
-### Phase 10 — Recommendation Engine Exposure
-- Backend: new `GET /api/recommendations` blueprint (`season, trip_duration, group_size, budget_max, limit, offset`), `@login_required`, rate-limited, backed by `AIRecommendationService` (learned-priors blended by default); register in `app/main.py:292-320`; activate priors in `recommendation_engine.RecommendationService` (`ScoringEngine(priors=LearnedPriors.get_instance())` — currently dormant, `recommendation_engine.py:557`).
-- Mobile: HomeScreen "Recommended for You" (L843–851) switches from `featuredDestinations` slice to the orphaned `useRecommendations()` hook (`src/api/queries/useRecommendations.ts`, params already match); skeleton loading; featured-fallback on error/empty; server score as "• N% match".
-- Verify: route tests (auth/params/mocked fallback), priors-activation test, `tsc --noEmit`, full suite.
-
-### Phase 11 — Explore Screen Alignment (deferred)
-- Add "Hidden Gems"/"Weekend Escapes" sections (copy exists, no UI — `featureConfig.ts:268`, `journalAI.ts:255`).
-- Make server honor `query/category/region/budget/sortBy` on `GET /api/destinations` (params sent by `useDestinations.ts:91-93` but ignored server-side).
-- Optionally feed Explore's "Curated for You"/seasonal/trending sections (`useExploreEngine.ts:106-175`) from the Phase 10 route.
+Phases 9, 10, and 11 shipped (see table above). No in-plan phases remain; the next work is the vision backlog (Part 5) and non-ML tracks (Part 6).
 
 ---
 
@@ -92,7 +82,7 @@ Artifacts (gitignored, reproducible from committed data): `data/models/*.joblib`
 | 16 | **Offline support** — maps/itinerary/notes/emergency contacts for poor-connectivity regions | L | — |
 | 17 | **Booking integrations** — hotels/flights/transport links ("planned integration" per vision) | L | 14 |
 
-Known orphaned code to be consumed by these phases: `AIRecommendationService` (no route calls it), `get_ai_recommendations` (`trip_management.py:510`, zero callers), `recommendation_engine` (only imported by tests), mobile `useRecommendations.ts` (unimported).
+Known orphaned code to be consumed by these phases: `get_ai_recommendations` (`trip_management.py:510`, zero callers — trip-level variant of Phase 10's route), `recommendation_engine` (imported by tests + the Phase-10-activated `RecommendationService`).
 
 ---
 
@@ -112,21 +102,17 @@ Known orphaned code to be consumed by these phases: `AIRecommendationService` (n
 ## Part 7 — Key Findings & Risks
 
 1. **Corpus geography mismatch** — the 5,000-question QA corpus is generic travel Q&A (Cape Town / South Africa forum threads); intent model generalizes well (0.93 chat flow) but destination extraction can't be benchmarked on it. Highest-leverage fix = Phase 12.
-2. **Learned-priors blending was dormant at engine level** — `RecommendationService` builds `ScoringEngine()` without priors (`recommendation_engine.py:557`); Phase 10 activates it.
-3. **4 dead endpoint links** in destination-aware chat templates (transport/hotels/food/things-to-do) — Phase 9 rephrases them.
-4. **AI chat path faked ML fields** (`"ai_response"`, `confidence: 1.0`, no destination) — Phase 9 fixes contract parity.
-5. **Per-message artifact reload bug** (Phase 6) — fixed via `get_instance()`; regression covered by tests.
-6. **Model reproducibility** — all artifacts gitignored by design (`531a551`); CI reproduces from committed data; keep `train_models.py`/data in sync with app expectations.
-7. **Seasonality risk** — if real data never arrives, seasonal sections ("Perfect For This Season") must remain heuristic-only; do not ship unlearnable models.
+2. **Recommendations candidate pool is the DB** — `AIRecommendationService`/`RecommendationService` score the DB `Destination` model, which is **never seeded** (the app serves `data/india_destinations.json`). `/api/recommendations` therefore degrades to TripQuery/fallback items until destinations are seeded — Home shows featured fallback; Explore was deliberately not fed from it (Phase 11).
+3. **Seasonality risk** — if real data never arrives, seasonal sections ("Perfect For This Season") must remain heuristic-only; do not ship unlearnable models (Phase 4 guardrail).
 
 ---
 
 ## Part 8 — Recommended Execution Order
 
-1. **Phase 9** — chat ML integration (small, unblocks user-visible ML) 
-2. **Phase 10** — recommendation route + HomeScreen wiring (largest unused ML asset)
-3. **Phase 12** — India QA dataset (improves everything downstream; unblocks 13–14 honesty)
-4. **Phase 13 → 15** — personalization + memory
-5. **Phase 11** — Explore alignment (can fold into 12/13 delivery windows)
+1. ~~Phase 9 — chat ML integration~~ ✅ `8750d86`
+2. ~~Phase 10 — recommendation route + HomeScreen wiring~~ ✅ `f9afc90`
+3. ~~Phase 11 — Explore alignment~~ ✅ `e162afe`
+4. **Phase 12** — India QA dataset (improves everything downstream; unblocks 13–14 honesty)
+5. **Phase 13 → 15** — personalization + memory
 6. **Phase 16 → 17** — offline, bookings
 7. Non-ML in parallel: Play Store release, roadmap rewrite, `VISION.md`, Oracle signup + domain
