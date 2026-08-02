@@ -263,7 +263,7 @@ def chat_status():
 # ---------------------------------------------------------------------------
 def _classic_response(message, session_id):
     """Run the local TF-IDF + LogReg pipeline."""
-    reply, intent, confidence = chat(message)
+    reply, intent, confidence, destination = chat(message)
     _persist_message(session_id, message, reply, intent=intent)
 
     return (
@@ -272,6 +272,7 @@ def _classic_response(message, session_id):
                 "reply": reply,
                 "intent": intent,
                 "confidence": confidence,
+                "destination": destination,
                 "model": "tfidf-logreg",
                 "mode": "classic",
                 "session_id": session_id,

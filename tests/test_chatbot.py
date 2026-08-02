@@ -39,6 +39,15 @@ class TestChatEndpoint:
         data = resp.get_json()
         assert data["intent"] == "greeting"
 
+    def test_chat_returns_destination_when_mentioned(self, auth):
+        resp = auth.post(
+            "/api/chat",
+            json={"message": "best restaurants in goa"},
+        )
+        data = resp.get_json()
+        assert data["destination"] == "Goa"
+        assert "Goa" in data["reply"]
+
     def test_chat_detects_budget_intent(self, auth):
         resp = auth.post(
             "/api/chat",

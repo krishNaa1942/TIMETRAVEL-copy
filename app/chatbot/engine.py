@@ -31,7 +31,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-from app.chatbot.responses import RESPONSES
+from app.chatbot.destinations import extract_destination
+from app.chatbot.responses import DESTINATION_RESPONSES, RESPONSES
 
 logger = logging.getLogger(__name__)
 
@@ -233,21 +234,30 @@ def _classify_learned_qa(message: str) -> Tuple[str, float]:
     return "fallback", 0.0
 
 
-def get_response(intent: str) -> str:
+def get_response(intent: str, destination: Optional[str] = None) -> str:
     """
     Pick a response string for the given intent.
 
+    When a destination was extracted from the user's message and a
+    destination-aware variant exists for the intent, the variant is used
+    with the destination name substituted in.
+
     Args:
         intent: Intent tag (e.g. "budget", "safety").
+        destination: Optional destination name mentioned by the user.
 
     Returns:
         A randomly chosen response string.
     """
     options = RESPONSES.get(intent, RESPONSES["fallback"])
+    if destination:
+        variants = DESTINATION_RESPONSES.get(intent)
+        if variants:
+            options = [v.format(name=destination) for v in variants]
     return random.choice(options)
 
 
-def chat(message: str) -> Tuple[str, str, float]:
+def chat(message: str) -> Tuple[str, str, float, Optional[str]]:
     """
     End-to-end chat: classify + respond.
 
@@ -255,8 +265,10 @@ def chat(message: str) -> Tuple[str, str, float]:
         message: Raw user text.
 
     Returns:
-        (response_text, intent_tag, confidence)
+        (response_text, intent_tag, confidence, destination) – destination
+        is the place mentioned in the message, if any.
     """
     intent, confidence = classify_intent(message)
-    reply = get_response(intent)
-    return reply, intent, confidence
+    destination = extract_destination(message)
+    reply = get_response(intent, destination)
+    return reply, intent, confidence, destination

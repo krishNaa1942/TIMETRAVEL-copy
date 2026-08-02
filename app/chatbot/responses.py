@@ -88,3 +88,53 @@ RESPONSES: Dict[str, List[str]] = {
         "and I'll suggest attractions and activities.",
     ],
 }
+
+# Destination-aware variants used when the user's message names a place
+# ({name} is substituted). Falls back to the generic RESPONSES otherwise.
+DESTINATION_RESPONSES: Dict[str, List[str]] = {
+    "destination_info": [
+        "Great pick — {name}! Tell me what matters most: budget, safety, "
+        "weather, or things to do, and I'll tailor the advice for you.",
+    ],
+    "transport": [
+        "For {name}: check trains, flights and cabs. I can outline the best "
+        "way to reach it — or use the /api/transport/{name} endpoint.",
+        "Traveling to {name}? I'll help you compare trains, flights and road "
+        "options for a smooth family trip.",
+    ],
+    "accommodation": [
+        "Looking to stay in {name}? Share your budget and family size and "
+        "I'll match you with suitable hotels or resorts — or use the "
+        "/api/hotels/{name} endpoint.",
+        "Staying in {name}? I can help find family-friendly places to stay "
+        "once I know your budget.",
+    ],
+    "food_dining": [
+        "In {name}, local food is a highlight! I'll point you to specialties "
+        "and family-friendly dining options — or use the /api/food/{name} "
+        "endpoint.",
+        "Eating in {name}? Share what you're craving and I'll suggest local "
+        "cuisines and restaurants to try.",
+    ],
+    "entertainment": [
+        "In {name}, there's plenty to do! Tell me the experiences your family "
+        "enjoys and I'll suggest attractions — or use the "
+        "/api/things-to-do/{name} endpoint.",
+        "Planning fun in {name}? Share your travel style and I'll recommend "
+        "activities and sights.",
+    ],
+    "weather": [
+        "Checking weather for {name}? I can fetch live conditions and suggest "
+        "what to pack — or use the /api/weather/{name} endpoint.",
+    ],
+    "budget": [
+        "Budgeting a trip to {name}? Tell me the number of days, family size "
+        "and travel class (economy / comfort / premium) for an estimate — or "
+        "use the /api/budget/estimate endpoint.",
+    ],
+    "safety": [
+        "For {name}, I check crime rates, health infrastructure and "
+        "tourist-friendliness — or use the /api/safety/{name} endpoint for "
+        "the full profile.",
+    ],
+}

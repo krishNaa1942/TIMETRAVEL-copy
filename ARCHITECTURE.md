@@ -388,6 +388,15 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
                               metadata.json          .priors(name)       → (q, p)
 ```
 
+- **Destination-aware responses**: `app/chatbot/destinations.py` extracts
+  a destination mention (from the app's curated 201-name list in
+  `data/india_destinations.json`, longest match, word boundaries) and
+  `get_response()` substitutes destination-aware template variants
+  (`/api/transport/<dest>` etc.), with `destination` surfaced in the API
+  response. Note: the 5,000-question QA corpus is generic travel Q&A
+  (mostly Cape Town / South Africa forum threads), so it contains few
+  Indian destination names — extraction is validated by unit tests on
+  Indian places rather than scored on the QA benchmark.
 - **QA intent tier** (chat fallback): the classic chatbot pipeline
   (`app/chatbot/engine.py`) trains on its handcrafted `intents.json`
   patterns plus all 5,000 real user questions (coarse intents mapped onto
