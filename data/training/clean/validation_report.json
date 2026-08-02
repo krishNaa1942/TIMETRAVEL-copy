@@ -1,0 +1,30 @@
+{
+  "generated_by": "prepare_training_data.py",
+  "files": {
+    "tourism_destinations.csv": {
+      "input_rows": 3000,
+      "duplicates_dropped": 0,
+      "invalid_state_dropped": 0,
+      "synthetic_rows": 3000,
+      "output_rows": 3000
+    },
+    "top_indian_places.csv": {
+      "input_rows": 325,
+      "duplicates_dropped": 4,
+      "state_filled": 0,
+      "unique_names": 321,
+      "output_rows": 321
+    },
+    "expanded_destinations.csv": {
+      "input_rows": 1000,
+      "duplicates_dropped": 995,
+      "state_filled": 0,
+      "unique_names": 5,
+      "output_rows": 5
+    },
+    "places.csv": {
+      "input_rows": 2989,
+      "output_rows": 2989
+    }
+  }
+}

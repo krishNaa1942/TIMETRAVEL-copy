@@ -97,11 +97,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-train.txt
 
+      - name: Validate training data
+        run: python scripts/prepare_training_data.py
+
       - name: Smoke-train models
         run: python scripts/train_models.py --smoke
 
       - name: Evaluate with gates
-        run: python scripts/evaluate_models.py --smoke
+        run: python scripts/evaluate_models.py --smoke --real-only
 
   # ── Integration Tests ─────────────────────────────────
   integration:

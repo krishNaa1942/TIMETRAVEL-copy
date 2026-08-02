@@ -99,6 +99,7 @@ def load_quality_dataset(
         + top["significance"].astype(str)
     )
     top = top[["name", "state", "text", "rating", "fee", "time_needed"]]
+    top["source"] = "top_indian_places"
     frames.append(top)
 
     places = pd.read_csv(training_dir / "places.csv")
@@ -121,7 +122,10 @@ def load_quality_dataset(
     places["state"] = ""  # resolved later via state lookup
     places["fee"] = np.nan
     places["time_needed"] = np.nan
-    frames.append(places[["name", "state", "text", "rating", "fee", "time_needed"]])
+    places["source"] = "places"
+    frames.append(
+        places[["name", "state", "text", "rating", "fee", "time_needed", "source"]]
+    )
 
     df = pd.concat(frames, ignore_index=True)
     df = df[pd.to_numeric(df["rating"], errors="coerce").notna()]
@@ -176,8 +180,15 @@ def load_content_corpus(
         blob = " ".join(filter(None, [key, clean_text(state), text])).lower()
         records[key] = blob if key not in records else records[key] + " " + blob
 
-    # Rich synthetic features (text only — validated later)
-    synth = pd.read_csv(training_dir / "tourism_destinations.csv")
+    # Rich synthetic features (text only — validated later). Prefer the
+    # validated copy from prepare_training_data.py and skip rows flagged
+    # synthetic (Place_N style names pollute the similarity space).
+    synth_path = training_dir / "clean" / "tourism_destinations_clean.csv"
+    if not synth_path.exists():
+        synth_path = training_dir / "tourism_destinations.csv"
+    synth = pd.read_csv(synth_path)
+    if "is_synthetic" in synth.columns:
+        synth = synth[synth["is_synthetic"].fillna(False) != True]  # noqa: E712
     for _, row in synth.iterrows():
         add(
             row["destination_name"],

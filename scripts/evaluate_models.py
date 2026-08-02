@@ -35,6 +35,9 @@ SMOKE_GATES = {
     "quality_mae": 0.6,
     "popularity_mae": 1.0,
     "content_precision_at_5": 0.30,
+    # Contamination guard: the quality regressor may only ever train on real
+    # Google ratings (top_indian_places / places.csv), never synthetic rows.
+    "quality_synthetic_rows": 0,
 }
 
 
@@ -42,7 +45,10 @@ def content_precision_at_5(corpus, vectorizer, matrix, names, k=5, sample=500):
     """Fraction of held-out destinations whose same-state neighbour appears in
     the top-k content matches. Sanity metric for the TF-IDF matcher."""
     rng = np.random.RandomState(tm.RANDOM_STATE)
-    idx = rng.choice(len(corpus), size=min(sample, len(corpus)), replace=False)
+    # Sample within the matrix dimension so smoke-trained artifacts
+    # (smaller corpus) are evaluated consistently.
+    size = min(sample, len(names), len(corpus))
+    idx = rng.choice(len(names), size=size, replace=False)
     hits = 0
     total = 0
     from sklearn.metrics.pairwise import cosine_similarity
@@ -79,6 +85,12 @@ def main(argv=None):
     parser.add_argument(
         "--smoke", action="store_true", help="CI gate with hard thresholds"
     )
+    parser.add_argument(
+        "--real-only",
+        action="store_true",
+        help="Restrict quality evaluation to real Google ratings "
+        "(top_indian_places) and gate synthetic contamination",
+    )
     args = parser.parse_args(argv)
 
     model_dir = args.model_dir
@@ -99,6 +111,15 @@ def main(argv=None):
 
     # Re-run the same split/pipeline as the trainer for an honest recheck
     quality = tm.load_quality_dataset(tm.TRAINING_DIR)
+    synthetic_rows = int(
+        (quality["source"] == "synthetic").sum() if "source" in quality.columns else 0
+    )
+    gates["quality_synthetic_rows"] = synthetic_rows
+    if args.real_only and "source" in quality.columns:
+        quality = quality[quality["source"] != "synthetic"]
+        logger.info(
+            "Real-only mode: %d rows (synthetic: %d)", len(quality), synthetic_rows
+        )
     Xq = quality[["text", "fee", "time_needed"]].astype(object).values
     yq = quality["rating"].astype(float)
     Xq_tr, Xq_te, yq_tr, yq_te = train_test_split(
@@ -112,7 +133,8 @@ def main(argv=None):
     report["quality"] = {"mae": round(q_mae, 4), "rmse": round(q_rmse, 4)}
     gates["quality_mae"] = q_mae
     print(
-        f"quality  MAE={q_mae:.3f} RMSE={q_rmse:.3f}  (trained {metadata['quality']['mae']:.3f})"
+        f"quality  MAE={q_mae:.3f} RMSE={q_rmse:.3f}  "
+        f"(trained {metadata['quality']['mae']:.3f}, synthetic rows: {synthetic_rows})"
     )
 
     pop = tm.load_popularity_dataset(tm.TRAINING_DIR)
