@@ -79,6 +79,22 @@ const DESTINATION_PATTERNS = [
   /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:trip|tour|travel)/gi,
 ];
 
+// Server ML intent tags → client DetectedIntent union ("general" = no match).
+const SERVER_INTENT_MAP: Record<string, DetectedIntent> = {
+  budget: "budget",
+  safety: "safety",
+  weather: "weather",
+  packing: "packing",
+  transport: "transport",
+  food_dining: "food",
+  entertainment: "places",
+  destination_info: "places",
+};
+
+function mapServerIntent(serverIntent: string): DetectedIntent {
+  return SERVER_INTENT_MAP[serverIntent] ?? "general";
+}
+
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "bot",
@@ -277,24 +293,40 @@ export function useChatAgent(options: UseChatAgentOptions = {}): UseChatAgentRet
         routeContext: "travel_agent",
       });
       
-      // Add bot response
+      // Add bot response with server-provided ML metadata
       const botMsg: ChatMessage = {
         id: generateId(),
         role: "bot",
         text: response.reply,
         timestamp: Date.now(),
+        intent: response.intent,
+        confidence: response.confidence,
+        model: response.model,
+        mode: response.mode,
+        destination: response.destination ?? null,
       };
       
       setMessages(prev => [...prev, botMsg]);
       
-      // Detect intent from bot response for better suggestions
+      // Server ML metadata wins; client heuristics are only the offline
+      // fallback (e.g. Gemini path errors before any metadata arrives).
+      const finalDest = response.destination || dest || detectedDestination;
+      if (response.destination) {
+        setDetectedDestination(response.destination);
+      }
+      
+      const serverMapped = mapServerIntent(response.intent);
       const responseIntent = detectIntent(response.reply);
-      const finalIntent = intent !== "general" ? intent : responseIntent;
+      const finalIntent = serverMapped !== "general"
+        ? serverMapped
+        : intent !== "general"
+          ? intent
+          : responseIntent;
       
       // Generate smart suggestions based on intent and destination
       const newSuggestions = generateSuggestions(
         finalIntent,
-        dest || detectedDestination,
+        finalDest,
         response.reply
       );
       setSuggestions(newSuggestions);

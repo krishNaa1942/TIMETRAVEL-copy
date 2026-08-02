@@ -22,11 +22,30 @@ interface ChatBubbleProps {
   isStreaming?: boolean;
   isError?: boolean;
   onRetry?: () => void;
+  intent?: string;
+  confidence?: number;
+  model?: string;
+  destination?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────
 // HELPER FUNCTIONS
 // ─────────────────────────────────────────────────────────────
+
+const METADATA_EXCLUDED_INTENTS = new Set([
+  "fallback",
+  "greeting",
+  "goodbye",
+  "thanks",
+  "help",
+]);
+
+function formatModelLabel(model: string | undefined): string {
+  if (!model) return "";
+  if (model.includes("gemini")) return "AI";
+  if (model.includes("tfidf")) return "ML";
+  return model;
+}
 
 function formatTime(ts: number): string {
   const date = new Date(ts);
@@ -119,9 +138,20 @@ const ChatBubble = memo(({
   timestamp, 
   isStreaming,
   isError,
-  onRetry 
+  onRetry,
+  intent,
+  confidence,
+  model,
+  destination,
 }: ChatBubbleProps) => {
   const timeStr = useMemo(() => formatTime(timestamp), [timestamp]);
+
+  const hasMetadata = !isUser && !isError && (destination || intent) &&
+    !METADATA_EXCLUDED_INTENTS.has(intent ?? "");
+  const modelLabel = formatModelLabel(model);
+  const confidencePct = confidence != null
+    ? `${Math.round(confidence * 100)}%`
+    : null;
 
   return (
     <View style={[styles.container, isUser && styles.containerUser]}>
@@ -145,6 +175,31 @@ const ChatBubble = memo(({
         {isStreaming && (
           <View style={styles.streamingIndicator}>
             <Text style={styles.streamingDots}>...</Text>
+          </View>
+        )}
+        
+        {hasMetadata && (
+          <View style={styles.metadataRow}>
+            {destination && (
+              <View style={[styles.metaChip, styles.destinationChip]}>
+                <MaterialCommunityIcons name="map-marker" size={11} color="#7C3AED" />
+                <Text style={[styles.metaChipText, styles.destinationChipText]}>
+                  {destination}
+                </Text>
+              </View>
+            )}
+            {intent && (
+              <View style={styles.metaChip}>
+                <Text style={styles.metaChipText}>
+                  {intent.replace(/_/g, " ")}
+                </Text>
+              </View>
+            )}
+            {(modelLabel || confidencePct) && (
+              <Text style={styles.metaModelText}>
+                {[modelLabel, confidencePct].filter(Boolean).join(" · ")}
+              </Text>
+            )}
           </View>
         )}
         
@@ -282,6 +337,41 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.primary,
     letterSpacing: 2,
+  },
+  
+  // ML metadata row
+  metadataRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 6,
+  },
+  metaChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${colors.primary}10`,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    gap: 3,
+  },
+  destinationChip: {
+    backgroundColor: "#F5F3FF",
+  },
+  metaChipText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: colors.textSecondary,
+    textTransform: "capitalize",
+  },
+  destinationChipText: {
+    color: "#7C3AED",
+  },
+  metaModelText: {
+    fontSize: 11,
+    color: colors.gray,
+    marginLeft: 2,
   },
   
   // Footer

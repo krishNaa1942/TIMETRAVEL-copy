@@ -12,8 +12,9 @@ Request JSON:
 Response JSON:
     {
         "reply": "...",
-        "intent": "safety",       (classic mode only)
-        "confidence": 0.89,       (classic mode only)
+        "intent": "safety",       (ML classifier intent, both modes)
+        "confidence": 0.89,       (ML classifier confidence, both modes)
+        "destination": "Goa",     (extracted destination or null)
         "model": "gemini-2.5-flash" or "tfidf-logreg",
         "mode": "ai" or "classic",
         "session_id": "..."
@@ -24,7 +25,8 @@ import uuid
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import current_user, login_required
 
-from app.chatbot.engine import chat
+from app.chatbot.engine import chat, classify_intent
+from app.chatbot.destinations import extract_destination
 from app.models.database import db
 from app.models.entities import ChatMessage
 from app.services.gemini_service import (
@@ -40,7 +42,16 @@ def _google_key() -> str:
     return current_app.config.get("GOOGLE_API_KEY", "")
 
 
-def _persist_message(session_id, user_msg_text, bot_reply, intent=None):
+def _ml_metadata(message):
+    """ML view of a message: (intent, confidence, destination)."""
+    intent, confidence = classify_intent(message)
+    destination = extract_destination(message)
+    return intent, confidence, destination
+
+
+def _persist_message(
+    session_id, user_msg_text, bot_reply, intent=None, destination=None
+):
     """Save conversation to DB for future training (non-critical)."""
     try:
         uid = current_user.id if current_user.is_authenticated else None
@@ -50,6 +61,7 @@ def _persist_message(session_id, user_msg_text, bot_reply, intent=None):
             role="user",
             message=user_msg_text,
             detected_intent=intent,
+            destination=destination,
         )
         bot_msg = ChatMessage(
             user_id=uid,
@@ -57,6 +69,7 @@ def _persist_message(session_id, user_msg_text, bot_reply, intent=None):
             role="bot",
             message=bot_reply,
             detected_intent=intent,
+            destination=destination,
         )
         db.session.add_all([user_msg, bot_msg])
         db.session.commit()
@@ -129,16 +142,22 @@ def chat_endpoint():
 
             result = chat_with_gemini(ai_message, session_id, key)
             if result.get("model") != "error":
+                intent, confidence, destination = _ml_metadata(message)
                 _persist_message(
-                    session_id, message, result["reply"], intent="gemini_ai"
+                    session_id,
+                    message,
+                    result["reply"],
+                    intent=intent,
+                    destination=destination,
                 )
                 return (
                     jsonify(
                         {
                             **result,
                             "session_id": session_id,
-                            "intent": "ai_response",
-                            "confidence": 1.0,
+                            "intent": intent,
+                            "confidence": confidence,
+                            "destination": destination,
                         }
                     ),
                     200,
@@ -197,15 +216,23 @@ def chat_ai_endpoint():
         payload["fallback_from"] = "gemini"
         return jsonify(payload), status_code
 
-    _persist_message(session_id, message, result["reply"], intent="gemini_ai")
+    intent, confidence, destination = _ml_metadata(message)
+    _persist_message(
+        session_id,
+        message,
+        result["reply"],
+        intent=intent,
+        destination=destination,
+    )
 
     return (
         jsonify(
             {
                 **result,
                 "session_id": session_id,
-                "intent": "ai_response",
-                "confidence": 1.0,
+                "intent": intent,
+                "confidence": confidence,
+                "destination": destination,
             }
         ),
         200,
@@ -264,7 +291,7 @@ def chat_status():
 def _classic_response(message, session_id):
     """Run the local TF-IDF + LogReg pipeline."""
     reply, intent, confidence, destination = chat(message)
-    _persist_message(session_id, message, reply, intent=intent)
+    _persist_message(session_id, message, reply, intent=intent, destination=destination)
 
     return (
         jsonify(

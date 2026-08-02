@@ -57,12 +57,18 @@ export interface ChatMessage {
   role: "user" | "bot";
   text: string;
   timestamp: number;
+  intent?: string;
+  confidence?: number;
+  model?: string;
+  mode?: string;
+  destination?: string | null;
 }
 
 export interface ChatResponse {
   reply: string;
   intent: string;
   confidence: number;
+  destination?: string | null;
   model: string;
   mode: string;
   session_id: string;

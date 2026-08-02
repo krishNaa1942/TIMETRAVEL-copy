@@ -112,6 +112,7 @@ class ChatMessage(db.Model):
     role = db.Column(db.String(16), nullable=False)  # "user" or "bot"
     message = db.Column(db.Text, nullable=False)
     detected_intent = db.Column(db.String(64), nullable=True)
+    destination = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):

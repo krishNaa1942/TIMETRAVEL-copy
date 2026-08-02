@@ -85,6 +85,117 @@ class TestChatEndpoint:
         assert "reply" in data
 
 
+class TestChatAIMetadata:
+    """AI chat responses must carry the real ML intent/destination metadata."""
+
+    def _patch_gemini(self):
+        return patch(
+            "app.api.routes.chatbot.chat_with_gemini",
+            return_value={
+                "reply": "Here is your Goa plan!",
+                "model": "gemini-2.5-flash",
+                "mode": "ai",
+            },
+        )
+
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    def test_ai_path_returns_real_metadata(self, _mock_key, auth):
+        with self._patch_gemini():
+            resp = auth.post(
+                "/api/chat",
+                json={"message": "best restaurants in goa", "mode": "ai"},
+            )
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["mode"] == "ai"
+        assert data["model"] == "gemini-2.5-flash"
+        assert data["intent"] == "food_dining"
+        assert data["destination"] == "Goa"
+        assert 0.0 < data["confidence"] <= 1.0
+
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    def test_ai_path_destination_null_when_absent(self, _mock_key, auth):
+        with self._patch_gemini():
+            resp = auth.post(
+                "/api/chat",
+                json={"message": "hello there", "mode": "ai"},
+            )
+        data = resp.get_json()
+        assert data["mode"] == "ai"
+        assert data["destination"] is None
+
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    def test_chat_ai_route_returns_real_metadata(self, _mock_key, auth):
+        with self._patch_gemini():
+            resp = auth.post(
+                "/api/chat/ai",
+                json={"message": "safe for family in Goa?"},
+            )
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["intent"] == "safety"
+        assert data["destination"] == "Goa"
+
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    def test_ai_path_persists_intent_and_destination(self, _mock_key, app, auth):
+        from app.models.database import db
+        from app.models.entities import ChatMessage
+
+        with self._patch_gemini():
+            auth.post(
+                "/api/chat",
+                json={
+                    "message": "best restaurants in goa",
+                    "mode": "ai",
+                    "session_id": "meta-ai-1",
+                },
+            )
+        with app.app_context():
+            rows = (
+                db.session.query(ChatMessage)
+                .filter(ChatMessage.user_session == "meta-ai-1")
+                .order_by(ChatMessage.id)
+                .all()
+            )
+            assert len(rows) == 2  # user + bot
+            for row in rows:
+                assert row.detected_intent == "food_dining"
+                assert row.destination == "Goa"
+            db.session.query(ChatMessage).filter(
+                ChatMessage.user_session == "meta-ai-1"
+            ).delete()
+            db.session.commit()
+
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    def test_classic_path_persists_destination(self, _mock_key, app, auth):
+        from app.models.database import db
+        from app.models.entities import ChatMessage
+
+        auth.post(
+            "/api/chat",
+            json={
+                "message": "best restaurants in goa",
+                "mode": "classic",
+                "session_id": "meta-classic-1",
+            },
+        )
+        with app.app_context():
+            rows = (
+                db.session.query(ChatMessage)
+                .filter(ChatMessage.user_session == "meta-classic-1")
+                .order_by(ChatMessage.id)
+                .all()
+            )
+            assert len(rows) == 2
+            for row in rows:
+                assert row.detected_intent == "food_dining"
+                assert row.destination == "Goa"
+            db.session.query(ChatMessage).filter(
+                ChatMessage.user_session == "meta-classic-1"
+            ).delete()
+            db.session.commit()
+
+
 # ═══════════════════════════════════════════════════════════
 # Gemini Session Lifecycle (TTL, history cap, eviction)
 # ═══════════════════════════════════════════════════════════

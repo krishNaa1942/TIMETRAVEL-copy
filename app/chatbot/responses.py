@@ -61,29 +61,25 @@ RESPONSES: Dict[str, List[str]] = {
     ],
     "transport": [
         "I can help you get around! Tell me the destination and I'll suggest "
-        "local transport options — trains, buses, flights and cabs.\n\n"
-        "Or use the /api/transport/<destination> endpoint.",
+        "local transport options — trains, buses, flights and cabs.",
         "Planning the commute? Share your destination and I'll outline the best "
         "ways to reach and travel within it.",
     ],
     "accommodation": [
         "Need a place to stay? Tell me your destination, budget and family size "
-        "and I'll help match you with suitable hotels or resorts.\n\n"
-        "Or use the /api/hotels/<destination> endpoint.",
+        "and I'll help match you with suitable hotels or resorts.",
         "I can help you find accommodation! Share your destination and budget "
         "to get tailored suggestions.",
     ],
     "food_dining": [
         "Food is a big part of travel! Tell me your destination and I'll point "
-        "you toward local specialties and family-friendly dining options.\n\n"
-        "Or use the /api/food/<destination> endpoint.",
+        "you toward local specialties and family-friendly dining options.",
         "Looking for good eats? Share your destination and I'll suggest local "
         "cuisines and restaurants to try.",
     ],
     "entertainment": [
         "I can help you plan activities and entertainment! Tell me your "
-        "destination and the kind of experiences your family enjoys.\n\n"
-        "Or use the /api/things-to-do/<destination> endpoint.",
+        "destination and the kind of experiences your family enjoys.",
         "Want ideas for things to do? Share your destination and travel style "
         "and I'll suggest attractions and activities.",
     ],
@@ -97,31 +93,33 @@ DESTINATION_RESPONSES: Dict[str, List[str]] = {
         "weather, or things to do, and I'll tailor the advice for you.",
     ],
     "transport": [
-        "For {name}: check trains, flights and cabs. I can outline the best "
-        "way to reach it — or use the /api/transport/{name} endpoint.",
-        "Traveling to {name}? I'll help you compare trains, flights and road "
-        "options for a smooth family trip.",
+        "For {name}: compare trains, flights and cabs, and I'll outline the "
+        "best way to reach it. Tell me your starting city and travel dates "
+        "to get the smoothest family route.",
+        "Traveling to {name}? I'll help you weigh trains, flights and road "
+        "options — share your starting city and dates and I'll lay out the "
+        "best plan.",
     ],
     "accommodation": [
         "Looking to stay in {name}? Share your budget and family size and "
-        "I'll match you with suitable hotels or resorts — or use the "
-        "/api/hotels/{name} endpoint.",
+        "I'll match you with suitable hotels or resorts for a comfortable "
+        "family trip.",
         "Staying in {name}? I can help find family-friendly places to stay "
-        "once I know your budget.",
+        "once I know your budget and check-in dates.",
     ],
     "food_dining": [
         "In {name}, local food is a highlight! I'll point you to specialties "
-        "and family-friendly dining options — or use the /api/food/{name} "
-        "endpoint.",
+        "and family-friendly dining options — tell me your taste and budget "
+        "and I'll narrow it down.",
         "Eating in {name}? Share what you're craving and I'll suggest local "
         "cuisines and restaurants to try.",
     ],
     "entertainment": [
         "In {name}, there's plenty to do! Tell me the experiences your family "
-        "enjoys and I'll suggest attractions — or use the "
-        "/api/things-to-do/{name} endpoint.",
+        "enjoys — attractions, activities or events — and I'll build you a "
+        "shortlist.",
         "Planning fun in {name}? Share your travel style and I'll recommend "
-        "activities and sights.",
+        "activities and sights worth your time.",
     ],
     "weather": [
         "Checking weather for {name}? I can fetch live conditions and suggest "

@@ -339,6 +339,10 @@ export default function ChatScreen() {
       timestamp={item.timestamp}
       isError={item.text.startsWith("⚠️")}
       onRetry={item.text.startsWith("⚠️") ? retryLast : undefined}
+      intent={item.intent}
+      confidence={item.confidence}
+      model={item.model}
+      destination={item.destination}
     />
   ), [retryLast]);
 
