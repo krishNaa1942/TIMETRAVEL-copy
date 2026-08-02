@@ -50,6 +50,14 @@ class TestLearnedPriorsFallback:
         priors = LearnedPriors(model_dir=str(tmp_path))
         assert priors.content_score("goa beach", "Baga Beach") is None
 
+    def test_intent_falls_back_to_none(self, tmp_path):
+        priors = LearnedPriors(model_dir=str(tmp_path))
+        assert priors.intent("Is Goa safe for families?") is None
+
+    def test_qa_match_falls_back_to_empty(self, tmp_path):
+        priors = LearnedPriors(model_dir=str(tmp_path))
+        assert priors.qa_match("what to do in goa") == []
+
     def test_singleton_shared(self):
         assert LearnedPriors.get_instance() is LearnedPriors.get_instance()
 
@@ -103,3 +111,40 @@ class TestLearnedPriorsWithArtifacts:
         assert "quality" in meta
         assert "popularity" in meta
         assert "content" in meta
+
+    def test_intent_returns_coarse_and_confidence(self, priors):
+        result = priors.intent("What are the best things to do in Goa with family?")
+        assert result is not None
+        coarse, confidence = result
+        assert coarse in {
+            "TTD",
+            "TGU",
+            "TRS",
+            "ACM",
+            "FOD",
+            "ENT",
+            "WTH",
+        }
+        assert 0.0 <= confidence <= 1.0
+
+    def test_intent_blank_query(self, priors):
+        assert priors.intent("") is None
+
+    def test_qa_match_returns_real_questions(self, priors):
+        matches = priors.qa_match("how to travel to jaipur", top_k=3)
+        assert isinstance(matches, list)
+        assert 0 < len(matches) <= 3
+        for match in matches:
+            assert isinstance(match["question"], str)
+            assert match["coarse"] in {
+                "TTD",
+                "TGU",
+                "TRS",
+                "ACM",
+                "FOD",
+                "ENT",
+                "WTH",
+            }
+            assert 0.0 < match["score"] <= 1.0
+        scores = [m["score"] for m in matches]
+        assert scores == sorted(scores, reverse=True)

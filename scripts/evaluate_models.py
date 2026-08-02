@@ -38,6 +38,8 @@ SMOKE_GATES = {
     # Contamination guard: the quality regressor may only ever train on real
     # Google ratings (top_indian_places / places.csv), never synthetic rows.
     "quality_synthetic_rows": 0,
+    # QA intent classifier on real user questions (chance = 0.143).
+    "intent_accuracy": 0.80,
 }
 
 
@@ -108,7 +110,6 @@ def main(argv=None):
         "popularity_mae": None,
         "content_precision_at_5": None,
     }
-
     # Re-run the same split/pipeline as the trainer for an honest recheck
     quality = tm.load_quality_dataset(tm.TRAINING_DIR)
     synthetic_rows = int(
@@ -163,17 +164,37 @@ def main(argv=None):
     gates["content_precision_at_5"] = p_at_5
     print(f"content   same-state precision@5 = {p_at_5:.3f}")
 
+    intent = tm.load_intent_dataset(tm.TRAINING_DIR)
+    Xi = intent["question"]
+    yi = intent["coarse_intent"]
+    Xi_tr, Xi_te, yi_tr, yi_te = train_test_split(
+        Xi, yi, test_size=0.2, random_state=tm.RANDOM_STATE
+    )
+    pipe_i = tm.build_intent_pipeline()
+    pipe_i.fit(Xi_tr, yi_tr)
+    pred_i = pipe_i.predict(Xi_te)
+    from sklearn.metrics import accuracy_score, f1_score
+
+    i_acc = float(accuracy_score(yi_te, pred_i))
+    i_f1 = float(f1_score(yi_te, pred_i, average="macro"))
+    report["intent_accuracy"] = round(i_acc, 4)
+    gates["intent_accuracy"] = i_acc
+    print(
+        f"intent    accuracy={i_acc:.3f} f1={i_f1:.3f}  (trained {metadata['intent']['accuracy']:.3f})"
+    )
+
     (model_dir / "evaluation.json").write_text(json.dumps(report, indent=2))
 
     if args.smoke:
         failures = []
+        higher_is_better = {
+            g: g in ("content_precision_at_5", "intent_accuracy") for g in gates
+        }
         for gate, value in gates.items():
             limit = SMOKE_GATES[gate]
-            # MAE gates: lower is better → fail when above.
-            # Precision gate: higher is better → fail when below.
-            failed = (
-                value > limit if gate != "content_precision_at_5" else value < limit
-            )
+            # Accuracy/precision gates: higher is better → fail when below.
+            # MAE/count gates: lower is better → fail when above.
+            failed = value < limit if higher_is_better[gate] else value > limit
             if failed:
                 failures.append(f"{gate}={value:.3f} vs limit={limit}")
         if failures:

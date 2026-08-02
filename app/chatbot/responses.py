@@ -59,4 +59,32 @@ RESPONSES: Dict[str, List[str]] = {
         "Hmm, I didn't catch that. Try asking about budgets, destination safety, "
         "or what to pack for your trip.",
     ],
+    "transport": [
+        "I can help you get around! Tell me the destination and I'll suggest "
+        "local transport options — trains, buses, flights and cabs.\n\n"
+        "Or use the /api/transport/<destination> endpoint.",
+        "Planning the commute? Share your destination and I'll outline the best "
+        "ways to reach and travel within it.",
+    ],
+    "accommodation": [
+        "Need a place to stay? Tell me your destination, budget and family size "
+        "and I'll help match you with suitable hotels or resorts.\n\n"
+        "Or use the /api/hotels/<destination> endpoint.",
+        "I can help you find accommodation! Share your destination and budget "
+        "to get tailored suggestions.",
+    ],
+    "food_dining": [
+        "Food is a big part of travel! Tell me your destination and I'll point "
+        "you toward local specialties and family-friendly dining options.\n\n"
+        "Or use the /api/food/<destination> endpoint.",
+        "Looking for good eats? Share your destination and I'll suggest local "
+        "cuisines and restaurants to try.",
+    ],
+    "entertainment": [
+        "I can help you plan activities and entertainment! Tell me your "
+        "destination and the kind of experiences your family enjoys.\n\n"
+        "Or use the /api/things-to-do/<destination> endpoint.",
+        "Want ideas for things to do? Share your destination and travel style "
+        "and I'll suggest attractions and activities.",
+    ],
 }

@@ -43,6 +43,21 @@ _intent_tags: List[str] = []
 # Minimum confidence to accept an intent (else fallback)
 CONFIDENCE_THRESHOLD = 0.35
 
+# QA classifier acceptance: the offline model (trained on 5000 real user
+# questions) must be clearly confident before its intent wins.
+QA_CONFIDENCE_THRESHOLD = 0.5
+
+# Map the QA coarse intents (real user questions) onto response templates.
+QA_INTENT_MAP = {
+    "TTD": "destination_info",  # things to do
+    "TGU": "destination_info",  # general guide
+    "TRS": "transport",
+    "ACM": "accommodation",
+    "FOD": "food_dining",
+    "ENT": "entertainment",
+    "WTH": "weather",
+}
+
 # Persisted model path
 _MODEL_DIR = Path(__file__).parent / "model_cache"
 _MODEL_PATH = _MODEL_DIR / "pipeline.joblib"
@@ -138,6 +153,10 @@ def classify_intent(message: str) -> Tuple[str, float]:
     """
     Classify a user message into an intent tag.
 
+    Tries the handcrafted pipeline first; when it is not confident enough,
+    the offline QA classifier (trained on 5000 real user questions) gets a
+    chance before falling back.
+
     Args:
         message: Raw user text.
 
@@ -152,10 +171,30 @@ def classify_intent(message: str) -> Tuple[str, float]:
     confidence = float(proba[best_idx])
     intent = pipe.classes_[best_idx]
 
-    if confidence < CONFIDENCE_THRESHOLD:
-        return "fallback", confidence
+    if confidence >= CONFIDENCE_THRESHOLD:
+        return intent, round(confidence, 4)
 
-    return intent, round(confidence, 4)
+    return _classify_learned_qa(cleaned)
+
+
+def _classify_learned_qa(message: str) -> Tuple[str, float]:
+    """Second tier: offline QA intent model on real user questions."""
+    try:
+        from app.services.learned_prior import LearnedPriors
+
+        result = LearnedPriors().intent(message)
+    except Exception:  # pragma: no cover - defensive
+        logger.warning("Learned QA intent unavailable; using handcrafted fallback")
+        result = None
+
+    if not result:
+        return "fallback", 0.0
+
+    coarse, confidence = result
+    mapped = QA_INTENT_MAP.get(coarse)
+    if mapped and confidence >= QA_CONFIDENCE_THRESHOLD:
+        return mapped, round(confidence, 4)
+    return "fallback", 0.0
 
 
 def get_response(intent: str) -> str:

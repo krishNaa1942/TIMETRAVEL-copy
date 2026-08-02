@@ -381,8 +381,20 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
    TF-IDF content matcher     content_vectorizer     .popularity(name)   → 0-1 or None
                               content_matrix         .content_similarity(query, k)
                               content_names.json     .content_score(query, name)
+   QA intent classifier       intent_model           .intent(query)      → (tag, conf)
+   QA retrieval index         qa_vectorizer          .qa_match(query, k) → real questions
+                              qa_matrix
+                              qa_index.json
                               metadata.json          .priors(name)       → (q, p)
 ```
+
+- **QA intent tier** (chat fallback): the classic chatbot pipeline
+  (`app/chatbot/engine.py`) stays authoritative for handcrafted intents;
+  low-confidence messages are re-scored by the offline classifier trained on
+  5,000 real user questions (char-ngram TF-IDF + balanced logistic
+  regression, accuracy 0.82 vs chance 0.14) and mapped onto response
+  templates (TTD/TGU→destination_info, TRS→transport, ACM→accommodation,
+  FOD→food_dining, ENT→entertainment, WTH→weather).
 
 - **Datasets** (`data/training/`, ~4 MB, committed): `top_indian_places.csv`
   (real Google ratings — ground truth), `expanded_destinations.csv`,
@@ -407,8 +419,9 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
   (see `tests/test_learned_prior.py`), and `MODELS_DIR` overrides the
   default path.
 - **Validation**: `scripts/evaluate_models.py` enforces CI gates — quality
-  MAE ≤ 0.6, popularity MAE ≤ 1.0, content same-state precision@5 ≥ 0.30
-  (current: 0.338 / 0.494 / 0.830). Smoke training runs in the CI `ml` job.
+  MAE ≤ 0.6, popularity MAE ≤ 1.0, content same-state precision@5 ≥ 0.30,
+  intent accuracy ≥ 0.80 (current: 0.338 / 0.494 / 0.652 / 0.820). Smoke
+  training runs in the CI `ml` job.
 
 ---
 

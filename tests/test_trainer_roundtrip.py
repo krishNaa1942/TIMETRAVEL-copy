@@ -5,8 +5,6 @@ artifacts through the runtime LearnedPriors loader.
 
 import json
 
-import pytest
-
 from app.services.learned_prior import LearnedPriors
 from scripts.train_models import train
 
@@ -194,6 +192,34 @@ def _write_synthetic_data(data_dir):
     )
     synth.to_csv(data_dir / "tourism_destinations.csv", index=False)
 
+    qa = pd.DataFrame(
+        [
+            ["what to do in goa with kids", "TTD", "TTDSPO"],
+            ["things to do in jaipur", "TTD", "TTDSPO"],
+            ["top attractions in kerala", "TTD", "TTDSIG"],
+            ["is goa safe for family travel", "TGU", "TGUHEA"],
+            ["general guide for himachal", "TGU", "TGUGEN"],
+            ["where to stay in munnar", "TGU", "TGUOTH"],
+            ["best hotels in munnar", "ACM", "ACMHOT"],
+            ["homestays in coorg", "ACM", "ACMOTH"],
+            ["resorts near ooty", "ACM", "ACMOTH"],
+            ["restaurants serving seafood in kerala", "FOD", "FODBAK"],
+            ["best street food in delhi", "FOD", "FODOTH"],
+            ["vegetarian restaurants in varanasi", "FOD", "FODOTH"],
+            ["flights to delhi cost", "TRS", "TRSROU"],
+            ["train from mumbai to goa", "TRS", "TRSOTH"],
+            ["weekend trip from bangalore", "TRS", "TRSROU"],
+            ["rainy season in himachal", "WTH", "WTHOTH"],
+            ["best weather for beach trip", "WTH", "WTHOTH"],
+            ["monsoon in kerala", "WTH", "WTHOTH"],
+            ["evening activities in mysore", "ENT", "ENTEVN"],
+            ["nightlife in goa", "ENT", "ENTOTH"],
+            ["music festivals in india", "ENT", "ENTOTH"],
+        ],
+        columns=["question", "coarse_intent", "fine_intent"],
+    )
+    qa.to_csv(data_dir / "qa_questions.csv", index=False)
+
 
 class TestTrainerRoundTrip:
     def test_smoke_train_and_load(self, tmp_path):
@@ -215,6 +241,10 @@ class TestTrainerRoundTrip:
             "content_matrix.joblib",
             "content_names.json",
             "metadata.json",
+            "intent_model.joblib",
+            "qa_vectorizer.joblib",
+            "qa_matrix.joblib",
+            "qa_index.json",
         ):
             assert (out_dir / artifact).exists()
 
@@ -233,5 +263,19 @@ class TestTrainerRoundTrip:
         score = priors.content_score("goa beach nightlife", "Calangute Beach")
         assert score is not None and 0.0 <= score <= 1.0
 
+        intent = priors.intent("what to do in goa with kids")
+        assert intent is not None
+        coarse, confidence = intent
+        assert coarse == "TTD"
+        assert 0.0 <= confidence <= 1.0
+
+        matches = priors.qa_match("safe places for family in goa", top_k=2)
+        assert len(matches) >= 1
+        assert matches[0]["coarse"] in {"TTD", "TGU"}
+
         meta = json.loads((out_dir / "metadata.json").read_text())
         assert meta["smoke"] is True
+        assert meta["intent"]["classes"] == sorted(
+            {"TTD", "TGU", "TRS", "ACM", "FOD", "ENT", "WTH"}
+        )
+        assert meta["qa"]["questions"] == 21

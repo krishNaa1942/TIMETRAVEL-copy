@@ -33,7 +33,13 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -139,6 +145,22 @@ def load_quality_dataset(
     return df.reset_index(drop=True)
 
 
+def load_intent_dataset(
+    training_dir: Path, max_rows: int | None = None
+) -> pd.DataFrame:
+    """Real user questions with coarse intent labels (qa_questions.csv)."""
+    df = pd.read_csv(training_dir / "qa_questions.csv")
+    df["question"] = df["question"].fillna("").astype(str).str.strip().str.lower()
+    df["coarse_intent"] = df["coarse_intent"].fillna("").astype(str).str.strip()
+    df = df[(df["question"] != "") & (df["coarse_intent"] != "")]
+    if max_rows:
+        df = df.sample(n=min(max_rows, len(df)), random_state=RANDOM_STATE)
+    logger.info(
+        "Intent dataset: %d rows (%d classes)", len(df), df["coarse_intent"].nunique()
+    )
+    return df.reset_index(drop=True)
+
+
 def load_popularity_dataset(
     training_dir: Path, max_rows: int | None = None
 ) -> pd.DataFrame:
@@ -221,6 +243,21 @@ def load_content_corpus(
     places = pd.read_csv(training_dir / "places.csv")
     for _, row in places.iterrows():
         add(row["Place"], row["City"], row["Place_desc"])
+
+    # Cultural corpora (real descriptions of events, sites and traditions)
+    for json_name, keys in (
+        ("cultural_events.json", ("title", "description", "state")),
+        ("historical_sites.json", ("name", "description", "state")),
+        ("local_traditions.json", ("name", "summary", "state")),
+    ):
+        json_path = training_dir / json_name
+        if not json_path.exists():
+            continue
+        for item in json.loads(json_path.read_text()):
+            name = item.get(keys[0], "") or item.get(keys[1], "")
+            state = item.get("state", "") or ""
+            blob = " ".join(str(item.get(k) or "") for k in keys)
+            add(name, state, blob)
 
     # App's canonical dataset
     app_json = app_data_dir / "india_destinations.json"
@@ -319,6 +356,48 @@ def build_popularity_pipeline(max_features: int = 3000):
     )
 
 
+def build_intent_pipeline(max_features: int = 20000):
+    """char-ngram TF-IDF + balanced logistic regression over QA intents.
+
+    Char-wb ngrams are robust to typos and partial words in real chat input.
+    """
+    return Pipeline(
+        [
+            (
+                "tfidf",
+                TfidfVectorizer(
+                    analyzer="char_wb",
+                    ngram_range=(2, 5),
+                    max_features=max_features,
+                    sublinear_tf=True,
+                    min_df=2,
+                ),
+            ),
+            (
+                "clf",
+                LogisticRegression(
+                    max_iter=3000,
+                    C=5.0,
+                    class_weight="balanced",
+                    random_state=RANDOM_STATE,
+                ),
+            ),
+        ]
+    )
+
+
+def evaluate_classifier(pipeline, X_train, X_test, y_train, y_test):
+    pipeline.fit(X_train, y_train)
+    preds = pipeline.predict(X_test)
+    return {
+        "accuracy": float(accuracy_score(y_test, preds)),
+        "f1_macro": float(f1_score(y_test, preds, average="macro")),
+        "classes": sorted(str(c) for c in pipeline.classes_),
+        "test_rows": int(len(y_test)),
+        "train_rows": int(len(y_train)),
+    }
+
+
 def evaluate_regressor(pipeline, X_train, X_test, y_train, y_test):
     pipeline.fit(X_train, y_train)
     preds = pipeline.predict(X_test)
@@ -402,6 +481,45 @@ def train(training_dir: Path, out_dir: Path, smoke: bool = False) -> dict:
     joblib.dump(matrix, out_dir / "content_matrix.joblib")
     (out_dir / "content_names.json").write_text(json.dumps(names))
     metadata["content"] = {"destinations": len(names)}
+
+    # C1 — QA intent classifier (real user questions)
+    intent = load_intent_dataset(training_dir, max_rows=limit)
+    Xi = intent["question"]
+    yi = intent["coarse_intent"]
+    Xi_tr, Xi_te, yi_tr, yi_te = train_test_split(
+        Xi, yi, test_size=0.2, random_state=RANDOM_STATE
+    )
+    pipe_i = build_intent_pipeline(max_features or 20000)
+    metrics_i = evaluate_classifier(pipe_i, Xi_tr, Xi_te, yi_tr, yi_te)
+    metrics_i["target"] = "coarse_intent"
+    metadata["intent"] = metrics_i
+    joblib.dump(pipe_i, out_dir / "intent_model.joblib")
+    logger.info(
+        "Intent model    → accuracy %.3f  f1 %.3f (%d test rows)",
+        metrics_i["accuracy"],
+        metrics_i["f1_macro"],
+        metrics_i["test_rows"],
+    )
+
+    # C2 — QA retrieval index (nearest-question matching for chat fallback)
+    qa_vec = TfidfVectorizer(
+        analyzer="char_wb",
+        ngram_range=(2, 5),
+        max_features=max_features or 20000,
+        sublinear_tf=True,
+        min_df=2,
+    )
+    qa_matrix = qa_vec.fit_transform(intent["question"])
+    qa_index = [
+        {"question": q, "coarse": c, "fine": f}
+        for q, c, f in zip(
+            intent["question"], intent["coarse_intent"], intent["fine_intent"]
+        )
+    ]
+    joblib.dump(qa_vec, out_dir / "qa_vectorizer.joblib")
+    joblib.dump(qa_matrix, out_dir / "qa_matrix.joblib")
+    (out_dir / "qa_index.json").write_text(json.dumps(qa_index, ensure_ascii=False))
+    metadata["qa"] = {"questions": len(qa_index)}
 
     (out_dir / "metadata.json").write_text(json.dumps(metadata, indent=2))
     logger.info("Artifacts written to %s", out_dir)

@@ -63,6 +63,11 @@ class LearnedPriors:
         self._popularity_min: float = 0.0
         self._popularity_max: float = 1.0
 
+        self.intent_pipe = None
+        self.qa_vectorizer = None
+        self.qa_matrix = None
+        self.qa_index: List[Dict] = []
+
     # ── Singleton ────────────────────────────────────────────
     @classmethod
     def get_instance(cls) -> "LearnedPriors":
@@ -100,6 +105,15 @@ class LearnedPriors:
                 pop_meta = self.metadata.get("popularity", {})
                 self._popularity_min = float(pop_meta.get("popularity_min", 0.0))
                 self._popularity_max = float(pop_meta.get("popularity_max", 1.0))
+
+                self.intent_pipe = joblib.load(self.model_dir / "intent_model.joblib")
+                self.qa_vectorizer = joblib.load(
+                    self.model_dir / "qa_vectorizer.joblib"
+                )
+                self.qa_matrix = joblib.load(self.model_dir / "qa_matrix.joblib")
+                self.qa_index = json.loads(
+                    (self.model_dir / "qa_index.json").read_text()
+                )
                 self._loaded = True
                 logger.info("Learned priors loaded from %s", self.model_dir)
             except Exception as exc:  # pragma: no cover - defensive
@@ -190,6 +204,40 @@ class LearnedPriors:
         except Exception as exc:  # pragma: no cover - defensive
             logger.debug("content score failed: %s", exc)
             return None
+
+    # ── QA intent classifier + retrieval ───────────────────
+    def intent(self, query: str) -> Optional[Tuple[str, float]]:
+        """Classify a chat query into (coarse_intent, confidence) or None."""
+        if not self.is_available or not query:
+            return None
+        try:
+            proba = self.intent_pipe.predict_proba([query])[0]
+            best = int(np.argmax(proba))
+            return str(self.intent_pipe.classes_[best]), float(proba[best])
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.debug("intent classification failed: %s", exc)
+            return None
+
+    def qa_match(self, query: str, top_k: int = 3) -> List[Dict]:
+        """Nearest real questions to ``query`` as {question, coarse, fine,
+        score} dicts, best-first."""
+        if not self.is_available or not query:
+            return []
+        try:
+            qvec = self.qa_vectorizer.transform([query])
+            sims = cosine_similarity(qvec, self.qa_matrix)[0]
+            top = np.argsort(sims)[::-1][:top_k]
+            results = []
+            for i in top:
+                if sims[i] <= 0:
+                    continue
+                entry = dict(self.qa_index[int(i)])
+                entry["score"] = float(sims[i])
+                results.append(entry)
+            return results
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.debug("qa match failed: %s", exc)
+            return []
 
 
 def blend_prior(learned: Optional[float], heuristic: float) -> float:
