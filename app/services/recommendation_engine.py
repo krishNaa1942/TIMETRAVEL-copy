@@ -286,17 +286,33 @@ class FeatureEngineer:
         return destination.current_season_score, factors
 
     @staticmethod
-    def calculate_popularity(destination: Destination) -> float:
-        """Calculate normalized popularity"""
+    def calculate_popularity(destination: Destination, priors=None) -> float:
+        """Calculate normalized popularity.
+
+        Blends the deterministic heuristic with the learned prior when the
+        offline model (app.services.learned_prior.LearnedPriors) has a
+        prediction for this destination.
+        """
         booking_score = FeatureEngineer.log_normalize(destination.booking_count, 3.0)
         review_score = FeatureEngineer.log_normalize(destination.review_count, 2.5)
         rating_score = FeatureEngineer.normalize_rating(destination.rating)
 
-        return (booking_score * 0.3) + (review_score * 0.2) + (rating_score * 0.5)
+        heuristic = (booking_score * 0.3) + (review_score * 0.2) + (rating_score * 0.5)
+
+        if priors is not None:
+            learned = priors.popularity(destination.name)
+            if learned is not None:
+                from app.services.learned_prior import blend_prior
+
+                return round(blend_prior(learned, heuristic), 4)
+        return heuristic
 
     @staticmethod
-    def calculate_quality(destination: Destination) -> Tuple[float, List[str]]:
-        """Calculate overall quality score"""
+    def calculate_quality(
+        destination: Destination, priors=None
+    ) -> Tuple[float, List[str]]:
+        """Calculate overall quality score (optionally blended with the
+        learned rating prior from the offline ML model)."""
         factors = []
 
         score = (
@@ -305,6 +321,14 @@ class FeatureEngineer:
             + destination.accessibility_score * 0.15
             + FeatureEngineer.normalize_rating(destination.rating) * 0.2
         )
+
+        if priors is not None:
+            learned = priors.quality(destination.name)
+            if learned is not None:
+                from app.services.learned_prior import blend_prior
+
+                score = blend_prior(learned / 5.0, score)
+                factors.append("Refined by data-driven quality model")
 
         if destination.safety_score > 0.9:
             factors.append("Excellent safety rating")
@@ -325,8 +349,9 @@ class ScoringEngine:
     Same inputs ALWAYS produce same outputs. NO RANDOMNESS.
     """
 
-    def __init__(self, weights: Dict[str, float] = None):
+    def __init__(self, weights: Dict[str, float] = None, priors=None):
         self.weights = weights or SCORING_WEIGHTS
+        self.priors = priors  # optional LearnedPriors (app.services.learned_prior)
         self._validate_weights()
 
     def _validate_weights(self):
@@ -350,13 +375,13 @@ class ScoringEngine:
             user.preferences.price_sensitivity,
         )
         seasonal_score, _ = FeatureEngineer.calculate_seasonality(destination, context)
-        quality_score, _ = FeatureEngineer.calculate_quality(destination)
+        quality_score, _ = FeatureEngineer.calculate_quality(destination, self.priors)
 
         breakdown = ScoreBreakdown(
             preference_match=pref_score,
             budget_fit=budget_score,
             seasonality=seasonal_score,
-            popularity=FeatureEngineer.calculate_popularity(destination),
+            popularity=FeatureEngineer.calculate_popularity(destination, self.priors),
             quality=quality_score,
             distance=0.5,  # Would calculate from user location
             trending=destination.trending_score,

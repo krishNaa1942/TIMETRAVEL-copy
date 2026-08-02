@@ -367,6 +367,40 @@ User Input → AIPromptSanitizer.sanitize_input()
        └── Safe? → Send sanitized input to Gemini
 ```
 
+### 6.3 Offline ML Layer (learned priors)
+
+Trained artifacts in `data/models/` (gitignored; reproducible via
+`scripts/train_models.py`) provide data-driven priors that **blend with** —
+never replace — the deterministic heuristic engines, so the system keeps
+working with zero models deployed.
+
+```
+scripts/train_models.py ──► data/models/*.joblib  ──► app/services/learned_prior.py
+   quality regressor          quality_model          LearnedPriors (lazy singleton)
+   popularity regressor       popularity_model       .quality(name)      → 0-5 or None
+   TF-IDF content matcher     content_vectorizer     .popularity(name)   → 0-1 or None
+                              content_matrix         .content_similarity(query, k)
+                              content_names.json     .content_score(query, name)
+                              metadata.json          .priors(name)       → (q, p)
+```
+
+- **Datasets** (`data/training/`, ~4 MB, committed): `top_indian_places.csv`
+  (real Google ratings — ground truth), `expanded_destinations.csv`,
+  `tourism_destinations.csv` (rich synthetic features), `places.csv`.
+- **Training**: GradientBoosting regressors over TF-IDF text + numeric
+  features (median imputation, scaling); pipeline uses **positional column
+  indices** so runtime inference needs only numpy + scikit-learn — pandas
+  is a train-time dependency only (`requirements-train.txt`).
+- **Blending**: `blend_prior()` = 0.6 × learned + 0.4 × heuristic (clamped
+  to [0,1]); applied in `FeatureEngineer.calculate_popularity/quality` and
+  the AI recommendation preference matcher (0.75 feature + 0.25 content).
+- **Graceful degradation**: missing/corrupt artifacts return `None`/`[]`
+  (see `tests/test_learned_prior.py`), and `MODELS_DIR` overrides the
+  default path.
+- **Validation**: `scripts/evaluate_models.py` enforces CI gates — quality
+  MAE ≤ 0.6, popularity MAE ≤ 1.0, content same-state precision@5 ≥ 0.30
+  (current: 0.338 / 0.494 / 0.830). Smoke training runs in the CI `ml` job.
+
 ---
 
 ## 7. Mobile App Architecture

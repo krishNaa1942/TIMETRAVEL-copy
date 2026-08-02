@@ -75,3 +75,6 @@ STARTER_*
 SETUP_MOBILE_APP.sh
 *.bak
 *.joblib
+
+# ── Trained ML artifacts (reproducible via scripts/train_models.py) ──
+data/models/

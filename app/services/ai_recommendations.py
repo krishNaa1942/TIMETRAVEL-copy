@@ -84,16 +84,23 @@ class AIRecommendationService:
         "social_proof": 0.10,
     }
 
-    def __init__(self, db_service=None, embedding_service=None):
+    def __init__(self, db_service=None, embedding_service=None, learned=None):
         """
         Initialize the recommendation service.
 
         Args:
             db_service: Database service for fetching data
             embedding_service: Service for generating embeddings
+            learned: Optional LearnedPriors (offline ML artifacts). Defaults to
+                the shared lazy singleton; degrades gracefully when absent.
         """
         self.db = db_service
         self.embedding_service = embedding_service
+        if learned is None:
+            from app.services.learned_prior import LearnedPriors
+
+            learned = LearnedPriors.get_instance()
+        self.learned = learned
 
     def get_recommendations(
         self,
@@ -249,7 +256,29 @@ class AIRecommendationService:
             score += activity_score * 0.25
             total_weight += 0.25
 
-        return score / max(total_weight, 0.001)
+        feature_score = score / max(total_weight, 0.001)
+
+        # Offline content-matcher prior (TF-IDF over the training corpus):
+        # blends the data-driven similarity with feature matching so results
+        # stay grounded even when vector embeddings are unavailable.
+        content = self.learned.content_score(
+            self._preferences_query(user_prefs), destination.name
+        )
+        if content is not None:
+            feature_score = 0.75 * feature_score + 0.25 * content
+
+        return min(max(feature_score, 0.0), 1.0)
+
+    def _preferences_query(self, user_prefs: UserPreferences) -> str:
+        """Plain-text query derived from user preferences for the content matcher."""
+        parts = [user_prefs.travel_style]
+        if user_prefs.activity_preferences:
+            parts.extend(user_prefs.activity_preferences)
+        if user_prefs.climate_preference:
+            parts.append(user_prefs.climate_preference)
+        if user_prefs.budget_preference:
+            parts.append(str(user_prefs.budget_preference))
+        return " ".join(str(p) for p in parts if p)
 
     def _calculate_budget_match(self, budget_pref: str, avg_cost: float) -> float:
         """Calculate budget preference match."""
