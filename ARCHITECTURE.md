@@ -387,6 +387,15 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
 - **Datasets** (`data/training/`, ~4 MB, committed): `top_indian_places.csv`
   (real Google ratings — ground truth), `expanded_destinations.csv`,
   `tourism_destinations.csv` (rich synthetic features), `places.csv`.
+- **Learnability audit** (`scripts/audit_targets.py`, runs in CI before
+  training): every candidate target is tested for real signal before a model
+  is built — categorical accuracy vs chance, numeric MAE vs mean baseline.
+  The synthetic `tourism_destinations.csv` fails this audit for seasonality,
+  cost and safety targets (peak_season accuracy 0.32 vs chance 0.33; cost/
+  safety regressors at or below baseline) — those models are **not shipped**
+  until a real dataset with genuine seasonality/cost/safety labels exists.
+  The QA intent target (real questions) passes strongly (acc 0.79 vs chance
+  0.14) and powers the Phase-5 intent classifier.
 - **Training**: GradientBoosting regressors over TF-IDF text + numeric
   features (median imputation, scaling); pipeline uses **positional column
   indices** so runtime inference needs only numpy + scikit-learn — pandas

@@ -100,6 +100,9 @@ jobs:
       - name: Validate training data
         run: python scripts/prepare_training_data.py
 
+      - name: Learnability audit (targets must carry signal)
+        run: python scripts/audit_targets.py
+
       - name: Smoke-train models
         run: python scripts/train_models.py --smoke
 
