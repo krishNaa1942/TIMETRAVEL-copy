@@ -109,6 +109,9 @@ jobs:
       - name: Evaluate with gates
         run: python scripts/evaluate_models.py --smoke --real-only
 
+      - name: Chat QA end-to-end eval
+        run: python scripts/evaluate_chat_qa.py --smoke
+
   # ── Integration Tests ─────────────────────────────────
   integration:
     name: Integration Tests

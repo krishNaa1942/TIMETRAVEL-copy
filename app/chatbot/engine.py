@@ -182,7 +182,7 @@ def _classify_learned_qa(message: str) -> Tuple[str, float]:
     try:
         from app.services.learned_prior import LearnedPriors
 
-        result = LearnedPriors().intent(message)
+        result = LearnedPriors.get_instance().intent(message)
     except Exception:  # pragma: no cover - defensive
         logger.warning("Learned QA intent unavailable; using handcrafted fallback")
         result = None

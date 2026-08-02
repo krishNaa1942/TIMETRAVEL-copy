@@ -394,7 +394,12 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
   5,000 real user questions (char-ngram TF-IDF + balanced logistic
   regression, accuracy 0.82 vs chance 0.14) and mapped onto response
   templates (TTD/TGU→destination_info, TRS→transport, ACM→accommodation,
-  FOD→food_dining, ENT→entertainment, WTH→weather).
+  FOD→food_dining, ENT→entertainment, WTH→weather). The end-to-end flow
+  is gated in `scripts/evaluate_chat_qa.py`: all 5,000 real questions are
+  run through `classify_intent()` and the final intent must match the
+  annotated template mapping at accuracy ≥ 0.80 (measured 0.840, majority
+  baseline 0.244, fallback rate 8%). CI runs the same check in structural
+  smoke mode against the tiny smoke artifacts.
 
 - **Datasets** (`data/training/`, ~4 MB, committed): `top_indian_places.csv`
   (real Google ratings — ground truth), `expanded_destinations.csv`,
