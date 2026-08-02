@@ -521,19 +521,23 @@ class PasswordSecurity:
         Returns:
             True if password matches
         """
+        if not hashed:
+            return False
+        # Fallback-format hashes are always verified with hashlib
+        if hashed.startswith("sha256$"):
+            parts = hashed.split("$")
+            if len(parts) == 3:
+                salt = parts[1]
+                expected = parts[2]
+                computed = hashlib.sha256((password + salt).encode()).hexdigest()
+                return secrets.compare_digest(computed, expected)
+            return False
         try:
             import bcrypt
 
             return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
-        except ImportError:
-            # Handle fallback format
-            if hashed.startswith("sha256$"):
-                parts = hashed.split("$")
-                if len(parts) == 3:
-                    salt = parts[1]
-                    expected = parts[2]
-                    computed = hashlib.sha256((password + salt).encode()).hexdigest()
-                    return secrets.compare_digest(computed, expected)
+        except (ImportError, ValueError):
+            # Invalid salt or malformed hash -> never crash, treat as mismatch
             return False
 
     @classmethod

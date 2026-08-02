@@ -106,7 +106,7 @@ def get_checklist():
 @login_required
 def toggle_item(item_id):
     """Toggle the checked state of a packing item."""
-    item = PackingItem.query.get_or_404(item_id)
+    item = db.get_or_404(PackingItem, item_id)
     if item.user_id != current_user.id:
         return jsonify({"error": "Forbidden"}), 403
 
@@ -142,7 +142,7 @@ def add_custom_item():
 @login_required
 def delete_item(item_id):
     """Delete a custom packing item."""
-    item = PackingItem.query.get_or_404(item_id)
+    item = db.get_or_404(PackingItem, item_id)
     if item.user_id != current_user.id:
         return jsonify({"error": "Forbidden"}), 403
     if not item.is_custom:

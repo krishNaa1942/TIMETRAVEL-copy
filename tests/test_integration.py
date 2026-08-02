@@ -41,7 +41,9 @@ def client(app):
 # ── Helpers ─────────────────────────────────────────────────────────────
 
 
-def _register(client, name="Test User", email="test@example.com", password="Secret123!"):
+def _register(
+    client, name="Test User", email="test@example.com", password="Secret123!"
+):
     return client.post(
         "/api/auth/register",
         json={
@@ -296,7 +298,9 @@ class TestOwnershipIsolation:
 
     def test_cross_user_trip_isolation(self, app, client):
         # User A registers and creates a trip + photo
-        _register(client, name="Alice", email="alice@example.com", password="Alice123!X")
+        _register(
+            client, name="Alice", email="alice@example.com", password="Alice123!X"
+        )
         _create_trip(client, title="Alice's Trip")
         trip_id_a = _get_trip_id(client)
 
@@ -350,7 +354,9 @@ class TestOwnershipIsolation:
 
     def test_cross_user_share_isolation(self, app, client):
         """User B cannot revoke User A's shares."""
-        _register(client, name="Alice", email="alice@example.com", password="Alice123!X")
+        _register(
+            client, name="Alice", email="alice@example.com", password="Alice123!X"
+        )
         res = client.post(
             "/api/share",
             json={

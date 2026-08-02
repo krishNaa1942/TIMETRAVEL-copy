@@ -64,9 +64,7 @@ class TestChatEndpoint:
         assert data["session_id"] == "test-123"
 
     @patch("app.api.routes.chatbot._google_key", return_value="")
-    def test_chat_falls_back_to_classic_when_gemini_unavailable(
-        self, _mock_key, auth
-    ):
+    def test_chat_falls_back_to_classic_when_gemini_unavailable(self, _mock_key, auth):
         resp = auth.post(
             "/api/chat",
             json={"message": "plan a Goa trip", "mode": "ai"},

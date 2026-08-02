@@ -1,0 +1,169 @@
+diff --git a/node_modules/react-native/.DS_Store b/node_modules/react-native/.DS_Store
+new file mode 100644
+index 0000000..2286756
+Binary files /dev/null and b/node_modules/react-native/.DS_Store differ
+diff --git a/node_modules/react-native/Libraries/Core/.setUpDeveloperTools.js.swp b/node_modules/react-native/Libraries/Core/.setUpDeveloperTools.js.swp
+new file mode 100644
+index 0000000..d2d6229
+Binary files /dev/null and b/node_modules/react-native/Libraries/Core/.setUpDeveloperTools.js.swp differ
+diff --git a/node_modules/react-native/Libraries/Debugging/DebuggingOverlay.js b/node_modules/react-native/Libraries/Debugging/DebuggingOverlay.js
+index ba9a66a..69ce786 100644
+--- a/node_modules/react-native/Libraries/Debugging/DebuggingOverlay.js
++++ b/node_modules/react-native/Libraries/Debugging/DebuggingOverlay.js
+@@ -83,7 +83,7 @@ function DebuggingOverlay({
+ 
+   return (
+     isNativeComponentReady && (
+-      <View pointerEvents="none" style={styles.overlay}>
++      <View style={[styles.overlay, styles.pointerEventsNone]}>
+         <DebuggingOverlayNativeComponent
+           ref={nativeComponentRef}
+           style={styles.overlay}
+@@ -101,6 +101,9 @@ const styles = StyleSheet.create({
+     left: 0,
+     right: 0,
+   },
++  pointerEventsNone: {
++    pointerEvents: 'none',
++  },
+ });
+ 
+ export default DebuggingOverlay as component(
+diff --git a/node_modules/react-native/Libraries/ReactNative/AppContainer-dev.js b/node_modules/react-native/Libraries/ReactNative/AppContainer-dev.js
+index 1f90033..da60ce8 100644
+--- a/node_modules/react-native/Libraries/ReactNative/AppContainer-dev.js
++++ b/node_modules/react-native/Libraries/ReactNative/AppContainer-dev.js
+@@ -141,9 +141,8 @@ const AppContainer = ({
+   let innerView: React.Node = (
+     <View
+       collapsable={reactDevToolsAgent == null && !shouldRenderInspector}
+-      pointerEvents="box-none"
+       key={key}
+-      style={rootViewStyle || styles.container}
++      style={[rootViewStyle || styles.container, styles.boxNone]}
+       ref={innerViewRef}>
+       {children}
+     </View>
+@@ -166,8 +165,7 @@ const AppContainer = ({
+     <RootTagContext.Provider value={createRootTag(rootTag)}>
+       <View
+         ref={appContainerRootViewRef}
+-        style={rootViewStyle || styles.container}
+-        pointerEvents="box-none">
++        style={[rootViewStyle || styles.container, styles.boxNone]}>
+         {innerView}
+ 
+         <DebuggingOverlay ref={debuggingOverlayRef} />
+@@ -195,6 +193,7 @@ const AppContainer = ({
+ 
+ const styles = StyleSheet.create({
+   container: {flex: 1},
++  boxNone: {pointerEvents: 'box-none'},
+ });
+ 
+ export type AppContainerRootViewRef = React.RefObject<React.ElementRef<
+diff --git a/node_modules/react-native/Libraries/ReactNative/AppContainer-prod.js b/node_modules/react-native/Libraries/ReactNative/AppContainer-prod.js
+index 5f8de6f..da7f714 100644
+--- a/node_modules/react-native/Libraries/ReactNative/AppContainer-prod.js
++++ b/node_modules/react-native/Libraries/ReactNative/AppContainer-prod.js
+@@ -35,7 +35,7 @@ const AppContainer = ({
+ 
+   return (
+     <RootTagContext.Provider value={createRootTag(rootTag)}>
+-      <View style={rootViewStyle || styles.root} pointerEvents="box-none">
++      <View style={[rootViewStyle || styles.root, styles.boxNone]}>
+         {innerView}
+       </View>
+     </RootTagContext.Provider>
+@@ -44,6 +44,7 @@ const AppContainer = ({
+ 
+ const styles = StyleSheet.create({
+   root: {flex: 1},
++  boxNone: {pointerEvents: 'box-none'},
+ });
+ 
+ export default AppContainer;
+diff --git a/node_modules/react-native/src/private/webapis/dom/events/Event.js b/node_modules/react-native/src/private/webapis/dom/events/Event.js
+index 6f61673..b7270eb 100644
+--- a/node_modules/react-native/src/private/webapis/dom/events/Event.js
++++ b/node_modules/react-native/src/private/webapis/dom/events/Event.js
+@@ -44,16 +44,6 @@ export interface EventInit {
+ }
+ 
+ export default class Event {
+-  static +NONE: 0;
+-  static +CAPTURING_PHASE: 1;
+-  static +AT_TARGET: 2;
+-  static +BUBBLING_PHASE: 3;
+-
+-  +NONE: 0;
+-  +CAPTURING_PHASE: 1;
+-  +AT_TARGET: 2;
+-  +BUBBLING_PHASE: 3;
+-
+   _bubbles: boolean;
+   _cancelable: boolean;
+   _composed: boolean;
+diff --git a/node_modules/react-native/src/private/webapis/errors/DOMException.js b/node_modules/react-native/src/private/webapis/errors/DOMException.js
+index b759632..42c4ab3 100644
+--- a/node_modules/react-native/src/private/webapis/errors/DOMException.js
++++ b/node_modules/react-native/src/private/webapis/errors/DOMException.js
+@@ -73,58 +73,6 @@ const ERROR_CODES: {[string]: number} = {
+ /* eslint-disable @react-native/monorepo/require-extends-error */
+ // $FlowExpectedError[incompatible-variance] name is writable in Error but not in DOMException, but this is how it works on Web.
+ export default class DOMException extends Error {
+-  static +INDEX_SIZE_ERR: 1;
+-  static +DOMSTRING_SIZE_ERR: 2;
+-  static +HIERARCHY_REQUEST_ERR: 3;
+-  static +WRONG_DOCUMENT_ERR: 4;
+-  static +INVALID_CHARACTER_ERR: 5;
+-  static +NO_DATA_ALLOWED_ERR: 6;
+-  static +NO_MODIFICATION_ALLOWED_ERR: 7;
+-  static +NOT_FOUND_ERR: 8;
+-  static +NOT_SUPPORTED_ERR: 9;
+-  static +INUSE_ATTRIBUTE_ERR: 10;
+-  static +INVALID_STATE_ERR: 11;
+-  static +SYNTAX_ERR: 12;
+-  static +INVALID_MODIFICATION_ERR: 13;
+-  static +NAMESPACE_ERR: 14;
+-  static +INVALID_ACCESS_ERR: 15;
+-  static +VALIDATION_ERR: 16;
+-  static +TYPE_MISMATCH_ERR: 17;
+-  static +SECURITY_ERR: 18;
+-  static +NETWORK_ERR: 19;
+-  static +ABORT_ERR: 20;
+-  static +URL_MISMATCH_ERR: 21;
+-  static +QUOTA_EXCEEDED_ERR: 22;
+-  static +TIMEOUT_ERR: 23;
+-  static +INVALID_NODE_TYPE_ERR: 24;
+-  static +DATA_CLONE_ERR: 25;
+-
+-  +INDEX_SIZE_ERR: 1;
+-  +DOMSTRING_SIZE_ERR: 2;
+-  +HIERARCHY_REQUEST_ERR: 3;
+-  +WRONG_DOCUMENT_ERR: 4;
+-  +INVALID_CHARACTER_ERR: 5;
+-  +NO_DATA_ALLOWED_ERR: 6;
+-  +NO_MODIFICATION_ALLOWED_ERR: 7;
+-  +NOT_FOUND_ERR: 8;
+-  +NOT_SUPPORTED_ERR: 9;
+-  +INUSE_ATTRIBUTE_ERR: 10;
+-  +INVALID_STATE_ERR: 11;
+-  +SYNTAX_ERR: 12;
+-  +INVALID_MODIFICATION_ERR: 13;
+-  +NAMESPACE_ERR: 14;
+-  +INVALID_ACCESS_ERR: 15;
+-  +VALIDATION_ERR: 16;
+-  +TYPE_MISMATCH_ERR: 17;
+-  +SECURITY_ERR: 18;
+-  +NETWORK_ERR: 19;
+-  +ABORT_ERR: 20;
+-  +URL_MISMATCH_ERR: 21;
+-  +QUOTA_EXCEEDED_ERR: 22;
+-  +TIMEOUT_ERR: 23;
+-  +INVALID_NODE_TYPE_ERR: 24;
+-  +DATA_CLONE_ERR: 25;
+-
+   #name: string;
+   #code: number;
+ 

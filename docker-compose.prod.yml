@@ -17,9 +17,17 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/templates/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
       - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
       - ./deploy/nginx/logs:/var/log/nginx
+      - ./TimeTravelMobile/dist:/app/web-build:ro
+    environment:
+      - API_DOMAIN=${API_DOMAIN:-api.timetotravel.app}
+      - WEB_DOMAIN=${WEB_DOMAIN:-timetotravel.app}
+    command:
+      - sh
+      - -c
+      - envsubst '$$API_DOMAIN $$WEB_DOMAIN' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'
     depends_on:
       - web
     restart: unless-stopped
@@ -45,7 +53,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 512M
+          memory: 768M
         reservations:
           cpus: '0.5'
           memory: 256M
@@ -55,7 +63,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     volumes:
       - uploads-data:/app/uploads
       - ./data:/app/data:ro
@@ -125,34 +134,6 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
-
-  # ───────────────────────────────────────────────────────
-  # Celery Worker (Background Tasks)
-  # ───────────────────────────────────────────────────────
-  celery-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    image: timetravel-api:${VERSION:-latest}
-    container_name: timetravel-celery
-    command: celery -A app.celery worker --loglevel=info --concurrency=2
-    environment:
-      - FLASK_ENV=production
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY}
-    depends_on:
-      - postgres
-      - redis
-    restart: unless-stopped
-    networks:
-      - backend
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
           memory: 512M
 
   # ───────────────────────────────────────────────────────

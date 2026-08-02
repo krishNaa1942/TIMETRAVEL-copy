@@ -117,7 +117,7 @@ def expense_summary():
 @login_required
 def delete_expense(expense_id):
     """Delete an expense (owner only)."""
-    expense = Expense.query.get_or_404(expense_id)
+    expense = db.get_or_404(Expense, expense_id)
     if expense.user_id != current_user.id:
         return jsonify({"error": "Forbidden"}), 403
 

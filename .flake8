@@ -1,0 +1,12 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203
+exclude = __pycache__,node_modules,migrations,.git,.venv,venv
+
+# Unbreakable long prompt strings (f-string literals black cannot split)
+per-file-ignores =
+    app/api/routes/chatbot.py:E501
+    app/api/routes/templates.py:E501
+    app/services/ai_insights_service.py:E501
+    app/services/gemini_service.py:E501
+    app/services/itinerary_service.py:E501

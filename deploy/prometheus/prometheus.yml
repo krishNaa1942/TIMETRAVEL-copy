@@ -1,20 +1,12 @@
+# Prometheus config — trimmed for the initial launch.
+# NOTE: Flask (/api/metrics) and Redis exporter targets are NOT wired yet.
+# Adding them requires instrumenting the app (e.g. prometheus-flask-exporter)
+# and a redis-exporter sidecar service; revisit post-launch.
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'flask'
-    static_configs:
-      - targets: ['web:5001']
-    metrics_path: '/api/metrics'
-    scheme: http
-
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['redis:6379']
-    metrics_path: '/metrics'
-    scheme: http
-
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']

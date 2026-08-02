@@ -252,7 +252,9 @@ def get_client_key(request) -> str:
     """
     # Get IP address
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    if isinstance(ip, list):
+    if not ip:
+        ip = "unknown"
+    elif isinstance(ip, list):
         ip = ip[0]
     elif "," in ip:
         ip = ip.split(",")[0].strip()

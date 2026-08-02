@@ -149,7 +149,7 @@ class TripCreate(BaseModel):
 
     name: str = Field(..., min_length=3, max_length=200)
     description: Optional[str] = Field(None, max_length=2000)
-    destinations: List[DestinationInput] = Field(..., min_items=1)
+    destinations: List[DestinationInput] = Field(..., min_length=1)
     start_date: date
     end_date: date
     budget: Optional[float] = Field(None, ge=0)
@@ -158,7 +158,7 @@ class TripCreate(BaseModel):
     status: TripStatus = TripStatus.PLANNING
     tags: Optional[List[str]] = None
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_dates(cls, values):
         start = values.get("start_date")
         end = values.get("end_date")
@@ -187,7 +187,7 @@ class TripUpdate(BaseModel):
     status: Optional[TripStatus] = None
     tags: Optional[List[str]] = None
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_dates(cls, values):
         start = values.get("start_date")
         end = values.get("end_date")
@@ -207,13 +207,13 @@ class TripQuery(BaseModel):
     budget_max: Optional[float] = Field(None, ge=0)
     travelers: Optional[int] = Field(None, ge=1)
     sort_by: Optional[str] = Field(
-        "created_at", regex="^(created_at|start_date|name|budget)$"
+        "created_at", pattern="^(created_at|start_date|name|budget)$"
     )
-    sort_order: Optional[str] = Field("desc", regex="^(asc|desc)$")
+    sort_order: Optional[str] = Field("desc", pattern="^(asc|desc)$")
     page: int = Field(1, ge=1)
     limit: int = Field(20, ge=1, le=100)
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_budget_range(cls, values):
         min_b = values.get("budget_min")
         max_b = values.get("budget_max")
@@ -229,8 +229,10 @@ class ItineraryActivity(BaseModel):
     title: str = Field(..., min_length=2, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     location: Optional[str] = Field(None, max_length=200)
-    start_time: Optional[str] = Field(None, regex=r"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
-    end_time: Optional[str] = Field(None, regex=r"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
+    start_time: Optional[str] = Field(
+        None, pattern=r"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+    )
+    end_time: Optional[str] = Field(None, pattern=r"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
     cost: Optional[float] = Field(None, ge=0)
     currency: Optional[Currency] = Currency.USD
     booking_url: Optional[str] = Field(None, max_length=500)
@@ -258,7 +260,7 @@ class ItineraryCreate(BaseModel):
     """Itinerary creation validation"""
 
     trip_id: str = Field(..., min_length=1)
-    days: List[ItineraryDay] = Field(..., min_items=1)
+    days: List[ItineraryDay] = Field(..., min_length=1)
     total_budget: Optional[float] = Field(None, ge=0)
     notes: Optional[str] = Field(None, max_length=2000)
 
@@ -317,7 +319,7 @@ class RecommendationRequest(BaseModel):
     interests: Optional[List[str]] = None
     limit: int = Field(10, ge=1, le=50)
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_dates(cls, values):
         dates = values.get("travel_dates")
         if dates and len(dates) == 2:
@@ -330,7 +332,9 @@ class SearchRequest(BaseModel):
     """Search request validation"""
 
     query: str = Field(..., min_length=2, max_length=200)
-    type: Optional[str] = Field("all", regex="^(all|destination|trip|activity|hotel)$")
+    type: Optional[str] = Field(
+        "all", pattern="^(all|destination|trip|activity|hotel)$"
+    )
     filters: Optional[Dict[str, Any]] = None
     page: int = Field(1, ge=1)
     limit: int = Field(20, ge=1, le=100)
@@ -368,7 +372,7 @@ class PaginatedResponse(BaseModel):
     limit: int
     has_more: bool
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def calculate_has_more(cls, values):
         total = values.get("total", 0)
         page = values.get("page", 1)

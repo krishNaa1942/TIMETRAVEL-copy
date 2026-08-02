@@ -66,7 +66,7 @@ def list_notes():
 @login_required
 def get_note(note_id):
     """Get a single note (must be owner or public)."""
-    note = TravelNote.query.get_or_404(note_id)
+    note = db.get_or_404(TravelNote, note_id)
     if note.user_id != current_user.id and not note.is_public:
         return jsonify({"error": "Not found"}), 404
     return jsonify({"note": note.to_dict()})
@@ -76,7 +76,7 @@ def get_note(note_id):
 @login_required
 def update_note(note_id):
     """Update a travel note (owner only)."""
-    note = TravelNote.query.get_or_404(note_id)
+    note = db.get_or_404(TravelNote, note_id)
     if note.user_id != current_user.id:
         return jsonify({"error": "Forbidden"}), 403
 
@@ -100,7 +100,7 @@ def update_note(note_id):
 @login_required
 def delete_note(note_id):
     """Delete a travel note (owner only)."""
-    note = TravelNote.query.get_or_404(note_id)
+    note = db.get_or_404(TravelNote, note_id)
     if note.user_id != current_user.id:
         return jsonify({"error": "Forbidden"}), 403
 

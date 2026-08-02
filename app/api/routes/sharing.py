@@ -35,7 +35,7 @@ def create_share():
 
     # Verify trip ownership if trip_id provided
     if trip_id:
-        trip = TripQuery.query.get(trip_id)
+        trip = db.session.get(TripQuery, trip_id)
         if not trip or trip.user_id != current_user.id:
             return jsonify({"error": "Trip not found"}), 404
 

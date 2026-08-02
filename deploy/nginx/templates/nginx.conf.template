@@ -82,9 +82,11 @@ http {
     }
 
     # ── HTTPS server ────────────────────────────────────────
+    # API_DOMAIN / WEB_DOMAIN are substituted from container env
+    # by the nginx docker entrypoint (template support).
     server {
         listen 443 ssl http2 default_server;
-        server_name api.timetotravel.app;
+        server_name ${API_DOMAIN} ${WEB_DOMAIN};
 
         ssl_certificate /etc/nginx/ssl/cert.pem;
         ssl_certificate_key /etc/nginx/ssl/key.pem;
@@ -122,7 +124,7 @@ http {
             if ($http_origin ~ "^https?://192\.168\.[0-9]+\.[0-9]+(:[0-9]+)?$") {
                 set $cors_origin $http_origin;
             }
-            if ($http_origin = "https://timetotravel.app") {
+            if ($http_origin = "https://${WEB_DOMAIN}") {
                 set $cors_origin $http_origin;
             }
             add_header Access-Control-Allow-Origin $cors_origin always;
@@ -143,16 +145,17 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
-        # ── Uploads ──────────────────────────────────────────
-        location /uploads/ {
-            alias /app/uploads/;
-            expires 30d;
-            add_header Cache-Control "public, immutable";
-        }
-
-        # ── Deny everything else ────────────────────────────
+        # ── Expo web build (static SPA) ─────────────────────
         location / {
-            return 404;
+            root /app/web-build;
+            index index.html;
+            try_files $uri $uri/ /index.html;
+
+            # SPA caching
+            location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?)$ {
+                expires 30d;
+                add_header Cache-Control "public, immutable";
+            }
         }
     }
 }

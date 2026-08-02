@@ -97,17 +97,24 @@ def create_app(config_class=None):
     # For development, we use a dynamic origin handler
     def get_cors_origin():
         """Get allowed origins for CORS."""
-        # Default localhost origins for web development
-        origins = [
-            "http://localhost:8081",
-            "http://localhost:8083",
-            "http://localhost:3000",
-            "http://localhost:5001",
-            "http://127.0.0.1:8081",
-            "http://127.0.0.1:8083",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5001",
-        ]
+        # Production origins come from ALLOWED_ORIGINS (comma-separated env var)
+        env_origins = os.environ.get("ALLOWED_ORIGINS", "")
+        if env_origins:
+            origins = [
+                origin.strip() for origin in env_origins.split(",") if origin.strip()
+            ]
+        else:
+            # Default localhost origins for web development
+            origins = [
+                "http://localhost:8081",
+                "http://localhost:8083",
+                "http://localhost:3000",
+                "http://localhost:5001",
+                "http://127.0.0.1:8081",
+                "http://127.0.0.1:8083",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5001",
+            ]
         # Add LAN origins from environment (for mobile/Expo Go)
         lan_ip = os.environ.get("LAN_IP")
         if lan_ip:
@@ -174,8 +181,9 @@ def create_app(config_class=None):
         user = getattr(g, "user", None)
         if user:
             from app.models.entities import User as UserModel
+            from app.models.database import db
 
-            return UserModel.query.get(user["user_id"])
+            return db.session.get(UserModel, user["user_id"])
         return None
 
     @app.before_request

@@ -129,9 +129,21 @@ class TestCompareSuccess:
     def test_compare_all_15_destinations(self, mock_weather, auth):
         mock_weather.return_value = None
         dests = [
-            "Goa", "Jaipur", "Manali", "Munnar", "Shimla",
-            "Varanasi", "Udaipur", "Mumbai", "Delhi", "Agra",
-            "Rishikesh", "Ooty", "Darjeeling", "Pondicherry", "Andaman",
+            "Goa",
+            "Jaipur",
+            "Manali",
+            "Munnar",
+            "Shimla",
+            "Varanasi",
+            "Udaipur",
+            "Mumbai",
+            "Delhi",
+            "Agra",
+            "Rishikesh",
+            "Ooty",
+            "Darjeeling",
+            "Pondicherry",
+            "Andaman",
         ]
         resp = auth.get(f"/api/compare?dest1={dests[0]}&dest2={dests[-1]}")
         assert resp.status_code == 200

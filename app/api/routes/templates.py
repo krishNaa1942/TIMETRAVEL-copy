@@ -1085,7 +1085,7 @@ def clone_template(template_id):
         if 0 <= idx < len(BUILTIN_TEMPLATES):
             template_data = BUILTIN_TEMPLATES[idx]
     else:
-        tpl = TripTemplate.query.get(int(template_id))
+        tpl = db.session.get(TripTemplate, int(template_id))
         if tpl:
             template_data = {
                 "title": tpl.title,

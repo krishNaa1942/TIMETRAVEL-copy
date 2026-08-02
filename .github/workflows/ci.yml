@@ -151,6 +151,10 @@ jobs:
         run: npx tsc --noEmit
         working-directory: TimeTravelMobile
 
+      - name: Web export (production bundle)
+        run: npx expo export --platform web
+        working-directory: TimeTravelMobile
+
   # ── Security Scan ──────────────────────────────────────
   security:
     name: Security Scan

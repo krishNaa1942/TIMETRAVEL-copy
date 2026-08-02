@@ -69,7 +69,7 @@ class TripPDF(FPDF):
             .replace("\u201c", '"')  # left double quote
             .replace("\u201d", '"')  # right double quote
             .replace("\u2026", "...")  # ellipsis
-            .replace("\u20b9", "\u20b9")  # rupee sign preserved
+            .replace("\u20b9", "Rs ")  # rupee sign -> core-font-safe label
         )
 
     def normalize_text(self, text):
