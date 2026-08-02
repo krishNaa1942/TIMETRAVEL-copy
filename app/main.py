@@ -250,6 +250,7 @@ def create_app(config_class=None):
     from app.api.routes.travel_stats import travel_stats_bp
     from app.api.routes.profile import profile_bp
     from app.api.routes.newsletter import newsletter_bp
+    from app.api.routes.recommendations import recommendations_bp
 
     # ── Exempt all API blueprints from CSRF ────────────────────────
     # Mobile apps cannot send CSRF tokens; they rely on CORS + session cookies.
@@ -284,6 +285,7 @@ def create_app(config_class=None):
         travel_stats_bp,
         profile_bp,
         newsletter_bp,
+        recommendations_bp,
         health_bp,
     ]
     for bp in api_blueprints:
@@ -320,6 +322,7 @@ def create_app(config_class=None):
     app.register_blueprint(travel_stats_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(newsletter_bp)
+    app.register_blueprint(recommendations_bp)
 
     # ── Security headers ───────────────────────────────────────────
     _register_security_headers(app)

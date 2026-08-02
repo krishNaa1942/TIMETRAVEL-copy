@@ -54,6 +54,7 @@ import {
   useFeaturedDestinations,
   useTrendingDestinations,
 } from "@/api/queries/useDestinations";
+import { useRecommendations } from "@/api/queries/useRecommendations";
 import { destinationsService } from "@/services/destinations";
 import { weatherService } from "@/services/weather";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
@@ -538,6 +539,7 @@ export default function HomeScreen() {
   const isWide = screenWidth >= 768;
   const user = useAuthStore((s) => s.user);
   const { logSearch, activeTrip } = useTravelIntelligence();
+  const userPreferences = useTravelIntelligence((s) => s.userPreferences);
   const setDestinationFilter = usePreferenceStore(
     (s) => s.setDestinationFilter,
   );
@@ -550,6 +552,26 @@ export default function HomeScreen() {
   } = useDestinations();
   const { data: featuredDestinations } = useFeaturedDestinations();
   const { data: trendingDestinations } = useTrendingDestinations();
+
+  const recommendationParams = useMemo(() => {
+    const groupSizeMap: Record<string, number> = {
+      solo: 1,
+      couple: 2,
+      family: 4,
+      friends: 4,
+    };
+    return {
+      season: userPreferences.preferredSeason,
+      trip_duration: activeTrip?.days,
+      group_size: groupSizeMap[userPreferences.groupType] ?? 2,
+      limit: 10,
+    };
+  }, [userPreferences, activeTrip]);
+
+  const {
+    data: recsData,
+    isLoading: recsLoading,
+  } = useRecommendations(recommendationParams, { enabled: !!user });
 
   const [refreshing, setRefreshing] = useState(false);
   const [aiQuery, setAiQuery] = useState("");
@@ -590,8 +612,43 @@ export default function HomeScreen() {
     return Math.max(0, diff);
   }, [activeTrip?.startDate]);
 
+  const apiRecommended = useMemo(() => {
+    const recs = recsData?.recommendations || [];
+    return recs.map((r) => {
+      const match = destinations.find(
+        (d) => d.label.toLowerCase() === r.name.toLowerCase(),
+      );
+      return {
+        id: match?.id || r.id,
+        label: r.name,
+        region: r.region || r.country,
+        best_season: "",
+        highlight: r.tags?.[0] || "",
+        tagline: r.explanations?.[0] || "",
+        category: r.categories || [],
+        lat: match?.lat || 0,
+        lon: match?.lon || 0,
+        rating: r.rating || match?.rating,
+        imageUrl: match?.imageUrl,
+      } as Destination;
+    });
+  }, [recsData, destinations]);
+
+  const recMatchPercentage = useMemo(() => {
+    const scores = (recsData?.recommendations || [])
+      .slice(0, 6)
+      .map((r) => r.score);
+    if (scores.length === 0) return undefined;
+    return Math.round(
+      scores.reduce((a, b) => a + b, 0) / scores.length,
+    );
+  }, [recsData]);
+
   const recommended = useMemo(() => {
-    const data = featuredDestinations || destinations;
+    const data =
+      apiRecommended.length > 0
+        ? apiRecommended
+        : featuredDestinations || destinations;
     if (!activeFilter) return data.slice(0, 6);
     return data
       .filter((d) => {
@@ -600,7 +657,7 @@ export default function HomeScreen() {
         return destStr.includes(activeFilter);
       })
       .slice(0, 6);
-  }, [featuredDestinations, destinations, activeFilter]);
+  }, [apiRecommended, featuredDestinations, destinations, activeFilter]);
 
   const trending = useMemo(
     () => (trendingDestinations || destinations).slice(0, 6),
@@ -847,8 +904,16 @@ export default function HomeScreen() {
             getImageUrl={getImageUrl}
             onItemPress={handleDestinationPress}
             onSeeAll={handleSeeAllRecommended}
+            matchPercentage={recMatchPercentage}
             icon="star-four-points"
           />
+          {recsLoading && !recsData && (
+            <View style={styles.recsSkeletonRow}>
+              {[1, 2, 3].map((i) => (
+                <Shimmer key={i} width={260} height={200} borderRadius={16} />
+              ))}
+            </View>
+          )}
           <CarouselSection
             title="Trending Now"
             subtitle="Most popular this season"
@@ -1176,6 +1241,14 @@ const styles = StyleSheet.create({
 
   // Carousel
   carouselSection: { marginBottom: spacing.lg },
+  recsSkeletonRow: {
+    flexDirection: "row",
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.sm,
+    paddingTop: spacing.sm,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
   carouselHeader: {
     flexDirection: "row",
     justifyContent: "space-between",

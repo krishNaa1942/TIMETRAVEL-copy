@@ -57,6 +57,7 @@ class RecommendationContext:
     budget_min: float = 0
     budget_max: float = float("inf")
     specific_interests: List[str] = None
+    season: Optional[str] = None
 
     def __post_init__(self):
         if self.specific_interests is None:
@@ -159,6 +160,8 @@ class AIRecommendationService:
                     "score_breakdown": item["score_breakdown"],
                     "reason": self._generate_recommendation_reason(item),
                     "highlights": self._get_destination_highlights(item["destination"]),
+                    "avg_daily_cost": round(item["destination"].avg_cost, 2),
+                    "categories": list(item["destination"].categories),
                 }
                 for item in paginated
             ]
@@ -346,7 +349,20 @@ class AIRecommendationService:
     def _calculate_seasonality(
         self, destination: Destination, context: RecommendationContext
     ) -> float:
-        """Calculate seasonal score based on travel dates."""
+        """Calculate seasonal score based on travel dates (or season label)."""
+        if not context.travel_dates and context.season:
+            # Season label (e.g. from the mobile app) → multiplier.
+            season_multipliers = {
+                "summer": 1.0,
+                "spring": 0.9,
+                "winter": 0.8,
+                "monsoon": 0.7,
+                "any": 1.0,
+            }
+            multiplier = season_multipliers.get(context.season)
+            if multiplier is not None:
+                return min(destination.seasonality_score * multiplier, 1.0)
+
         if not context.travel_dates:
             return destination.seasonality_score
 

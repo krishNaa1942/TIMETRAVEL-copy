@@ -554,7 +554,12 @@ class RecommendationService:
     def __init__(self, db_service=None, cache_service=None):
         self.db = db_service
         self.cache = cache_service
-        self.scoring_engine = ScoringEngine()
+        # Activate offline-learned priors: the shared lazy singleton blends
+        # learned quality/popularity predictions into the heuristic engine,
+        # degrading gracefully when data/models artifacts are absent.
+        from app.services.learned_prior import LearnedPriors
+
+        self.scoring_engine = ScoringEngine(priors=LearnedPriors.get_instance())
         self.ranking_engine = RankingEngine(self.scoring_engine)
 
     def get_recommendations(
