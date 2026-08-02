@@ -19,6 +19,7 @@ Future upgrades:
     • Maintain multi-turn conversation context.
 """
 
+import csv
 import json
 import logging
 import random
@@ -64,16 +65,12 @@ _MODEL_PATH = _MODEL_DIR / "pipeline.joblib"
 _INTENTS_PATH = _MODEL_DIR / "intent_tags.joblib"
 
 
-def _train_pipeline() -> Pipeline:
-    """
-    Load intents.json and train the TF-IDF + LogReg pipeline.
-
-    Returns:
-        Fitted sklearn Pipeline.
-    """
-    global _intent_tags
-
-    intents_path = Path(__file__).parent / "intents.json"
+def _load_training_data(
+    intents_path: Path, qa_path: Path
+) -> Tuple[List[str], List[str], int, int]:
+    """Assemble (texts, labels, pattern_count, qa_count) from handcrafted
+    patterns plus QA training data (coarse intents mapped onto response
+    templates)."""
     with open(intents_path, "r") as fh:
         data = json.load(fh)
 
@@ -84,6 +81,42 @@ def _train_pipeline() -> Pipeline:
         for pattern in intent["patterns"]:
             texts.append(pattern.lower())
             labels.append(tag)
+    pattern_count = len(texts)
+
+    qa_count = 0
+    try:
+        with open(qa_path, "r", encoding="utf-8") as fh:
+            rows = list(csv.reader(fh))
+            q_col = rows[0].index("question")
+            c_col = rows[0].index("coarse_intent")
+            for row in rows[1:]:
+                if len(row) <= max(q_col, c_col):
+                    continue
+                mapped = QA_INTENT_MAP.get(row[c_col].strip().upper())
+                if mapped:
+                    texts.append(row[q_col].strip().lower())
+                    labels.append(mapped)
+                    qa_count += 1
+    except (OSError, ValueError):
+        logger.warning("QA training data unavailable; training on patterns only")
+    return texts, labels, pattern_count, qa_count
+
+
+def _train_pipeline() -> Pipeline:
+    """
+    Train the TF-IDF + LogReg pipeline on handcrafted patterns plus the
+    real QA training data (coarse intents mapped onto response templates).
+
+    Returns:
+        Fitted sklearn Pipeline.
+    """
+    global _intent_tags
+
+    intents_path = Path(__file__).parent / "intents.json"
+    qa_path = (
+        Path(__file__).resolve().parents[2] / "data" / "training" / "qa_questions.csv"
+    )
+    texts, labels, pattern_count, qa_count = _load_training_data(intents_path, qa_path)
 
     _intent_tags = sorted(set(labels))
 
@@ -104,6 +137,7 @@ def _train_pipeline() -> Pipeline:
                     max_iter=1000,
                     C=5.0,
                     solver="lbfgs",
+                    class_weight="balanced",
                 ),
             ),
         ]
@@ -116,8 +150,10 @@ def _train_pipeline() -> Pipeline:
     joblib.dump(_intent_tags, _INTENTS_PATH)
 
     logger.info(
-        "Chatbot pipeline trained and persisted – %d patterns, %d intents",
-        len(texts),
+        "Chatbot pipeline trained and persisted – %d patterns, %d QA "
+        "questions, %d intents",
+        pattern_count,
+        qa_count,
         len(_intent_tags),
     )
     return pipeline

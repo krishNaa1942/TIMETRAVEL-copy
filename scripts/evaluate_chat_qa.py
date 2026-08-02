@@ -29,9 +29,11 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = REPO_DIR / "data" / "models"
 
 # Hard gate for the full two-tier chat flow on real artifacts.
-# Chance / majority-class baseline for 7 intents = 0.244. Measured 0.840.
+# Chance / majority-class baseline for 7 intents = 0.244.
+# Measured 0.840 before the classic tier was trained on real QA data,
+# 0.930 after (classic tier covers 98% of questions itself).
 CHAT_GATES = {
-    "chat_intent_accuracy": 0.80,
+    "chat_intent_accuracy": 0.85,
 }
 
 # Structural gate for CI, where the learned tier is trained on the tiny

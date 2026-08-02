@@ -389,17 +389,13 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
 ```
 
 - **QA intent tier** (chat fallback): the classic chatbot pipeline
-  (`app/chatbot/engine.py`) stays authoritative for handcrafted intents;
-  low-confidence messages are re-scored by the offline classifier trained on
-  5,000 real user questions (char-ngram TF-IDF + balanced logistic
-  regression, accuracy 0.82 vs chance 0.14) and mapped onto response
-  templates (TTD/TGU→destination_info, TRS→transport, ACM→accommodation,
-  FOD→food_dining, ENT→entertainment, WTH→weather). The end-to-end flow
-  is gated in `scripts/evaluate_chat_qa.py`: all 5,000 real questions are
-  run through `classify_intent()` and the final intent must match the
-  annotated template mapping at accuracy ≥ 0.80 (measured 0.840, majority
-  baseline 0.244, fallback rate 8%). CI runs the same check in structural
-  smoke mode against the tiny smoke artifacts.
+  (`app/chatbot/engine.py`) trains on its handcrafted `intents.json`
+  patterns plus all 5,000 real user questions (coarse intents mapped onto
+  response templates) with balanced class weights, so the classic tier
+  itself answers 98% of real questions at ≥ 0.35 confidence (accuracy
+  0.93 on the QA benchmark, up from 0.18 on patterns alone). Low-confidence
+  messages are re-scored by the offline classifier (char-ngram TF-IDF +
+  balanced logistic regression, accuracy 0.82 vs chance 0.14).
 
 - **Datasets** (`data/training/`, ~4 MB, committed): `top_indian_places.csv`
   (real Google ratings — ground truth), `expanded_destinations.csv`,
@@ -425,8 +421,10 @@ scripts/train_models.py ──► data/models/*.joblib  ──► app/services/l
   default path.
 - **Validation**: `scripts/evaluate_models.py` enforces CI gates — quality
   MAE ≤ 0.6, popularity MAE ≤ 1.0, content same-state precision@5 ≥ 0.30,
-  intent accuracy ≥ 0.80 (current: 0.338 / 0.494 / 0.652 / 0.820). Smoke
-  training runs in the CI `ml` job.
+  intent accuracy ≥ 0.80 (current: 0.338 / 0.494 / 0.652 / 0.820).
+  `scripts/evaluate_chat_qa.py` gates the end-to-end `classify_intent()`
+  flow on all 5,000 real questions at ≥ 0.85 (measured 0.930, majority
+  baseline 0.244). Smoke training runs in the CI `ml` job.
 
 ---
 
