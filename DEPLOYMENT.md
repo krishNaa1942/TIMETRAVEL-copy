@@ -2,6 +2,9 @@
 
 Public deployment of the full stack (Expo web + Flask API + Postgres + Redis) on a VPS with your own domain.
 
+> **Want to deploy for $0?** See [Free Deployment (Oracle Cloud + DuckDNS)](#free-deployment-oracle-cloud--duckdns) — a
+> permanently free VPS + free DNS hostname + free Let's Encrypt TLS, using everything below nearly unchanged.
+
 ## Architecture
 
 ```
@@ -111,11 +114,75 @@ curl https://timetotravel.app/api/health    # {"status":"ok"}
 
 Open `https://timetotravel.app` in a browser → register an account → browse destinations, plan a trip.
 
+## Free Deployment (Oracle Cloud + DuckDNS)
+
+Zero-cost path: Oracle Cloud **Always Free** VPS + `duckdns.org` free hostname + Let's Encrypt. Total: $0/yr.
+
+### 1. Create the free VPS (~20 min)
+
+1. Sign up at https://signup.oraclecloud.com (credit card required for verification, **never charged**).
+2. Console → **Compute → Instances → Create instance**:
+   - **Image:** Ubuntu 24.04 (ARM or AMD — both have free shapes)
+   - **Shape:** `VM.Standard.A1.Flex` (ARM, **4 OCPU / 24 GB RAM** — best free tier) **or** `VM.Standard.E2.1.Micro` (AMD, 1 GB — tight; use `LOWMEM=1`)
+   - Generate/upload an SSH key pair; keep the private key safe.
+3. **Open the firewall** (required or the deploy fails):
+   - Instance → **Attached VNICs → VNIC → Security lists/NSGs** → add ingress rules for **TCP 22, 80, 443** from `0.0.0.0/0`.
+   - If the Ubuntu iptables blocks ports after boot:
+     `sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT && sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT`
+4. SSH in: `ssh -i ~/.ssh/oracle_key ubuntu@<VPS_IP>` — note the public IP.
+
+### 2. Free hostname (duckdns.org)
+
+1. https://duckdns.org → sign in with GitHub/Google → create a subdomain, e.g. `mytravel`.
+2. Add an **A record** `mytravel.duckdns.org → <VPS_IP>`. (IPv6 optional.)
+3. Verify: `dig +short mytravel.duckdns.org` shows your IP.
+
+### 3. Environment file (one hostname for web + API)
+
+```bash
+cd /path/to/repo
+cp .env.example .env.production
+# in .env.production:
+#   DOMAIN=mytravel.duckdns.org
+#   WEB_DOMAIN=mytravel.duckdns.org
+#   API_DOMAIN=mytravel.duckdns.org
+#   SSL_EMAIL=your-real-email@example.com   (Let's Encrypt notices)
+#   LOWMEM=1                                (only on the 1 GB AMD shape)
+# + fill SECRET_KEY, JWT_SECRET_KEY, POSTGRES_PASSWORD, REDIS_PASSWORD,
+#   GRAFANA_ADMIN_PASSWORD, GOOGLE_API_KEY, and the other API keys
+```
+
+### 4. Deploy
+
+```bash
+sudo bash scripts/deploy_vps.sh
+```
+
+The script dedupes the (identical) web/API domains for certbot, so a single
+duckdns hostname gets one certificate covering both. Everything else —
+Docker, Node 20, web bundle, migrations, nginx, backup + renew crons —
+works exactly as in the paid path.
+
+### 5. Verify + use
+
+```bash
+curl https://mytravel.duckdns.org/api/health   # {"status":"ok"}
+curl https://mytravel.duckdns.org               # web app
+```
+
+Native app: set `EXPO_PUBLIC_API_URL=https://mytravel.duckdns.org/api` when
+starting/building the app.
+
+### Oracle free-tier limits to remember
+
+- **1 GB AMD shape:** use `LOWMEM=1` (single web replica, monitoring off). See `docker-compose.lowmem.yml`.
+- **ARM A1.Flex:** free forever up to 4 OCPU/24 GB; spot shortages on this shape are common — retry later if unavailable.
+- Free resources stop if the account is idle for 90 days — a cron keeps it active only if traffic flows; don't rely on it.
+- DuckDNS works with dynamic IPs too: set up the [duckdns client](https://www.duckdns.org/install.jsp) if your IP ever changes.
+
 ## Native Mobile (Expo Go / APK)
 
 Set the production API URL and rebuild:
-
-```bash
 cd TimeTravelMobile
 EXPO_PUBLIC_API_URL=https://api.timetotravel.app/api npm run start
 # or for a standalone build:

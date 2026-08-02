@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+# TimeTravel — low-memory override for the Oracle Cloud
+# "Always Free" 1 GB AMD shape (VM.Standard.E2.1.Micro).
+#
+# Usage (with the free deploy, after .env.production exists):
+#   docker compose -f docker-compose.prod.yml -f docker-compose.lowmem.yml up -d --build
+#
+# The deploy script auto-detects and applies this file when
+# LOWMEM=1 is set in .env.production:
+#   LOWMEM=1
+# ─────────────────────────────────────────────────────────────
+
+# Web: 1 replica (instead of 3), tighter limits.
+services:
+  web:
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 384M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Monitoring is disabled on 1 GB hosts (Prometheus + Grafana ≈ 200 MB).
+  # Set LOWMEM=0 in .env.production if you want them on bigger shapes.
+  prometheus:
+    deploy:
+      replicas: 0
+  grafana:
+    deploy:
+      replicas: 0

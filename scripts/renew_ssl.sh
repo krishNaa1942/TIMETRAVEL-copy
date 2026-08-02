@@ -19,6 +19,11 @@ fi
 DOMAIN="${DOMAIN:-timetotravel.app}"
 API_DOMAIN="${API_DOMAIN:-api.${DOMAIN}}"
 
+COMPOSE_FILES=(-f docker-compose.prod.yml)
+if [[ "${LOWMEM:-0}" == "1" ]]; then
+  COMPOSE_FILES+=(-f docker-compose.lowmem.yml)
+fi
+
 certbot renew --quiet --deploy-hook true
 
 SSL_DIR="/etc/letsencrypt/live/${API_DOMAIN}"
@@ -33,8 +38,8 @@ cp "${SSL_DIR}/privkey.pem"  deploy/nginx/ssl/key.pem
 chmod 644 deploy/nginx/ssl/cert.pem
 chmod 600 deploy/nginx/ssl/key.pem
 
-if docker compose -f docker-compose.prod.yml ps >/dev/null 2>&1; then
-  docker compose -f docker-compose.prod.yml restart nginx
+if docker compose "${COMPOSE_FILES[@]}" ps >/dev/null 2>&1; then
+  docker compose "${COMPOSE_FILES[@]}" restart nginx
   log "TLS certificate refreshed and nginx reloaded."
 else
   log "TLS certificate refreshed (stack not running — nginx will pick it up on next start)."

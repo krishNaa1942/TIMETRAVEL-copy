@@ -56,6 +56,14 @@ WEB_DOMAIN="${WEB_DOMAIN:-${DOMAIN}}"
 API_DOMAIN="${API_DOMAIN:-api.${DOMAIN}}"
 EMAIL="${SSL_EMAIL:-admin@${DOMAIN}}"
 
+# Compose file selection — low-mem override for Oracle free 1 GB shapes
+COMPOSE_FILES=(-f docker-compose.prod.yml)
+if [[ "${LOWMEM:-0}" == "1" ]]; then
+  COMPOSE_FILES+=(-f docker-compose.lowmem.yml)
+  log "LOWMEM=1 → single web replica, monitoring disabled (1 GB shape)."
+fi
+COMPOSE_CMD() { docker compose "${COMPOSE_FILES[@]}" "$@"; }
+
 # ── 3. DNS sanity check ───────────────────────────────────────
 log "Verifying DNS for ${WEB_DOMAIN} / ${API_DOMAIN} (A records must point to this server)..."
 resolve() { getent hosts "$1" | awk '{print $1}' | head -1; }
@@ -75,11 +83,20 @@ done
 mkdir -p deploy/nginx/ssl
 SSL_DIR="/etc/letsencrypt/live/${API_DOMAIN}"
 if [[ ! -f "${SSL_DIR}/fullchain.pem" ]]; then
-  log "Issuing Let's Encrypt certificate for ${API_DOMAIN} + ${WEB_DOMAIN}..."
+  # Deduplicate domains (free setups often use one hostname for web + API,
+  # e.g. yourname.duckdns.org — certbot rejects duplicate -d flags).
+  CERT_DOMAINS=()
+  for d in "${API_DOMAIN}" "${WEB_DOMAIN}"; do
+    [[ " ${CERT_DOMAINS[*]} " == *" ${d} "* ]] || CERT_DOMAINS+=("$d")
+  done
+  CERT_ARGS=()
+  for d in "${CERT_DOMAINS[@]}"; do CERT_ARGS+=(-d "$d"); done
+
+  log "Issuing Let's Encrypt certificate for: ${CERT_DOMAINS[*]}"
   systemctl stop nginx >/dev/null 2>&1 || true   # free port 80 for standalone mode
   certbot certonly --standalone \
     --non-interactive --agree-tos -m "$EMAIL" \
-    -d "${API_DOMAIN}" -d "${WEB_DOMAIN}" \
+    "${CERT_ARGS[@]}" \
     --register-unsafely-without-email \
     || die "certbot failed — ensure port 80 is open and DNS is correct, then rerun."
 else
@@ -100,7 +117,7 @@ log "Building web bundle (Expo export)..."
   || die "Web build failed — see npm output above."
 
 log "Starting Docker stack..."
-docker compose -f docker-compose.prod.yml up -d --build
+COMPOSE_CMD up -d --build
 
 # ── 7. Wait for health ────────────────────────────────────────
 log "Waiting for API health check..."
@@ -110,17 +127,17 @@ for i in $(seq 1 30); do
     break
   fi
   sleep 3
-  [[ $i -eq 30 ]] && die "API not healthy after 90s — check: docker compose -f docker-compose.prod.yml logs web"
+  [[ $i -eq 30 ]] && die "API not healthy after 90s — check: COMPOSE_CMD logs web"
 done
 
 # ── 8. Alembic migrations ─────────────────────────────────────
 log "Running database migrations..."
-docker compose -f docker-compose.prod.yml exec -T web alembic upgrade head \
+COMPOSE_CMD exec -T web alembic upgrade head \
   || die "Migration failed — check DATABASE_URL in .env.production"
 
 # ── 9. Verify nginx rendered config ───────────────────────────
 log "Verifying nginx config (server_name: ${API_DOMAIN}, ${WEB_DOMAIN})..."
-docker compose -f docker-compose.prod.yml exec -T nginx nginx -t \
+COMPOSE_CMD exec -T nginx nginx -t \
   || die "nginx config invalid — check API_DOMAIN/WEB_DOMAIN in .env.production"
 
 # ── 10. Cron: daily backup + TLS renewal ──────────────────────
