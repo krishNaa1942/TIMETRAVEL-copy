@@ -23,6 +23,8 @@ const INSIGHT_ICONS: Record<string, string> = {
   seasonal: "weather-sunny",
   personalized: "heart",
   recommendation: "star-four-points",
+  hidden_gems: "diamond-stone",
+  weekend: "calendar-weekend",
 };
 
 const INSIGHT_COLORS: Record<string, string> = {
@@ -30,6 +32,8 @@ const INSIGHT_COLORS: Record<string, string> = {
   seasonal: "#F59E0B",
   personalized: "#EC4899",
   recommendation: "#8B5CF6",
+  hidden_gems: "#10B981",
+  weekend: "#0EA5E9",
 };
 
 // ─────────────────────────────────────────────────────────────

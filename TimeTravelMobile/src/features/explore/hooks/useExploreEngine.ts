@@ -12,6 +12,7 @@ import {
   useDestinations,
   useSearchDestinations,
 } from "@/api/queries/useDestinations";
+import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { destinationsService } from "@/services/destinations";
 import { Destination, RootStackParamList, UnsplashImage } from "@/types";
 import {
@@ -26,8 +27,37 @@ import { CURRENT_SEASON } from "../constants/categories";
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
+// Destinations showcased by the featured carousel (mirrors server featured_ids)
+const FEATURED_IDS = new Set([
+  "goa",
+  "kerala_backwaters",
+  "jaipur",
+  "varanasi",
+  "andaman",
+]);
+
+const _hashId = (id: string): number =>
+  id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+
+const _haversineKm = (
+  a: { latitude: number; longitude: number },
+  b: { lat: number; lon: number },
+): number => {
+  const R = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.latitude);
+  const dLon = toRad(b.lon - a.longitude);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.latitude)) *
+      Math.cos(toRad(b.lat)) *
+      Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+};
+
 export function useExploreEngine() {
   const navigation = useNavigation<NavProp>();
+  const userLocation = useTravelIntelligence((s) => s.userLocation);
 
   // React Query for destinations
   const {
@@ -148,17 +178,48 @@ export function useExploreEngine() {
       });
     }
 
+    // Hidden Gems — long-tail destinations not in the featured set,
+    // deterministically ranked (stable id-hash, like the trending section).
+    const hiddenGems = [...destinations]
+      .filter((d) => !FEATURED_IDS.has(d.id))
+      .sort((a, b) => _hashId(a.id) - _hashId(b.id))
+      .slice(0, 5);
+
+    if (hiddenGems.length > 0) {
+      insights.push({
+        id: "hidden_gems",
+        type: "hidden_gems",
+        title: "Hidden Gems",
+        subtitle: "Lesser-known destinations worth the detour",
+        destinations: hiddenGems,
+        reason: "Off the typical tourist trail",
+      });
+    }
+
+    // Weekend Escapes — nearest destinations to the user's location
+    // (skipped when no location is known yet).
+    if (userLocation) {
+      const weekendEscapes = [...destinations]
+        .map((d) => ({ d, km: _haversineKm(userLocation, d) }))
+        .sort((a, b) => a.km - b.km)
+        .slice(0, 5)
+        .map(({ d }) => d);
+
+      if (weekendEscapes.length > 0) {
+        insights.push({
+          id: "weekend",
+          type: "weekend",
+          title: "Weekend Escapes",
+          subtitle: "Close to you",
+          destinations: weekendEscapes,
+          reason: "Short drive from your location",
+        });
+      }
+    }
+
     // Trending destinations — stable sort by ID hash
     const trendingDest = [...destinations]
-      .sort((a, b) => {
-        const hashA = a.id
-          .split("")
-          .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        const hashB = b.id
-          .split("")
-          .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        return hashB - hashA;
-      })
+      .sort((a, b) => _hashId(b.id) - _hashId(a.id))
       .slice(0, 5);
 
     if (trendingDest.length > 0) {
@@ -172,7 +233,7 @@ export function useExploreEngine() {
     }
 
     return insights;
-  }, [destinations, activeCategory]);
+  }, [destinations, activeCategory, userLocation]);
 
   // Filtered & scored destinations
   const filteredDestinations = useMemo(() => {

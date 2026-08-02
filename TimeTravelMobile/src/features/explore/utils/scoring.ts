@@ -35,7 +35,13 @@ export interface FilterState {
 
 export interface AIInsight {
   id: string;
-  type: "recommendation" | "trending" | "seasonal" | "personalized";
+  type:
+    | "recommendation"
+    | "trending"
+    | "seasonal"
+    | "personalized"
+    | "hidden_gems"
+    | "weekend";
   title: string;
   subtitle: string;
   destinations: Destination[];
