@@ -193,15 +193,16 @@ TripWorkspace passes `{trip: currentTrip}` → TripSharing (expects `tripId`; sc
 - B3. Fix F12 param flows (TripSharing `tripId`, Expenses `tripId`, Packing destination, Reservations `type`).
 - Verify: `tsc --noEmit` clean (no ESLint wired in project); manual smoke: Workspace → share (auto-selects trip), Workspace → Expenses (destination prefilled + trip_id attached), Workspace → Packing (destination preselect), Workspace → Reservations (type filter + trip preselect).
 
-### Phase C — Screen Experience Upgrades — effort M–L (per screen, priority order)
-- C1. Chat: conversation history UI from `chat_messages`.
-- C2. Itinerary: Save-to-Trip + Export PDF (backend ready).
-- C3. TripWorkspace: photo upload UI (backend ready).
-- C4. DestinationDetail: favorites fix + cost/rating chips + Compare/Directions entries.
-- C5. Packing: documents upload section.
-- C6. Profile: wire real preferences/achievements once A3 lands; error toasts for unsupported actions.
-- C7. TravelStats/Home: charts + budgetLevel on cards.
-- C8. Discoverability: Currency/RoutePlanner/Phrasebook/NewsFeed entries from profile actions + home shortcuts.
+### Phase C — Screen Experience Upgrades — effort M–L (per screen, priority order) ✅ (shipped `52e79cc`)
+- C1. Chat: conversation history UI backend `GET /api/chat/history` + `GET /api/chat/history/<session_id>` (per-user scoping), `chatService` `getHistory`/`getSessionMessages`, `useChatAgent.restoreSession`, ChatScreen header history button + sessions modal. Verified: `TestChatHistory` (5 tests).
+- C2. Itinerary: `exportService.exportItineraryPdf` (fetch→base64→expo-file-system→expo-sharing) hitting `POST /api/export/itinerary`; genuine `createTrip` save with "Go to trips" alert + Export PDF button.
+- C3. TripWorkspace: `uploadsService` (upload/list/delete photos + documents: one FormData per file, backend reads `files[0]`); multi-photo picker (max 10), photo grid with delete + set-cover, cover in header gradient.
+- C4. DestinationDetail: `daily_cost` budget preview, Rating + Cost/Day quick stats, Compare (preloads dest1) + Directions (Apple/Google maps, Alert fallback).
+- C5. Packing: documents section — type chips (passport/visa/ticket/insurance/other), upload/delete via documents endpoints.
+- C6. Profile: real preferences save (`Record<string, unknown>`), AchievementsCard + PreferencesCard, avatar upload helper (`getAvatarSource` carries full URL).
+- C7. TravelStats/Home: spending breakdown % bars in Overview; `budgetLevel` badge on DestinationCard.
+- C8. Discoverability: Home tools row (Currency/RoutePlanner/Phrasebook/NewsFeed) + profile shortcut grid (deduped against existing routes).
+- Verify: `tsc --noEmit` clean; 25/25 `tests/test_chatbot.py` pass (5 new history tests); all routes pre-existing (Currency, Compare, RoutePlanner, NewsFeed, Phrasebook). Pickers: `expo-image-picker`, `expo-document-picker`.
 
 ### Phase D — Data & Consistency — effort M
 - D1. Seed `destinations` table from `india_destinations.json` → unblocks recommendation engine candidates (real scores instead of fallback).
