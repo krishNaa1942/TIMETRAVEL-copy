@@ -294,6 +294,8 @@ def places_recommend():
 
 
 # ── GET /api/places/detail/<fsq_id> ──────────────────────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by PlaceDetailScreen is a trip-place modal, not Foursquare detail. See FRONTEND_AUDIT.md Phase D.
 @places_bp.route("/api/places/detail/<fsq_id>", methods=["GET"])
 @limiter.limit("30 per minute")
 def place_detail(fsq_id: str):
@@ -320,6 +322,8 @@ def place_detail(fsq_id: str):
 
 
 # ── GET /api/places/photos/<fsq_id> ──────────────────────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer. See FRONTEND_AUDIT.md Phase D.
 @places_bp.route("/api/places/photos/<fsq_id>", methods=["GET"])
 @limiter.limit("30 per minute")
 def place_photos(fsq_id: str):
@@ -347,6 +351,8 @@ def place_photos(fsq_id: str):
 
 
 # ── GET /api/places/tips/<fsq_id> ────────────────────────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer. See FRONTEND_AUDIT.md Phase D.
 @places_bp.route("/api/places/tips/<fsq_id>", methods=["GET"])
 @limiter.limit("30 per minute")
 def place_tips(fsq_id: str):

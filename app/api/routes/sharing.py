@@ -14,7 +14,7 @@ from flask_login import login_required, current_user
 
 from app.main import limiter
 from app.models.database import db
-from app.models.entities import SharedTrip, TripQuery
+from app.models.entities import SharedTrip, Trip, TripQuery
 
 sharing_bp = Blueprint("sharing", __name__)
 
@@ -33,9 +33,9 @@ def create_share():
     itinerary_json = data.get("itinerary_json")
     notes = (data.get("notes") or "")[:2000]
 
-    # Verify trip ownership if trip_id provided
+    # Verify trip ownership if trip_id provided (workspace Trip or analytics TripQuery)
     if trip_id:
-        trip = db.session.get(TripQuery, trip_id)
+        trip = db.session.get(Trip, trip_id) or db.session.get(TripQuery, trip_id)
         if not trip or trip.user_id != current_user.id:
             return jsonify({"error": "Trip not found"}), 404
 
@@ -77,9 +77,11 @@ def view_shared(token):
 
     result = share.to_dict()
 
-    # Include trip details if linked
-    if share.trip_id and share.trip:
-        result["trip"] = share.trip.to_dict()
+    # Include trip details if linked (workspace Trip, or legacy TripQuery row)
+    if share.trip_id:
+        trip = share.trip or TripQuery.query.get(share.trip_id)
+        if trip:
+            result["trip"] = trip.to_dict()
 
     # Parse stored itinerary JSON
     if share.itinerary_json:

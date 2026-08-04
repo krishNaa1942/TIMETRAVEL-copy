@@ -23,6 +23,8 @@ from app.models.database import db
 from app.models.entities import User
 from app.main import limiter
 
+# DEPRECATED (Phase D4): v1 auth routes superseded by /api/auth/v2 (JWT).
+# Mobile app is 100% on authV2; kept for legacy client compatibility.
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
 

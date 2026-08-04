@@ -204,11 +204,12 @@ TripWorkspace passes `{trip: currentTrip}` → TripSharing (expects `tripId`; sc
 - C8. Discoverability: Home tools row (Currency/RoutePlanner/Phrasebook/NewsFeed) + profile shortcut grid (deduped against existing routes).
 - Verify: `tsc --noEmit` clean; 25/25 `tests/test_chatbot.py` pass (5 new history tests); all routes pre-existing (Currency, Compare, RoutePlanner, NewsFeed, Phrasebook). Pickers: `expo-image-picker`, `expo-document-picker`.
 
-### Phase D — Data & Consistency — effort M
-- D1. Seed `destinations` table from `india_destinations.json` → unblocks recommendation engine candidates (real scores instead of fallback).
-- D2. Unify TripQuery vs Trip; add FK/relationship or explicit migration path.
-- D3. Reconcile `supabase/schema.sql` with ORM (single source = alembic).
-- D4. Decide fate of unused backend endpoints (`/api/uploads/*`, `/api/templates/*`, `/api/export/*`, places detail/photos/tips) — either wire mobile UI or mark deprecated.
+### Phase D — Data & Consistency — effort M ✅
+- D1. `destinations` table extended (`region`, `categories`, `highlights`, `description`, `best_months`) + seeded (201 rows) from `data/india_destinations.json`, enriched with `safety_score` (`data/safety_scores.json` mean) and `avg_daily_cost` (`data/budget_baselines.json` sum). Alembic migration `8a4b2d9c1f6e` seeds via `app/services/seed_destinations.py` (idempotent, session-injectable); dev script `scripts/seed_destinations.py`. `/api/recommendations` now scores real candidates (verified live: Kochi, Wayanad, Alleppey… with budget filter + seasonality from `best_months`).
+- D2. TripQuery ↔ Trip unified: `trip_queries.trip_id` FK → `trips.id` (+ `linked_trip` relationship, migration `c9d7e3f1a5b8`); `POST /api/trips` accepts optional `trip_query_id` to link the analytics row; `SharedTrip.trip_id` and `Expense.trip_id` FKs re-pointed from `trip_queries.id` → `trips.id` (matches what the mobile app actually stores), with `view_shared` legacy fallback to `TripQuery`.
+- D3. `supabase/schema.sql` reconciled with ORM: header now declares entities.py + alembic as single source; added missing CHECKs (destinations safety_score, trips status/travel_class, favorites item_type), `ix_destinations_country`, `trip_queries.trip_id`, `shared_trips`/`expenses` FK targets, and the ORM now carries `ondelete="CASCADE"` on all trip-child FKs matching schema.sql. RLS stays SQL-only.
+- D4. Endpoint fate decided: `GET /api/templates`, `POST /api/templates/<id>/clone`, `POST /api/export/budget|comparison`, `GET /api/places/detail|photos|tips/<id>`, `GET /api/booking/links`, `POST /api/newsletter`, `GET /api/news/destinations`, `GET /api/images/hero|status`, `POST /api/chat/ai`, v1 `/api/auth/*`, and unused v1 `/api/trips` routes (GET/<id>/DELETE/PUT/duplicate) marked `# DEPRECATED` in code — kept for compatibility, no mobile consumer as of Phase D. Fixed `TripPhoto._photo_url`/`TripDocument._doc_url` to match the real `/api/uploads/serve/*` routes.
+- Verify: `alembic upgrade head` applied to dev DB (201 seeded); `tests/test_phase_d.py` 8/8 (seed count/idempotency/refresh, engine candidates from DB, trip-query link, share ownership with workspace Trip ids); full suite 947 passed.
 
 ### Phase E — Polish & Observability — effort S–M
 - E1. Error toasts/retry states on every mutation (currently silent failures on many 404s).

@@ -14,6 +14,8 @@ newsletter_bp = Blueprint("newsletter", __name__, url_prefix="/api/newsletter")
 _EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
 
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer (no subscription UI). See FRONTEND_AUDIT.md Phase D.
 @newsletter_bp.route("", methods=["POST"])
 @limiter.limit("5 per hour")
 def subscribe():

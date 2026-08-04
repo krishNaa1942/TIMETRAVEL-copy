@@ -12,6 +12,8 @@ from app.services.booking_service import get_booking_links
 booking_bp = Blueprint("booking", __name__)
 
 
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer. See FRONTEND_AUDIT.md Phase D.
 @booking_bp.route("/api/booking/links", methods=["GET"])
 @limiter.limit("30 per minute")
 def booking_links():

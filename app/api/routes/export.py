@@ -52,6 +52,8 @@ def export_itinerary():
     )
 
 
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no UI (exportBudgetPdf client exists but is never called). See FRONTEND_AUDIT.md Phase D.
 @export_bp.route("/api/export/budget", methods=["POST"])
 @limiter.limit("10 per hour")
 def export_budget():
@@ -78,6 +80,8 @@ def export_budget():
     )
 
 
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no UI. See FRONTEND_AUDIT.md Phase D.
 @export_bp.route("/api/export/comparison", methods=["POST"])
 @limiter.limit("10 per hour")
 def export_comparison():

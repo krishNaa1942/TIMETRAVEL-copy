@@ -143,6 +143,8 @@ def destination_images(destination: str):
 
 
 # ── GET /api/images/hero/<name> – single hero banner ──────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by mobile getHeroImage reuses getDestinationImages. See FRONTEND_AUDIT.md Phase D.
 @images_bp.route("/api/images/hero/<destination>", methods=["GET"])
 @limiter.limit("30 per minute")
 def hero_image(destination: str):
@@ -199,6 +201,8 @@ def hero_image(destination: str):
 
 
 # ── GET /api/images/status ─────────────────────────────────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer. See FRONTEND_AUDIT.md Phase D.
 @images_bp.route("/api/images/status", methods=["GET"])
 def images_status():
     """Check if the Unsplash image service is available."""

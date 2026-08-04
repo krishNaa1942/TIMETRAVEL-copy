@@ -189,6 +189,8 @@ def chat_endpoint():
 # ---------------------------------------------------------------------------
 # POST /api/chat/ai – Force Gemini AI mode
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by mobile chat service never posts /chat/ai. See FRONTEND_AUDIT.md Phase D.
 @chatbot_bp.route("/api/chat/ai", methods=["POST"])
 @login_required
 @limiter.limit("20 per minute")

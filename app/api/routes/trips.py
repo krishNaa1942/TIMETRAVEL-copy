@@ -44,6 +44,8 @@ def _parse_date(value):
 # ---------------------------------------------------------------------------
 # GET /api/trips – list user's trip history
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by TripsScreen uses the mock tripsStore; planner blueprint serves lists. See FRONTEND_AUDIT.md Phase D.
 @trips_bp.route("/api/trips", methods=["GET"])
 @login_required
 def list_trips():
@@ -67,6 +69,8 @@ def list_trips():
 # ---------------------------------------------------------------------------
 # GET /api/trips/<id> – single trip detail
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer (getTrip never called). See FRONTEND_AUDIT.md Phase D.
 @trips_bp.route("/api/trips/<int:trip_id>", methods=["GET"])
 @login_required
 def get_trip(trip_id):
@@ -80,6 +84,8 @@ def get_trip(trip_id):
 # ---------------------------------------------------------------------------
 # DELETE /api/trips/<id> – delete a trip
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer. See FRONTEND_AUDIT.md Phase D.
 @trips_bp.route("/api/trips/<int:trip_id>", methods=["DELETE"])
 @login_required
 def delete_trip(trip_id):
@@ -141,6 +147,13 @@ def create_trip():
     db.session.add(trip)
     db.session.flush()  # get trip.id
 
+    # Explicit migration path (D2): link the new Trip to its source analytics row
+    trip_query_id = data.get("trip_query_id")
+    if trip_query_id:
+        query_row = db.session.get(TripQuery, trip_query_id)
+        if query_row and query_row.user_id == current_user.id:
+            query_row.trip_id = trip.id
+
     for i in range(1, num_days + 1):
         day_date = None
         if trip.start_date:
@@ -158,6 +171,8 @@ def create_trip():
 # ---------------------------------------------------------------------------
 # PUT /api/trips/<id> – update a trip
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer (updateTrip never called). See FRONTEND_AUDIT.md Phase D.
 @trips_bp.route("/api/trips/<int:trip_id>", methods=["PUT"])
 @login_required
 def update_trip(trip_id):
@@ -222,6 +237,8 @@ def update_trip(trip_id):
 # ---------------------------------------------------------------------------
 # POST /api/trips/<id>/duplicate – clone a trip and its sub-resources
 # ---------------------------------------------------------------------------
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by no consumer (duplicateTrip never called). See FRONTEND_AUDIT.md Phase D.
 @trips_bp.route("/api/trips/<int:trip_id>/duplicate", methods=["POST"])
 @login_required
 def duplicate_trip(trip_id):

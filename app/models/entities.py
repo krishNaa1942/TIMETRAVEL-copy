@@ -77,7 +77,12 @@ class TripQuery(db.Model):
     transport = db.Column(db.Float, nullable=True)
     activities = db.Column(db.Float, nullable=True)
     miscellaneous = db.Column(db.Float, nullable=True)
+    trip_id = db.Column(
+        db.Integer, db.ForeignKey("trips.id"), nullable=True, index=True
+    )
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    linked_trip = db.relationship("Trip")
 
     def to_dict(self):
         return {
@@ -139,6 +144,11 @@ class Destination(db.Model):
     safety_score = db.Column(db.Float, nullable=True)  # 0.0 – 10.0
     avg_daily_cost = db.Column(db.Float, nullable=True)  # in INR
     best_season = db.Column(db.String(64), nullable=True)
+    region = db.Column(db.String(64), nullable=True)
+    categories = db.Column(db.JSON, nullable=True)  # ["heritage", "nature", ...]
+    highlights = db.Column(db.JSON, nullable=True)  # top sights/attractions
+    description = db.Column(db.Text, nullable=True)
+    best_months = db.Column(db.JSON, nullable=True)  # [1..12]
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
@@ -254,7 +264,11 @@ class SharedTrip(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
     )
-    trip_id = db.Column(db.Integer, db.ForeignKey("trip_queries.id"), nullable=True)
+    trip_id = db.Column(
+        db.Integer,
+        db.ForeignKey("trips.id", ondelete="CASCADE"),
+        nullable=True,
+    )
     title = db.Column(db.String(256), nullable=False, default="My Trip")
     itinerary_json = db.Column(db.Text, nullable=True)  # stored JSON of itinerary
     notes = db.Column(db.Text, nullable=True)
@@ -263,7 +277,7 @@ class SharedTrip(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("shared_trips", lazy="dynamic"))
-    trip = db.relationship("TripQuery", backref=db.backref("shares", lazy="dynamic"))
+    trip = db.relationship("Trip", backref=db.backref("shares", lazy="dynamic"))
 
     def to_dict(self):
         return {
@@ -299,7 +313,11 @@ class Expense(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
     )
-    trip_id = db.Column(db.Integer, db.ForeignKey("trip_queries.id"), nullable=True)
+    trip_id = db.Column(
+        db.Integer,
+        db.ForeignKey("trips.id", ondelete="CASCADE"),
+        nullable=True,
+    )
     destination = db.Column(db.String(128), nullable=False)
     category = db.Column(
         db.String(64), nullable=False
@@ -311,7 +329,7 @@ class Expense(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", backref=db.backref("expenses", lazy="dynamic"))
-    trip = db.relationship("TripQuery", backref=db.backref("expenses", lazy="dynamic"))
+    trip = db.relationship("Trip", backref=db.backref("expenses", lazy="dynamic"))
 
     def to_dict(self):
         return {
@@ -471,7 +489,7 @@ class TripDay(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, index=True
     )
     day_number = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=True)
@@ -511,10 +529,10 @@ class TripPlace(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, index=True
     )
     day_id = db.Column(
-        db.Integer, db.ForeignKey("trip_days.id"), nullable=True, index=True
+        db.Integer, db.ForeignKey("trip_days.id", ondelete="CASCADE"), nullable=True, index=True
     )
     name = db.Column(db.String(256), nullable=False)
     address = db.Column(db.String(512), nullable=True)
@@ -567,7 +585,7 @@ class Reservation(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
@@ -621,7 +639,7 @@ class TripPhoto(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
@@ -649,7 +667,7 @@ class TripPhoto(db.Model):
                 return f"{url}/storage/v1/object/public/{bucket}/{self.user_id}/{self.filename}"
         except RuntimeError:
             pass  # outside app context
-        return f"/uploads/photos/{self.filename}"
+        return f"/api/uploads/serve/photos/{self.filename}"
 
     def to_dict(self):
         return {
@@ -676,7 +694,7 @@ class TripDocument(db.Model):
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
     )
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=True, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=True, index=True
     )
     doc_type = db.Column(
         db.String(32), nullable=False
@@ -705,7 +723,7 @@ class TripDocument(db.Model):
                 return f"{url}/storage/v1/object/public/{bucket}/{self.user_id}/{self.filename}"
         except RuntimeError:
             pass  # outside app context
-        return f"/uploads/documents/{self.filename}"
+        return f"/api/uploads/serve/documents/{self.filename}"
 
     def to_dict(self):
         return {
@@ -730,7 +748,7 @@ class Companion(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trip_id = db.Column(
-        db.Integer, db.ForeignKey("trips.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("trips.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=False, index=True

@@ -12,6 +12,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _seasonality_score(best_months: Optional[List[int]]) -> float:
+    """1.0 when the current month is a destination's best month, else 0.8."""
+    if not best_months:
+        return 0.8
+    return 1.0 if datetime.now().month in best_months else 0.8
+
+
 @dataclass
 class UserPreferences:
     """User travel preferences"""
@@ -643,11 +650,11 @@ class AIRecommendationService:
                     country=d.country or "India",
                     rating=d.safety_score / 2 if d.safety_score else 3.5,
                     booking_count=0,
-                    categories=[d.best_season] if d.best_season else [],
+                    categories=list(d.categories or []),
                     climate="moderate",
                     avg_cost=d.avg_daily_cost or 0,
-                    seasonality_score=0.8,
-                    activities=[],
+                    seasonality_score=_seasonality_score(d.best_months),
+                    activities=list(d.highlights or []),
                     cuisine_types=[],
                 )
                 for d in destinations

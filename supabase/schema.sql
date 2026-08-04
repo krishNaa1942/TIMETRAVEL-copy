@@ -5,8 +5,13 @@
 -- Alternatively, the Flask app creates tables automatically on startup
 -- via SQLAlchemy's create_all().
 --
--- This script also enables Row Level Security (RLS) on user-owned
--- tables so each user can only access their own data.
+-- SINGLE SOURCE OF TRUTH: app/models/entities.py + alembic/ migrations.
+-- This file mirrors the ORM metadata for the Supabase PostgreSQL target.
+-- When models change, update entities.py + add an alembic migration, then
+-- regenerate this file's table definitions from `alembic revision
+-- --autogenerate` output. Do not hand-edit here first.
+--
+-- RLS policies (below) are a Supabase-only artifact and stay here only.
 -- =====================================================================
 
 -- ── Users ───────────────────────────────────────────────────────────
@@ -26,12 +31,19 @@ CREATE TABLE IF NOT EXISTS destinations (
     country         VARCHAR(64)   NOT NULL DEFAULT 'India',
     latitude        DOUBLE PRECISION,
     longitude       DOUBLE PRECISION,
-    safety_score    DOUBLE PRECISION,
+    safety_score    DOUBLE PRECISION
+                    CHECK (safety_score IS NULL OR (safety_score >= 0 AND safety_score <= 10)),
     avg_daily_cost  DOUBLE PRECISION,
     best_season     VARCHAR(64),
+    region          VARCHAR(64),
+    categories      JSONB,
+    highlights      JSONB,
+    description     TEXT,
+    best_months     JSONB,
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_destinations_name ON destinations (name);
+CREATE INDEX IF NOT EXISTS ix_destinations_country ON destinations (country);
 
 -- ── Trip Queries ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS trip_queries (
@@ -48,6 +60,7 @@ CREATE TABLE IF NOT EXISTS trip_queries (
     transport       DOUBLE PRECISION,
     activities      DOUBLE PRECISION,
     miscellaneous   DOUBLE PRECISION,
+    trip_id         INTEGER REFERENCES trips(id),
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_trip_queries_user ON trip_queries (user_id);
@@ -71,7 +84,8 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages (user_sess
 CREATE TABLE IF NOT EXISTS favorites (
     id          SERIAL PRIMARY KEY,
     user_id     INTEGER      NOT NULL REFERENCES users(id),
-    item_type   VARCHAR(32)  NOT NULL DEFAULT 'destination',
+    item_type   VARCHAR(32)  NOT NULL DEFAULT 'destination'
+                CHECK (item_type IN ('destination', 'place', 'attraction', 'restaurant')),
     item_name   VARCHAR(256) NOT NULL,
     notes       TEXT,
     created_at  TIMESTAMPTZ  DEFAULT NOW(),
@@ -99,7 +113,7 @@ CREATE TABLE IF NOT EXISTS shared_trips (
     id              SERIAL PRIMARY KEY,
     share_token     VARCHAR(36) NOT NULL UNIQUE,
     user_id         INTEGER     NOT NULL REFERENCES users(id),
-    trip_id         INTEGER     REFERENCES trip_queries(id),
+    trip_id         INTEGER     REFERENCES trips(id) ON DELETE CASCADE,
     title           VARCHAR(256) NOT NULL DEFAULT 'My Trip',
     itinerary_json  TEXT,
     notes           TEXT,
@@ -114,7 +128,7 @@ CREATE INDEX IF NOT EXISTS idx_shared_trips_user ON shared_trips (user_id);
 CREATE TABLE IF NOT EXISTS expenses (
     id          SERIAL PRIMARY KEY,
     user_id     INTEGER      NOT NULL REFERENCES users(id),
-    trip_id     INTEGER      REFERENCES trip_queries(id),
+    trip_id     INTEGER      REFERENCES trips(id) ON DELETE CASCADE,
     destination VARCHAR(128) NOT NULL,
     category    VARCHAR(64)  NOT NULL,
     description VARCHAR(256) NOT NULL,
@@ -147,9 +161,11 @@ CREATE TABLE IF NOT EXISTS trips (
     end_date        DATE,
     num_days        INTEGER      DEFAULT 1,
     family_size     INTEGER      DEFAULT 1,
-    travel_class    VARCHAR(16)  DEFAULT 'economy',
+    travel_class    VARCHAR(16)  DEFAULT 'economy'
+                    CHECK (travel_class IN ('economy', 'budget', 'standard', 'premium', 'luxury')),
     cover_image_url VARCHAR(512),
-    status          VARCHAR(20)  DEFAULT 'planning',
+    status          VARCHAR(20)  DEFAULT 'planning'
+                    CHECK (status IN ('planning', 'active', 'completed', 'cancelled')),
     budget_total    DOUBLE PRECISION,
     notes           TEXT,
     itinerary_json  TEXT,

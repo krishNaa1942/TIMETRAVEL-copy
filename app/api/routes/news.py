@@ -108,6 +108,8 @@ def safety_news():
 
 
 # ── GET /api/news/destinations ────────────────────────────
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by mobile news service only uses travel/trending/safety. See FRONTEND_AUDIT.md Phase D.
 @news_bp.route("/api/news/destinations", methods=["GET"])
 def news_destinations():
     """Return list of destinations with news coverage."""

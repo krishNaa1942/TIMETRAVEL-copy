@@ -1032,6 +1032,8 @@ BUILTIN_TEMPLATES = [
 ]
 
 
+# DEPRECATED (Phase D4): no mobile consumer; TripWorkspaceScreen uses its
+# local TRIP_TEMPLATES constant. See FRONTEND_AUDIT.md Phase D.
 @templates_bp.route("", methods=["GET"])
 def list_templates():
     """List all available trip templates."""
@@ -1072,6 +1074,8 @@ def list_templates():
     return jsonify({"templates": result})
 
 
+# DEPRECATED (Phase D4): no mobile consumer; kept for API compatibility.
+# Disposition: superseded by the local TRIP_TEMPLATES constant in TripWorkspaceScreen. See FRONTEND_AUDIT.md Phase D.
 @templates_bp.route("/<template_id>/clone", methods=["POST"])
 @login_required
 def clone_template(template_id):
