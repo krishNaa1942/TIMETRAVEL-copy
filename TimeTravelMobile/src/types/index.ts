@@ -159,6 +159,9 @@ export type RootStackParamList = {
   NewsFeed: undefined;
   TravelStats: undefined;
   Phrasebook: undefined;
+  PlaceDetail: { place: any };
+  CompanionDetail: { companion: any };
+  AddCompanion: { tripId: string | number };
 };
 
 export type BottomTabParamList = {

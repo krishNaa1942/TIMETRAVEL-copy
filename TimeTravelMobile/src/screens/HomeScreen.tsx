@@ -123,6 +123,14 @@ const CURRENT_SEASON = (() => {
   return "spring";
 })();
 
+// Home filter chips → Explore category ids
+const HOME_FILTER_TO_CATEGORY: Record<string, string> = {
+  adventure: "adventure",
+  beach: "beach",
+  heritage: "spiritual",
+  nature: "mountain",
+};
+
 // ─────────────────────────────────────────────────────────────
 // UTILITY FUNCTIONS
 // ─────────────────────────────────────────────────────────────
@@ -713,37 +721,42 @@ export default function HomeScreen() {
 
   const handleQuickAction = useCallback(
     (action: (typeof QUICK_ACTIONS)[number]) => {
-      navigation.navigate("MainTabs", { screen: action.route as any, params: {} });
+      if (action.route === "Trips" || action.route === "Explore") {
+        navigation.navigate("MainTabs", { screen: action.route });
+        return;
+      }
+      navigation.navigate(action.route as any);
     },
     [navigation],
   );
 
   // Navigation helpers for "See All" buttons
   const handleSeeAllRecommended = useCallback(() => {
-    navigation.navigate("MainTabs", {
-      screen: "ExploreTab",
-      params: { filter: activeFilter || "featured" },
-    });
+    const category =
+      activeFilter && activeFilter in HOME_FILTER_TO_CATEGORY
+        ? HOME_FILTER_TO_CATEGORY[activeFilter]
+        : "all";
+    navigation.navigate("MainTabs", { screen: "Explore", params: { category } });
   }, [navigation, activeFilter]);
 
   const handleSeeAllTrending = useCallback(() => {
     navigation.navigate("MainTabs", {
-      screen: "ExploreTab",
-      params: { filter: "trending" },
+      screen: "Explore",
+      params: { category: "all" },
     });
   }, [navigation]);
 
   const handleSeeAllBudget = useCallback(() => {
     navigation.navigate("MainTabs", {
-      screen: "ExploreTab",
-      params: { filter: "budget" },
+      screen: "Explore",
+      params: { category: "all" },
     });
   }, [navigation]);
 
   const handleInsightPress = useCallback(() => {
     if (travelInsight.type === "tip") {
       navigation.navigate("MainTabs", {
-        screen: "ExploreTab",
+        screen: "Explore",
         params: { season: CURRENT_SEASON },
       });
     } else if (destinations.length > 0) {
@@ -794,7 +807,7 @@ export default function HomeScreen() {
             </View>
             <PressableScale
               onPress={() =>
-                navigation.navigate("MainTabs", { screen: "ProfileTab" })
+                navigation.navigate("MainTabs", { screen: "Profile" })
               }
               style={styles.avatarContainer}
               accessibilityLabel="Profile settings"
@@ -888,7 +901,7 @@ export default function HomeScreen() {
               daysUntil={daysUntilTrip}
               getImageUrl={getImageUrl}
               onPress={() =>
-                navigation.navigate("MainTabs", { screen: "TripsTab" })
+                navigation.navigate("MainTabs", { screen: "Trips" })
               }
             />
           )}

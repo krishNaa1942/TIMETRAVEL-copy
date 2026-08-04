@@ -95,6 +95,71 @@ def add_favorite():
     return jsonify({"message": "Added to wishlist", "favorite": fav.to_dict()}), 201
 
 
+# ── POST /api/favorites/toggle ─────────────────────────────
+@favorites_bp.route("/api/favorites/toggle", methods=["POST"])
+def toggle_favorite():
+    """Toggle a bookmark.
+
+    Accepts either a Favorite row id (``destinationId`` — the shape used by
+    the mobile optimistic toggle) or an (item_name, item_type) pair.
+    """
+    user = resolve_authenticated_user()
+    if not user:
+        return jsonify({"error": "Authentication required"}), 401
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
+
+    # Mode 1: toggle by Favorite row id (mobile useToggleFavorite).
+    destination_id = data.get("destinationId") or data.get("favorite_id")
+    if destination_id is not None:
+        fav = Favorite.query.filter_by(id=int(destination_id), user_id=user.id).first()
+        if fav:
+            db.session.delete(fav)
+            db.session.commit()
+            logger.info("User %s toggled favorite %s off", user.id, fav.id)
+            return jsonify({"isFavorite": False, "favorite": None}), 200
+        # Id not found — fall through to name-based toggle.
+
+    # Mode 2: toggle by item_name / item_type.
+    item_name = (data.get("item_name") or "").strip()
+    item_type = (data.get("item_type") or "destination").strip().lower()
+
+    if not item_name:
+        return jsonify({"error": "destinationId or item_name is required"}), 400
+    if item_type not in VALID_TYPES:
+        return (
+            jsonify(
+                {"error": f"item_type must be one of: {', '.join(sorted(VALID_TYPES))}"}
+            ),
+            400,
+        )
+
+    existing = Favorite.query.filter_by(
+        user_id=user.id,
+        item_type=item_type,
+        item_name=item_name,
+    ).first()
+
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        logger.info("User %s toggled %s:%s off", user.id, item_type, item_name)
+        return jsonify({"isFavorite": False, "favorite": None}), 200
+
+    fav = Favorite(
+        user_id=user.id,
+        item_type=item_type,
+        item_name=item_name,
+        notes=(data.get("notes") or "").strip() or None,
+    )
+    db.session.add(fav)
+    db.session.commit()
+    logger.info("User %s toggled %s:%s on", user.id, item_type, item_name)
+    return jsonify({"isFavorite": True, "favorite": fav.to_dict()}), 201
+
+
 # ── DELETE /api/favorites/<id> ──────────────────────────────
 @favorites_bp.route("/api/favorites/<int:fav_id>", methods=["DELETE"])
 def remove_favorite(fav_id):

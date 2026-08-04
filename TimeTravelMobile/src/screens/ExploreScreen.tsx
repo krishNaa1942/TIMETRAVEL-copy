@@ -12,7 +12,7 @@
  *   └── constants/      — categories
  */
 
-import React, { useRef, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -27,6 +27,7 @@ import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { useRoute, RouteProp } from "@react-navigation/native";
 
 import ErrorMessage from "@/components/Common/ErrorMessage";
 import DestinationCard from "@/components/Features/DestinationCard";
@@ -45,6 +46,7 @@ import {
 import { CATEGORIES } from "@/features/explore/constants/categories";
 import { getColumnCount } from "@/features/explore/utils/responsive";
 import { AIInsight } from "@/features/explore/utils/scoring";
+import type { BottomTabParamList } from "@/navigation/BottomTabNavigator";
 
 // ─────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -71,6 +73,20 @@ export default function ExploreScreen() {
     handleDestinationPress,
     handleRefresh,
   } = useExploreEngine();
+
+  const route = useRoute<RouteProp<BottomTabParamList, "Explore">>();
+
+  // Apply navigation params (Home "See All" / insight card deep links)
+  useEffect(() => {
+    const { category, season } = route.params ?? {};
+    if (category && category !== activeCategory) {
+      setActiveCategory(category);
+    }
+    if (season) {
+      handleFilterChange("season", season);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.params?.category, route.params?.season]);
 
   const listRef = useRef<any>(null);
   const { width: screenWidth } = useWindowDimensions();

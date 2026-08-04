@@ -197,8 +197,8 @@ const QuickActionsSection: React.FC = () => {
           // Navigate to Explore tab
           navigation.dispatch(
             CommonActions.navigate({
-              name: "MainApp",
-              params: { screen: "ExploreTab" },
+              name: "MainTabs",
+              params: { screen: "Explore" },
             }),
           );
           break;

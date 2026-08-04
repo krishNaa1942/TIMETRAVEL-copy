@@ -45,6 +45,9 @@ import TripSharingScreen from "@/screens/TripSharingScreen";
 import NewsFeedScreen from "@/screens/NewsFeedScreen";
 import TravelStatsScreen from "@/screens/TravelStatsScreen";
 import PhrasebookScreen from "@/screens/PhrasebookScreen";
+import PlaceDetailScreen from "@/screens/PlaceDetailScreen";
+import CompanionDetailScreen from "@/screens/CompanionDetailScreen";
+import AddCompanionScreen from "@/screens/AddCompanionScreen";
 
 // Types
 export type RootStackParamList = {
@@ -67,6 +70,9 @@ export type RootStackParamList = {
   NewsFeed: { category?: string };
   TravelStats: undefined;
   Phrasebook: undefined;
+  PlaceDetail: { place: any };
+  CompanionDetail: { companion: any };
+  AddCompanion: { tripId: string | number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -291,6 +297,33 @@ const AuthenticatedStack = React.memo<AuthenticatedStackProps>(
         component={PhrasebookScreen}
         options={{ ...darkHeader, headerTitle: "🗣️ Phrasebook" }}
       />
+      <Stack.Screen
+        name="PlaceDetail"
+        component={PlaceDetailScreen}
+        options={{
+          presentation: "modal",
+          ...darkHeader,
+          headerTitle: "📍 Place Detail",
+        }}
+      />
+      <Stack.Screen
+        name="CompanionDetail"
+        component={CompanionDetailScreen}
+        options={{
+          presentation: "modal",
+          ...darkHeader,
+          headerTitle: "👥 Companion",
+        }}
+      />
+      <Stack.Screen
+        name="AddCompanion"
+        component={AddCompanionScreen}
+        options={{
+          presentation: "modal",
+          ...darkHeader,
+          headerTitle: "➕ Add Companion",
+        }}
+      />
     </Stack.Navigator>
   ),
 );
@@ -448,11 +481,7 @@ export const NavOS: React.FC = () => {
         }}
       >
         <StatusBar barStyle="light-content" />
-        {isAuthenticated ? (
-          <AuthenticatedStack />
-        ) : (
-          <GuestStack />
-        )}
+        {isAuthenticated ? <AuthenticatedStack /> : <GuestStack />}
       </NavigationContainer>
     </NavigationErrorBoundary>
   );

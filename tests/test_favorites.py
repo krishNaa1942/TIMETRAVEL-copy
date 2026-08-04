@@ -318,3 +318,61 @@ class TestFavoriteModel:
 
             assert user.favorites.count() == 1
             assert user.favorites.first().item_name == "Jaipur"
+
+
+# ═══════════════════════════════════════════════════════════
+# Toggle endpoint
+# ═══════════════════════════════════════════════════════════
+
+
+class TestFavoritesToggle:
+    def test_toggle_unauth(self, client):
+        res = client.post("/api/favorites/toggle", json={"item_name": "Goa"})
+        assert res.status_code == 401
+
+    def test_toggle_on_by_name(self, auth_client):
+        res = auth_client.post(
+            "/api/favorites/toggle", json={"item_name": "Goa", "item_type": "destination"}
+        )
+        assert res.status_code == 201
+        body = res.get_json()
+        assert body["isFavorite"] is True
+        assert body["favorite"]["item_name"] == "Goa"
+
+    def test_toggle_off_by_name(self, auth_client):
+        auth_client.post(
+            "/api/favorites/toggle", json={"item_name": "Goa", "item_type": "destination"}
+        )
+        res = auth_client.post(
+            "/api/favorites/toggle", json={"item_name": "Goa", "item_type": "destination"}
+        )
+        assert res.status_code == 200
+        assert res.get_json()["isFavorite"] is False
+        # Removed from list entirely
+        res = auth_client.get("/api/favorites")
+        assert res.get_json()["favorites"] == []
+
+    def test_toggle_off_by_destination_id(self, auth_client):
+        created = auth_client.post(
+            "/api/favorites/toggle",
+            json={"item_name": "Manali", "item_type": "destination"},
+        ).get_json()
+        fav_id = created["favorite"]["id"]
+
+        res = auth_client.post("/api/favorites/toggle", json={"destinationId": fav_id})
+        assert res.status_code == 200
+        assert res.get_json()["isFavorite"] is False
+
+    def test_toggle_unknown_id_falls_back_to_name(self, auth_client):
+        res = auth_client.post("/api/favorites/toggle", json={"destinationId": 99999})
+        assert res.status_code == 400
+
+    def test_toggle_missing_body(self, auth_client):
+        res = auth_client.post("/api/favorites/toggle", json={})
+        assert res.status_code == 400
+
+    def test_toggle_invalid_type(self, auth_client):
+        res = auth_client.post(
+            "/api/favorites/toggle", json={"item_name": "X", "item_type": "galaxy"}
+        )
+        assert res.status_code == 400

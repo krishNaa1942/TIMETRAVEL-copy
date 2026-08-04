@@ -180,3 +180,41 @@ class TestServiceSeasonality:
         )
         score = svc._calculate_seasonality(dest, RecommendationContext())
         assert score == pytest.approx(0.8)
+
+
+class TestRecommendationDetailEndpoint:
+    def test_detail_requires_auth(self, app):
+        fresh = app.test_client()
+        resp = fresh.get("/api/recommendations/d1")
+        assert resp.status_code == 401
+
+    def test_detail_returns_matching_recommendation(self, auth):
+        with patch("app.api.routes.recommendations.recommendation_service") as svc:
+            svc.get_recommendations.return_value = [
+                _sample_rec(),
+                _sample_rec(id="d2", name="Goa", rating=4.2, score=0.72),
+            ]
+            resp = auth.get("/api/recommendations/d2")
+
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["id"] == "d2"
+        assert data["name"] == "Goa"
+        assert data["rating"] == 4.2
+        assert data["score"] == pytest.approx(72.0)
+        assert data["explanations"] == ["Matches your travel preferences perfectly"]
+
+    def test_detail_unknown_id_returns_404(self, auth):
+        with patch("app.api.routes.recommendations.recommendation_service") as svc:
+            svc.get_recommendations.return_value = [_sample_rec()]
+            resp = auth.get("/api/recommendations/does-not-exist")
+
+        assert resp.status_code == 404
+        assert "error" in resp.get_json()
+
+    def test_detail_service_exception_returns_500(self, auth):
+        with patch("app.api.routes.recommendations.recommendation_service") as svc:
+            svc.get_recommendations.side_effect = RuntimeError("boom")
+            resp = auth.get("/api/recommendations/d1")
+
+        assert resp.status_code == 500

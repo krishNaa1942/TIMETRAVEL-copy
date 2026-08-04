@@ -1,6 +1,10 @@
 /**
  * Enhanced Journal Service - AI Travel Memory Engine
  * Full CRUD + Social + Media + Offline + AI Integration
+ *
+ * Backend contract: /api/notes (notes blueprint).
+ * Social / community / gamification endpoints are not implemented
+ * server-side yet — those calls degrade gracefully instead of erroring.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -57,6 +61,49 @@ interface SearchParams {
 }
 
 // ─────────────────────────────────────────────────────────────
+// NORMALIZATION (backend note → rich TravelNote shape)
+// ─────────────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const _normalizeNote = (note: any): TravelNote => ({
+  id: String(note.id),
+  userId: String(note.user_id ?? ''),
+  title: note.title ?? '',
+  content: note.content ?? '',
+  destination:
+    typeof note.destination === 'string'
+      ? {
+          id: note.destination,
+          name: note.destination,
+          country: 'India',
+          lat: 0,
+          lng: 0,
+        }
+      : note.destination,
+  mood: (note.mood as MoodType) || 'neutral',
+  rating: Number(note.rating ?? 0),
+  isPublic: Boolean(note.is_public),
+  media: [],
+  autoTags: [],
+  social: {
+    likesCount: 0,
+    commentsCount: 0,
+    sharesCount: 0,
+    savesCount: 0,
+    viewsCount: 0,
+  },
+  createdAt: note.created_at ?? new Date().toISOString(),
+  updatedAt: note.created_at ?? new Date().toISOString(),
+});
+
+const _toPaginated = <T,>(items: T[]): PaginatedResponse<T> => ({
+  items,
+  nextCursor: undefined,
+  hasMore: false,
+  total: items.length,
+});
+
+// ─────────────────────────────────────────────────────────────
 // MEDIA HANDLING
 // ─────────────────────────────────────────────────────────────
 
@@ -66,23 +113,9 @@ async function compressImage(uri: string): Promise<string> {
   return uri;
 }
 
-async function uploadMedia(uri: string, type: 'image' | 'video'): Promise<MediaItem | null> {
-  try {
-    const compressedUri = type === 'image' ? await compressImage(uri) : uri;
-    
-    const formData = new FormData();
-    formData.append('file', {
-      uri: compressedUri,
-      type: type === 'image' ? 'image/jpeg' : 'video/mp4',
-      name: `journal_${Date.now()}.${type === 'image' ? 'jpg' : 'mp4'}`,
-    } as any);
-    
-    const response = await apiService.post<MediaItem>('/journal/media', formData);
-    return response;
-  } catch (error) {
-    console.error('Media upload failed:', error);
-    return null;
-  }
+async function uploadMedia(_uri: string, _type: 'image' | 'video'): Promise<MediaItem | null> {
+  // No journal media endpoint on the backend yet; degrade gracefully.
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -93,7 +126,7 @@ async function getDrafts(): Promise<JournalDraft[]> {
   try {
     const data = await AsyncStorage.getItem(DRAFTS_KEY);
     if (!data) return [];
-    
+
     const drafts: JournalDraft[] = JSON.parse(data);
     // Filter out expired drafts
     const now = Date.now();
@@ -106,13 +139,13 @@ async function getDrafts(): Promise<JournalDraft[]> {
 async function saveDraft(draft: JournalDraft): Promise<void> {
   const drafts = await getDrafts();
   const index = drafts.findIndex(d => d.id === draft.id);
-  
+
   if (index >= 0) {
     drafts[index] = { ...draft, lastSaved: new Date().toISOString() };
   } else {
     drafts.push({ ...draft, lastSaved: new Date().toISOString() });
   }
-  
+
   await AsyncStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }
 
@@ -128,19 +161,10 @@ async function deleteDraft(draftId: string): Promise<void> {
 
 export const journalService = {
   // ───────────────────────────────────────────────────────────
-  // CRUD OPERATIONS
+  // CRUD OPERATIONS (backend: /api/notes)
   // ───────────────────────────────────────────────────────────
 
   async createNote(input: CreateNoteInput): Promise<TravelNote> {
-    // Upload media first
-    const mediaItems: MediaItem[] = [];
-    if (input.mediaUris && input.mediaUris.length > 0) {
-      for (const uri of input.mediaUris) {
-        const media = await uploadMedia(uri, 'image');
-        if (media) mediaItems.push(media);
-      }
-    }
-
     // Get AI analysis
     const aiAnalysis = journalAIService.analyzeLocal(
       input.content,
@@ -148,40 +172,29 @@ export const journalService = {
       input.mood
     );
 
-    const response = await apiService.post<{ note: TravelNote }>('/journal/notes', {
+    const response = await apiService.post<{ note: any }>('/notes', {
       title: input.title,
       content: input.content,
-      destination: input.destination,
+      destination: input.destination.name ?? input.destination,
       mood: input.mood,
       rating: input.rating,
       is_public: input.isPublic,
       trip_type: input.tripType,
       travel_date: input.travelDate,
       trip_duration: input.tripDuration,
-      media: mediaItems,
       ai_analysis: aiAnalysis,
       linked_trip_id: input.linkedTripId,
     });
 
-    return response.note;
+    return _normalizeNote(response.note);
   },
 
   async getNote(id: string): Promise<TravelNote> {
-    const response = await apiService.get<{ note: TravelNote }>(`/journal/notes/${id}`);
-    return response.note;
+    const response = await apiService.get<{ note: any }>(`/notes/${id}`);
+    return _normalizeNote(response.note);
   },
 
   async updateNote(id: string, data: Partial<CreateNoteInput>): Promise<TravelNote> {
-    // Handle media uploads if provided
-    let mediaItems: MediaItem[] | undefined;
-    if (data.mediaUris && data.mediaUris.length > 0) {
-      mediaItems = [];
-      for (const uri of data.mediaUris) {
-        const media = await uploadMedia(uri, 'image');
-        if (media) mediaItems.push(media);
-      }
-    }
-
     // Re-run AI analysis if content changed
     let aiAnalysis: AIAnalysis | undefined;
     if (data.content) {
@@ -192,17 +205,24 @@ export const journalService = {
       );
     }
 
-    const response = await apiService.put<{ note: TravelNote }>(`/journal/notes/${id}`, {
-      ...data,
-      media: mediaItems,
+    const response = await apiService.put<{ note: any }>(`/notes/${id}`, {
+      title: data.title,
+      content: data.content,
+      destination:
+        typeof data.destination === 'string'
+          ? data.destination
+          : data.destination?.name,
+      mood: data.mood,
+      rating: data.rating,
+      is_public: data.isPublic,
       ai_analysis: aiAnalysis,
     });
 
-    return response.note;
+    return _normalizeNote(response.note);
   },
 
   async deleteNote(id: string): Promise<void> {
-    await apiService.delete(`/journal/notes/${id}`);
+    await apiService.delete(`/notes/${id}`);
   },
 
   // ───────────────────────────────────────────────────────────
@@ -211,128 +231,104 @@ export const journalService = {
 
   async getMyNotes(params?: SearchParams): Promise<PaginatedResponse<TravelNote>> {
     const queryParams = new URLSearchParams();
-    if (params?.cursor) queryParams.set('cursor', params.cursor);
-    if (params?.limit) queryParams.set('limit', params.limit.toString());
-    if (params?.query) queryParams.set('q', params.query);
-    if (params?.filters?.mood) queryParams.set('mood', params.filters.mood);
-    if (params?.filters?.rating) queryParams.set('rating', params.filters.rating.toString());
+    if (params?.filters?.destination) {
+      queryParams.set('destination', params.filters.destination);
+    }
 
-    const response = await apiService.get<PaginatedResponse<TravelNote>>(
-      `/journal/notes?${queryParams.toString()}`
+    const response = await apiService.get<{ notes: any[] }>(
+      `/notes?${queryParams.toString()}`
     );
-    return response;
+    const notes = (response.notes || []).map(_normalizeNote);
+
+    if (params?.filters?.mood) {
+      return _toPaginated(notes.filter(n => n.mood === params.filters?.mood));
+    }
+    if (params?.query) {
+      const q = params.query.toLowerCase();
+      return _toPaginated(
+        notes.filter(
+          n =>
+            n.title.toLowerCase().includes(q) ||
+            n.content.toLowerCase().includes(q) ||
+            n.destination.name.toLowerCase().includes(q)
+        )
+      );
+    }
+    return _toPaginated(notes);
   },
 
-  async getCommunityFeed(params?: SearchParams): Promise<PaginatedResponse<TravelNote>> {
-    const queryParams = new URLSearchParams();
-    if (params?.cursor) queryParams.set('cursor', params.cursor);
-    if (params?.limit) queryParams.set('limit', (params.limit || 20).toString());
-    if (params?.sort?.field) queryParams.set('sort', params.sort.field);
-    if (params?.sort?.order) queryParams.set('order', params.sort.order);
-
-    const response = await apiService.get<PaginatedResponse<TravelNote>>(
-      `/journal/community?${queryParams.toString()}`
-    );
-    return response;
+  async getCommunityFeed(_params?: SearchParams): Promise<PaginatedResponse<TravelNote>> {
+    const response = await apiService.get<{ notes: any[] }>('/notes/community');
+    return _toPaginated((response.notes || []).map(_normalizeNote));
   },
 
-  async getTrendingFeed(limit: number = 20): Promise<TravelNote[]> {
-    const response = await apiService.get<{ notes: TravelNote[] }>(
-      `/journal/trending?limit=${limit}`
-    );
-    return response.notes || [];
+  async getTrendingFeed(_limit: number = 20): Promise<TravelNote[]> {
+    // No server-side trending; fall back to community feed.
+    const response = await apiService.get<{ notes: any[] }>('/notes/community');
+    return (response.notes || []).slice(0, _limit).map(_normalizeNote);
   },
 
   async searchNotes(query: string, filters?: FeedFilter): Promise<TravelNote[]> {
-    const queryParams = new URLSearchParams({ q: query });
-    if (filters?.destination) queryParams.set('destination', filters.destination);
-    if (filters?.mood) queryParams.set('mood', filters.mood);
-    if (filters?.tripType) queryParams.set('trip_type', filters.tripType);
-
-    const response = await apiService.get<{ notes: TravelNote[] }>(
-      `/journal/search?${queryParams.toString()}`
+    const response = await apiService.get<{ notes: any[] }>(
+      filters?.destination
+        ? `/notes?destination=${encodeURIComponent(filters.destination)}`
+        : '/notes'
     );
-    return response.notes || [];
+    const q = query.toLowerCase();
+    return (response.notes || [])
+      .map(_normalizeNote)
+      .filter(
+        n =>
+          n.title.toLowerCase().includes(q) ||
+          n.content.toLowerCase().includes(q) ||
+          n.destination.name.toLowerCase().includes(q)
+      );
   },
 
   // ───────────────────────────────────────────────────────────
-  // SOCIAL INTERACTIONS
+  // SOCIAL INTERACTIONS (unsupported server-side; degrade)
   // ───────────────────────────────────────────────────────────
 
-  async likeNote(noteId: string): Promise<void> {
-    await apiService.post(`/journal/notes/${noteId}/like`, {});
+  async likeNote(_noteId: string): Promise<void> {
+    // Social endpoints not implemented on the backend yet.
   },
 
-  async unlikeNote(noteId: string): Promise<void> {
-    await apiService.delete(`/journal/notes/${noteId}/like`);
+  async unlikeNote(_noteId: string): Promise<void> {},
+
+  async getComments(_noteId: string, _cursor?: string): Promise<PaginatedResponse<Comment>> {
+    return _toPaginated<Comment>([]);
   },
 
-  async getComments(noteId: string, cursor?: string): Promise<PaginatedResponse<Comment>> {
-    const query = cursor ? `?cursor=${cursor}` : '';
-    const response = await apiService.get<PaginatedResponse<Comment>>(
-      `/journal/notes/${noteId}/comments${query}`
-    );
-    return response;
+  async addComment(_noteId: string, _content: string): Promise<Comment> {
+    throw new Error('Comments are not available yet');
   },
 
-  async addComment(noteId: string, content: string): Promise<Comment> {
-    const response = await apiService.post<{ comment: Comment }>(
-      `/journal/notes/${noteId}/comments`,
-      { content }
-    );
-    return response.comment;
+  async deleteComment(_noteId: string, _commentId: string): Promise<void> {},
+
+  async likeComment(_noteId: string, _commentId: string): Promise<void> {},
+
+  async shareNote(_noteId: string): Promise<string> {
+    return `timetravel://journal/${_noteId}`;
   },
 
-  async deleteComment(noteId: string, commentId: string): Promise<void> {
-    await apiService.delete(`/journal/notes/${noteId}/comments/${commentId}`);
-  },
+  async saveNote(_noteId: string): Promise<void> {},
 
-  async likeComment(noteId: string, commentId: string): Promise<void> {
-    await apiService.post(`/journal/notes/${noteId}/comments/${commentId}/like`, {});
-  },
+  async unsaveNote(_noteId: string): Promise<void> {},
 
-  async shareNote(noteId: string): Promise<string> {
-    const response = await apiService.post<{ shareUrl: string }>(
-      `/journal/notes/${noteId}/share`,
-      {}
-    );
-    return response.shareUrl;
-  },
-
-  async saveNote(noteId: string): Promise<void> {
-    await apiService.post(`/journal/notes/${noteId}/save`, {});
-  },
-
-  async unsaveNote(noteId: string): Promise<void> {
-    await apiService.delete(`/journal/notes/${noteId}/save`);
-  },
-
-  async getSavedNotes(cursor?: string): Promise<PaginatedResponse<TravelNote>> {
-    const query = cursor ? `?cursor=${cursor}` : '';
-    const response = await apiService.get<PaginatedResponse<TravelNote>>(
-      `/journal/saved${query}`
-    );
-    return response;
+  async getSavedNotes(_cursor?: string): Promise<PaginatedResponse<TravelNote>> {
+    return _toPaginated<TravelNote>([]);
   },
 
   // ───────────────────────────────────────────────────────────
-  // USER & FOLLOWING
+  // USER & FOLLOWING (unsupported server-side; degrade)
   // ───────────────────────────────────────────────────────────
 
-  async followUser(userId: string): Promise<void> {
-    await apiService.post(`/users/${userId}/follow`, {});
-  },
+  async followUser(_userId: string): Promise<void> {},
 
-  async unfollowUser(userId: string): Promise<void> {
-    await apiService.delete(`/users/${userId}/follow`);
-  },
+  async unfollowUser(_userId: string): Promise<void> {},
 
-  async getUserNotes(userId: string, cursor?: string): Promise<PaginatedResponse<TravelNote>> {
-    const query = cursor ? `?cursor=${cursor}` : '';
-    const response = await apiService.get<PaginatedResponse<TravelNote>>(
-      `/users/${userId}/notes${query}`
-    );
-    return response;
+  async getUserNotes(_userId: string, _cursor?: string): Promise<PaginatedResponse<TravelNote>> {
+    return _toPaginated<TravelNote>([]);
   },
 
   // ───────────────────────────────────────────────────────────
@@ -389,17 +385,12 @@ export const journalService = {
   },
 
   async getSmartSummary(noteId: string): Promise<string> {
-    const response = await apiService.get<{ summary: string }>(
-      `/journal/notes/${noteId}/summary`
-    );
-    return response.summary;
+    const note = await this.getNote(noteId);
+    return note.content.length > 0 ? note.content.slice(0, 160) : '';
   },
 
-  async getRecommendations(noteId: string): Promise<{ places: JournalPlace[]; tips: string[] }> {
-    const response = await apiService.get<{ places: JournalPlace[]; tips: string[] }>(
-      `/journal/notes/${noteId}/recommendations`
-    );
-    return response;
+  async getRecommendations(_noteId: string): Promise<{ places: JournalPlace[]; tips: string[] }> {
+    return { places: [], tips: [] };
   },
 
   // ───────────────────────────────────────────────────────────
@@ -408,14 +399,53 @@ export const journalService = {
 
   async getStats(): Promise<JournalStats> {
     try {
-      const response = await apiService.get<JournalStats>('/journal/stats');
-      return response;
+      const response = await apiService.get<{ notes: any[] }>('/notes');
+      const notes = (response.notes || []).map(_normalizeNote);
+
+      const totalNotes = notes.length;
+      const totalWords = notes.reduce((sum, n) => sum + n.content.split(/\s+/).filter(Boolean).length, 0);
+      const countries = new Set(notes.map(n => n.destination.country || n.destination.name));
+      const ratings = notes.filter(n => n.rating > 0).map(n => n.rating);
+      const moods = notes.filter(n => n.mood).map(n => n.mood);
+      const mostFrequentMood =
+        moods.length === 0
+          ? 'neutral'
+          : moods.sort(
+              (a, b) =>
+                moods.filter(m => m === b).length - moods.filter(m => m === a).length
+            )[0];
+
+      const byCountry = new Map<string, number>();
+      notes.forEach(n => {
+        const c = n.destination.country || n.destination.name;
+        byCountry.set(c, (byCountry.get(c) || 0) + 1);
+      });
+      const mostVisitedCountry =
+        byCountry.size === 0
+          ? ''
+          : [...byCountry.entries()].sort((a, b) => b[1] - a[1])[0][0];
+
+      return {
+        totalNotes,
+        totalWords,
+        totalCountries: countries.size,
+        totalCities: notes.length,
+        averageRating:
+          ratings.length === 0
+            ? 0
+            : Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10,
+        mostVisitedCountry,
+        mostFrequentMood: mostFrequentMood as MoodType,
+        currentStreak: 0,
+        longestStreak: 0,
+        totalLikes: 0,
+        totalComments: 0,
+      };
     } catch {
       // Return cached stats if available
       const cached = await AsyncStorage.getItem(STATS_KEY);
       if (cached) return JSON.parse(cached);
-      
-      // Return default stats
+
       return {
         totalNotes: 0,
         totalWords: 0,
@@ -433,38 +463,56 @@ export const journalService = {
   },
 
   async getInsights(): Promise<TravelInsight[]> {
-    const response = await apiService.get<{ insights: TravelInsight[] }>('/journal/insights');
-    return response.insights || [];
+    return [];
   },
 
   async getOnThisDay(): Promise<TravelNote[]> {
-    const response = await apiService.get<{ notes: TravelNote[] }>('/journal/on-this-day');
-    return response.notes || [];
+    try {
+      const response = await apiService.get<{ notes: any[] }>('/notes');
+      const today = new Date();
+      return (response.notes || [])
+        .filter(n => {
+          if (!n.created_at) return false;
+          const d = new Date(n.created_at);
+          return d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+        })
+        .map(_normalizeNote);
+    } catch {
+      return [];
+    }
   },
 
   // ───────────────────────────────────────────────────────────
-  // GAMIFICATION
+  // GAMIFICATION (unsupported server-side; degrade)
   // ───────────────────────────────────────────────────────────
 
   async getAchievements(): Promise<{ achievements: any[]; level: any }> {
-    const response = await apiService.get<{ achievements: any[]; level: any }>(
-      '/journal/achievements'
-    );
-    return response;
+    return {
+      achievements: [],
+      level: { level: 1, xp: 0, xpToNext: 100, title: 'Explorer' },
+    };
   },
 
   // ───────────────────────────────────────────────────────────
-  // PLACES AUTOCOMPLETE
+  // PLACES AUTOCOMPLETE (via destinations search)
   // ───────────────────────────────────────────────────────────
 
   async searchPlaces(query: string): Promise<JournalPlace[]> {
     if (!query.trim()) return [];
-    
+
     try {
-      const response = await apiService.get<{ places: JournalPlace[] }>(
-        `/places/autocomplete?q=${encodeURIComponent(query)}`
+      const response = await apiService.get<{ destinations: any[] }>(
+        `/destinations?query=${encodeURIComponent(query)}&limit=8`
       );
-      return response.places || [];
+      return (response.destinations || []).map(d => ({
+        id: String(d.id),
+        name: d.label ?? d.name ?? '',
+        city: d.region ?? undefined,
+        country: d.country ?? 'India',
+        lat: Number(d.lat ?? 0),
+        lng: Number(d.lon ?? 0),
+        placeId: String(d.id),
+      }));
     } catch {
       return [];
     }

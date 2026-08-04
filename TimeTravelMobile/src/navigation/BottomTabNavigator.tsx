@@ -56,7 +56,11 @@ import ProfileStack from "./stacks/ProfileStack";
 
 export type BottomTabParamList = {
   Home: undefined;
-  Explore: { category?: string; destinationId?: string } | undefined;
+  Explore: {
+    category?: string;
+    destinationId?: string;
+    season?: string;
+  } | undefined;
   Chat: { conversationId?: string } | undefined;
   Trips: { tripId?: string; mode?: string } | undefined;
   Profile: { section?: string } | undefined;

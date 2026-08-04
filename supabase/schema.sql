@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     role            VARCHAR(16)  NOT NULL,
     message         TEXT         NOT NULL,
     detected_intent VARCHAR(64),
+    destination     VARCHAR(64),
     created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_chat_messages_user ON chat_messages (user_id);

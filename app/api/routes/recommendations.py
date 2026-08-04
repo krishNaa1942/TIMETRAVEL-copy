@@ -119,22 +119,7 @@ def get_recommendations():
     total = len(all_items)
     page = all_items[offset : offset + limit]
 
-    recommendations = [
-        {
-            "id": item.get("id"),
-            "name": item.get("name", ""),
-            "country": item.get("country", ""),
-            "region": item.get("country", ""),
-            "rating": item.get("rating", 0),
-            "score": round(item.get("score", 0) * 100, 1),
-            "score_breakdown": item.get("score_breakdown", {}),
-            "explanations": ([item["reason"]] if item.get("reason") else []),
-            "tags": item.get("highlights", []),
-            "avg_daily_cost": item.get("avg_daily_cost", 0),
-            "categories": item.get("categories", []),
-        }
-        for item in page
-    ]
+    recommendations = [_serialize_recommendation(item) for item in page]
 
     return (
         jsonify(
@@ -152,3 +137,50 @@ def get_recommendations():
         ),
         200,
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /api/recommendations/<id> – single recommendation detail
+# ---------------------------------------------------------------------------
+def _serialize_recommendation(item: dict) -> dict:
+    return {
+        "id": item.get("id"),
+        "name": item.get("name", ""),
+        "country": item.get("country", ""),
+        "region": item.get("country", ""),
+        "rating": item.get("rating", 0),
+        "score": round(item.get("score", 0) * 100, 1),
+        "score_breakdown": item.get("score_breakdown", {}),
+        "explanations": ([item["reason"]] if item.get("reason") else []),
+        "tags": item.get("highlights", []),
+        "avg_daily_cost": item.get("avg_daily_cost", 0),
+        "categories": item.get("categories", []),
+    }
+
+
+@recommendations_bp.route(
+    "/api/recommendations/<string:destination_id>", methods=["GET"]
+)
+@login_required
+def get_recommendation_detail(destination_id):
+    """Return a single recommendation by destination id."""
+    context = RecommendationContext(group_size=1, budget_max=0.0, season=None)
+    try:
+        all_items = recommendation_service.get_recommendations(
+            user_id=str(current_user.id),
+            context=context,
+            limit=50,
+            offset=0,
+        )
+    except Exception as e:
+        logger.error(f"Recommendation detail failed for user {current_user.id}: {e}")
+        return jsonify({"error": "Recommendations unavailable"}), 500
+
+    match = next(
+        (item for item in all_items if str(item.get("id")) == destination_id),
+        None,
+    )
+    if not match:
+        return jsonify({"error": "Recommendation not found"}), 404
+
+    return jsonify(_serialize_recommendation(match)), 200

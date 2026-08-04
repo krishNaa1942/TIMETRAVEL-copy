@@ -35,11 +35,11 @@ export type AuthStackParamList = {
 
 // ── Main Tab Navigator ──────────────────────────────────────────
 export type MainTabParamList = {
-  HomeTab: undefined;
-  ExploreTab: undefined;
-  ChatTab: undefined;
-  TripsTab: undefined;
-  ProfileTab: undefined;
+  Home: undefined;
+  Explore: undefined;
+  Chat: undefined;
+  Trips: undefined;
+  Profile: undefined;
 };
 
 // ── Trip Feature Stack ──────────────────────────────────────────
