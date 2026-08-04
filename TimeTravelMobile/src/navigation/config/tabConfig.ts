@@ -21,14 +21,7 @@ export type TabRouteName = "Home" | "Explore" | "Chat" | "Trips" | "Profile";
 
 export type UserRole = "guest" | "user" | "premium" | "admin";
 
-export type TabStackName =
-  | "HomeStack"
-  | "ExploreStack"
-  | "ChatStack"
-  | "TripsStack"
-  | "ProfileStack";
-
-export type TabBadgeStoreKey = "unreadMessagesCount" | "pendingTripsCount";
+type TabBadgeStoreKey = "unreadMessagesCount" | "pendingTripsCount";
 
 export interface TabBadgeCounts {
   unreadMessagesCount: number;
@@ -63,7 +56,7 @@ export interface TabConfig {
     eventName: string;
     properties: Record<string, string>;
   };
-  stack: TabStackName;
+  stack: string;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -193,37 +186,15 @@ export const TAB_CONFIGS: TabConfig[] = [
 // ─────────────────────────────────────────────────────────────
 // ROLE HIERARCHY
 // ─────────────────────────────────────────────────────────────
+// ROLE HIERARCHY
+// ─────────────────────────────────────────────────────────────
 
-export const ROLE_HIERARCHY: Record<UserRole, number> = {
+const ROLE_HIERARCHY: Record<UserRole, number> = {
   guest: 0,
   user: 1,
   premium: 2,
   admin: 3,
 };
-
-const normalizeDeepLinkPath = (path: string): string =>
-  path
-    .trim()
-    .replace(/^\/+|\/+$/g, "")
-    .toLowerCase();
-
-export const TAB_ROUTE_TO_PATH: Record<TabRouteName, string> =
-  TAB_CONFIGS.reduce(
-    (acc, tab) => {
-      acc[tab.name] = tab.deepLink.path;
-      return acc;
-    },
-    {} as Record<TabRouteName, string>,
-  );
-
-export const TAB_PATH_TO_ROUTE: Record<string, TabRouteName> =
-  TAB_CONFIGS.reduce(
-    (acc, tab) => {
-      acc[normalizeDeepLinkPath(tab.deepLink.path)] = tab.name;
-      return acc;
-    },
-    {} as Record<string, TabRouteName>,
-  );
 
 // ─────────────────────────────────────────────────────────────
 // HELPER FUNCTIONS
@@ -242,14 +213,6 @@ export function getVisibleTabs(userRole: UserRole): TabConfig[] {
   });
 }
 
-export function getTabByName(name: TabRouteName): TabConfig | undefined {
-  return TAB_CONFIGS.find((tab) => tab.name === name);
-}
-
-export function resolveTabRouteByPath(path: string): TabRouteName | undefined {
-  return TAB_PATH_TO_ROUTE[normalizeDeepLinkPath(path)];
-}
-
 export function getTabDeepLinkScreens(): Record<TabRouteName, string> {
   return TAB_CONFIGS.reduce(
     (acc, tab) => {
@@ -258,22 +221,6 @@ export function getTabDeepLinkScreens(): Record<TabRouteName, string> {
     },
     {} as Record<TabRouteName, string>,
   );
-}
-
-export function getDeepLinkConfig(): Record<
-  string,
-  { screen: string; params?: string[] }
-> {
-  const config: Record<string, { screen: string; params?: string[] }> = {};
-
-  TAB_CONFIGS.forEach((tab) => {
-    config[tab.deepLink.path] = {
-      screen: tab.name,
-      params: tab.deepLink.params,
-    };
-  });
-
-  return config;
 }
 
 // ─────────────────────────────────────────────────────────────

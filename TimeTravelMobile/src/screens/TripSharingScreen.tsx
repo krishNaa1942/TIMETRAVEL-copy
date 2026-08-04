@@ -28,6 +28,8 @@ import {
 import type { SharedTrip } from "@/services/sharing";
 import { sharingService } from "@/services/sharing";
 import type { TripData } from "@/services/tripPlanner";
+import { useRoute } from "@react-navigation/native";
+import { RootStackRouteProp } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 
 type SnackbarTone = "info" | "success" | "error";
@@ -79,6 +81,8 @@ const createShareTextFile = async (share: SharedTrip): Promise<string> => {
 };
 
 export default function TripSharingScreen() {
+  const route = useRoute<RootStackRouteProp<"TripSharing">>();
+  const paramTripId = route.params?.tripId;
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState<SnackbarState>(
     INITIAL_SNACKBAR_STATE,
@@ -109,6 +113,15 @@ export default function TripSharingScreen() {
       return;
     }
 
+    // Preselect the trip requested via route params (workspace "Share Trip").
+    if (paramTripId != null) {
+      const numeric = Number(paramTripId);
+      if (Number.isFinite(numeric) && trips.some((trip) => trip.id === numeric)) {
+        setSelectedTripId(numeric);
+        return;
+      }
+    }
+
     const selectedTripStillExists =
       selectedTripId !== null &&
       trips.some((trip) => trip.id === selectedTripId);
@@ -116,7 +129,7 @@ export default function TripSharingScreen() {
     if (!selectedTripStillExists) {
       setSelectedTripId(trips[0].id);
     }
-  }, [selectedTripId, trips]);
+  }, [selectedTripId, trips, paramTripId]);
 
   const selectedTrip = useMemo<TripData | null>(() => {
     if (selectedTripId === null) {

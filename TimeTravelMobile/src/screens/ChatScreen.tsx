@@ -27,7 +27,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ChatBubble from "@/components/Features/ChatBubble";
 import { useChatAgent, SmartSuggestion } from "@/hooks/useChatAgent";
 import { PressableScale } from "@/components/UI/PressableScale";
-import { RootStackParamList, ChatMessage } from "@/types";
+import { ChatMessage } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 
 // ─────────────────────────────────────────────────────────────
@@ -308,7 +309,12 @@ export default function ChatScreen() {
   // Handle suggestion press
   const handleSuggestionPress = useCallback((suggestion: SmartSuggestion) => {
     if (suggestion.action?.type === "navigate" && suggestion.action.screen) {
-      navigation.navigate(suggestion.action.screen as any);
+      const screen = suggestion.action.screen as
+        | "Budget"
+        | "Itinerary"
+        | "Places"
+        | "Compare";
+      navigation.navigate(screen);
     } else if (suggestion.message) {
       sendMessage(suggestion.message);
     }

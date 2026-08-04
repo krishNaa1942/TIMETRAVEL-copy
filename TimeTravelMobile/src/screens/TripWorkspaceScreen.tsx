@@ -49,7 +49,7 @@ import { Shimmer } from "@/components/UI/SkeletonLoader";
 import { tripPlannerService, TripData, TripDay, TripPlace } from "@/services/tripPlanner";
 import { queryKeys } from "@/api/queryKeys";
 import { colors, spacing } from "@/theme/colors";
-import { RootStackParamList } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import { haptics } from "@/utils/haptics";
 
 // Enable LayoutAnimation for Android
@@ -540,7 +540,7 @@ export default function TripWorkspaceScreen() {
   // Effects
   useEffect(() => {
     // Handle route params for deep linking
-    const tripId = (route.params as any)?.tripId;
+    const tripId = route.params?.tripId;
     if (tripId) {
       const trip = trips.find((t) => t.id === tripId);
       if (trip) setSelectedTrip(trip);
@@ -584,8 +584,8 @@ export default function TripWorkspaceScreen() {
                     [
                       { text: "Mark as Active", onPress: () => handleStatusChange(currentTrip, "active") },
                       { text: "Mark as Completed", onPress: () => handleStatusChange(currentTrip, "completed") },
-                      { text: "Share Trip", onPress: () => nav.navigate("TripSharing" as any, { trip: currentTrip }) },
-                      { text: "Manage Bookings", onPress: () => nav.navigate("Reservations" as any, { tripId: currentTrip.id }) },
+                      { text: "Share Trip", onPress: () => nav.navigate("TripSharing", { tripId: currentTrip.id }) },
+                      { text: "Manage Bookings", onPress: () => nav.navigate("Reservations", { tripId: currentTrip.id }) },
                       { text: "Cancel", style: "cancel" },
                       { text: "Delete Trip", style: "destructive", onPress: () => handleDelete(currentTrip) },
                     ]
@@ -746,7 +746,7 @@ export default function TripWorkspaceScreen() {
                     <PressableScale
                       key={place.id || idx}
                       style={styles.placeItem}
-                      onPress={() => nav.navigate("PlaceDetail" as any, { place })}
+                      onPress={() => nav.navigate("PlaceDetail", { place })}
                     >
                       <View style={styles.placeNumber}>
                         <Text style={styles.placeNumberText}>{idx + 1}</Text>
@@ -797,7 +797,7 @@ export default function TripWorkspaceScreen() {
           <View style={styles.quickActions}>
             <TouchableOpacity
               style={styles.quickActionBtn}
-              onPress={() => nav.navigate("Expenses" as any, { tripId: currentTrip.id, destination: currentTrip.destination })}
+              onPress={() => nav.navigate("Expenses", { tripId: currentTrip.id, destination: currentTrip.destination })}
             >
               <MaterialCommunityIcons name="wallet" size={22} color={colors.primary} />
               <Text style={styles.quickActionText}>Track Expenses</Text>
@@ -805,7 +805,7 @@ export default function TripWorkspaceScreen() {
 
             <TouchableOpacity
               style={styles.quickActionBtn}
-              onPress={() => nav.navigate("Reservations" as any, { tripId: currentTrip.id })}
+              onPress={() => nav.navigate("Reservations", { tripId: currentTrip.id })}
             >
               <MaterialCommunityIcons name="ticket" size={22} color={colors.primary} />
               <Text style={styles.quickActionText}>Bookings</Text>
@@ -813,7 +813,7 @@ export default function TripWorkspaceScreen() {
 
             <TouchableOpacity
               style={styles.quickActionBtn}
-              onPress={() => nav.navigate("Packing" as any, { destination: currentTrip.destination })}
+              onPress={() => nav.navigate("Packing", { destination: currentTrip.destination })}
             >
               <MaterialCommunityIcons name="bag-suitcase" size={22} color={colors.primary} />
               <Text style={styles.quickActionText}>Packing</Text>
@@ -821,7 +821,7 @@ export default function TripWorkspaceScreen() {
 
             <TouchableOpacity
               style={styles.quickActionBtn}
-              onPress={() => nav.navigate("TripSharing" as any, { trip: currentTrip })}
+              onPress={() => nav.navigate("TripSharing", { tripId: currentTrip.id })}
             >
               <MaterialCommunityIcons name="share-variant" size={22} color={colors.primary} />
               <Text style={styles.quickActionText}>Share</Text>
@@ -837,7 +837,7 @@ export default function TripWorkspaceScreen() {
                   <PressableScale
                     key={idx}
                     style={styles.companionCard}
-                    onPress={() => nav.navigate("CompanionDetail" as any, { companion })}
+                    onPress={() => nav.navigate("CompanionDetail", { companion })}
                   >
                     <View
                       style={[
@@ -855,7 +855,7 @@ export default function TripWorkspaceScreen() {
                 ))}
                 <TouchableOpacity
                   style={styles.addCompanionCard}
-                  onPress={() => nav.navigate("AddCompanion" as any, { tripId: currentTrip.id })}
+                  onPress={() => nav.navigate("AddCompanion", { tripId: currentTrip.id })}
                 >
                   <MaterialCommunityIcons name="plus" size={28} color={colors.gray} />
                   <Text style={styles.addCompanionText}>Add</Text>

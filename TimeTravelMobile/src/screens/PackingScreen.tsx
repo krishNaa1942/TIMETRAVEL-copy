@@ -48,6 +48,8 @@ import { weatherService } from "@/services/weather";
 import { Destination, WeatherData } from "@/types";
 import { colors, spacing } from "@/theme/colors";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
+import { useRoute } from "@react-navigation/native";
+import { RootStackRouteProp } from "@/navigation/types";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { GlassCard } from "@/components/UI/GlassCard";
 
@@ -642,6 +644,8 @@ EmptyState.displayName = "EmptyState";
 // ─────────────────────────────────────────────────────────────
 
 export default function PackingScreen() {
+  const route = useRoute<RootStackRouteProp<"Packing">>();
+  const destinationParam = route.params?.destination;
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedDestination, setSelectedDestination] = useState("");
   const [items, setItems] = useState<EnhancedPackingItem[]>([]);
@@ -663,9 +667,11 @@ export default function PackingScreen() {
         const dests = await destinationsService.getDestinations();
         setDestinations(dests);
 
-        // Use active trip destination if available
+        // Use route param, then active trip destination if available
         const initialDest =
-          activeTrip?.destination?.label || (dests[0]?.label ?? "");
+          destinationParam ||
+          activeTrip?.destination?.label ||
+          (dests[0]?.label ?? "");
         setSelectedDestination(initialDest);
 
         // Load cached packing list
@@ -677,7 +683,7 @@ export default function PackingScreen() {
       }
     };
     init();
-  }, [activeTrip?.destination?.label]);
+  }, [activeTrip?.destination?.label, destinationParam]);
 
   // Fetch weather when destination changes
   useEffect(() => {

@@ -47,7 +47,7 @@ import {
   PolylineComponent,
   MAP_PROVIDER,
 } from "@/components/Common/ExpoMap";
-import { RootStackParamList } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import { useItinerary } from "@/hooks/useItinerary";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";

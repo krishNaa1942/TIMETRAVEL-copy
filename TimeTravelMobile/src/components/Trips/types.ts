@@ -3,8 +3,6 @@
  * Config-driven system for scalable feature management
  */
 
-import { TripStackParamList, SocialStackParamList, SettingsStackParamList } from '@/navigation/types';
-
 // ─────────────────────────────────────────────────────────────
 // FEATURE CONFIGURATION TYPES
 // ─────────────────────────────────────────────────────────────
@@ -42,7 +40,7 @@ export interface FeatureConfig {
   status: FeatureStatus;
   
   // Navigation
-  screen?: keyof TripStackParamList | keyof SocialStackParamList | keyof SettingsStackParamList | string;
+  screen?: string;
   route?: FeatureRoute;
   params?: Record<string, unknown>;
   deepLink?: string;

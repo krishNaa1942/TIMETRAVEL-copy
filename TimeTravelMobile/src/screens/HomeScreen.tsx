@@ -725,7 +725,9 @@ export default function HomeScreen() {
         navigation.navigate("MainTabs", { screen: action.route });
         return;
       }
-      navigation.navigate(action.route as any);
+      if (action.route === "Itinerary" || action.route === "Budget") {
+        navigation.navigate(action.route);
+      }
     },
     [navigation],
   );

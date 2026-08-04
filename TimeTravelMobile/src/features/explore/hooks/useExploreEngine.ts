@@ -14,7 +14,8 @@ import {
 } from "@/api/queries/useDestinations";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { destinationsService } from "@/services/destinations";
-import { Destination, RootStackParamList, UnsplashImage } from "@/types";
+import { Destination, UnsplashImage } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import {
   analyzeSearchIntent,
   calculateDestinationScore,

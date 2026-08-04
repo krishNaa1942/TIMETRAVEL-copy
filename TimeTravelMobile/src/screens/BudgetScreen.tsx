@@ -29,7 +29,8 @@ import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper
 import { PressableScale } from "@/components/UI/PressableScale";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
 import { getAnalytics } from "@/core/telemetry/Analytics";
-import { RootStackParamList, BudgetEstimate } from "@/types";
+import { BudgetEstimate } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 
 // ─────────────────────────────────────────────────────────────

@@ -30,6 +30,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { expenseService, Expense, ExpenseSummary } from "@/services/expenses";
+import { RootStackRouteProp } from "@/navigation/types";
+import { useRoute } from "@react-navigation/native";
 import { colors, spacing } from "@/theme/colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -551,12 +553,20 @@ interface AddExpenseModalProps {
     category: string;
     description: string;
     amount: number;
+    trip_id?: number;
   }) => void;
   loading: boolean;
+  initialDestination?: string;
 }
 
 const AddExpenseModal = memo(
-  ({ visible, onClose, onSubmit, loading }: AddExpenseModalProps) => {
+  ({
+    visible,
+    onClose,
+    onSubmit,
+    loading,
+    initialDestination,
+  }: AddExpenseModalProps) => {
     const [destination, setDestination] = useState("");
     const [category, setCategory] = useState("food");
     const [description, setDescription] = useState("");
@@ -570,8 +580,11 @@ const AddExpenseModal = memo(
           duration: 300,
           useNativeDriver: true,
         }).start();
+        if (initialDestination) {
+          setDestination(initialDestination);
+        }
       }
-    }, [visible]);
+    }, [visible, initialDestination]);
 
     const handleSubmit = () => {
       if (!destination.trim() || !description.trim() || !amount.trim()) {
@@ -736,7 +749,7 @@ EmptyState.displayName = "EmptyState";
 // CUSTOM HOOK
 // ─────────────────────────────────────────────────────────────
 
-function useExpenseTracker() {
+function useExpenseTracker(initialDestination?: string, initialTripId?: number) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -795,10 +808,11 @@ function useExpenseTracker() {
       category: string;
       description: string;
       amount: number;
+      trip_id?: number;
     }) => {
       setAdding(true);
       try {
-        await expenseService.addExpense(data);
+        await expenseService.addExpense({ ...data, trip_id: initialTripId });
         triggerHaptic("heavy");
         setModalVisible(false);
         await load();
@@ -808,7 +822,7 @@ function useExpenseTracker() {
         setAdding(false);
       }
     },
-    [load],
+    [load, initialTripId],
   );
 
   // Delete expense
@@ -883,6 +897,14 @@ function useExpenseTracker() {
 // ─────────────────────────────────────────────────────────────
 
 export default function ExpenseTrackerScreen() {
+  const route = useRoute<RootStackRouteProp<"Expenses">>();
+  const destinationParam = route.params?.destination;
+  const tripIdParam = route.params?.tripId;
+  const initialTripId =
+    tripIdParam != null && Number.isFinite(Number(tripIdParam))
+      ? Number(tripIdParam)
+      : undefined;
+
   const {
     expenses,
     summary,
@@ -897,7 +919,7 @@ export default function ExpenseTrackerScreen() {
     editBudget,
     listData,
     retry,
-  } = useExpenseTracker();
+  } = useExpenseTracker(destinationParam, initialTripId);
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
@@ -999,6 +1021,7 @@ export default function ExpenseTrackerScreen() {
         onClose={() => setModalVisible(false)}
         onSubmit={addExpense}
         loading={adding}
+        initialDestination={destinationParam}
       />
       </KeyboardAvoidingWrapper>
     </SafeAreaView>

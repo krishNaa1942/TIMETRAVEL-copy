@@ -26,6 +26,7 @@ import {
 } from "react-native";
 import { useAuthStore } from "@/stores/authStore";
 import { getTabDeepLinkScreens } from "../config/tabConfig";
+import { RootStackParamList } from "../types";
 import AuthScreen from "@/screens/AuthScreen";
 import BottomTabNavigator from "../BottomTabNavigator";
 import DestinationDetailScreen from "@/screens/DestinationDetailScreen";
@@ -50,31 +51,6 @@ import CompanionDetailScreen from "@/screens/CompanionDetailScreen";
 import AddCompanionScreen from "@/screens/AddCompanionScreen";
 
 // Types
-export type RootStackParamList = {
-  Auth: undefined;
-  MainTabs: { screen?: string; params?: any } | undefined;
-  DestinationDetail: { destination: any; id?: string };
-  Budget: { destinationId?: string; days?: number };
-  Itinerary: { destinationId?: string; days?: number };
-  Packing: undefined;
-  Favorites: undefined;
-  Currency: undefined;
-  Compare: { dest1?: string; dest2?: string; days?: number };
-  Places: { lat?: number; lon?: number; category?: string };
-  RoutePlanner: { origin?: string; destination?: string };
-  TripWorkspace: { tripId?: string };
-  Expenses: undefined;
-  TravelJournal: { entryId?: string };
-  Reservations: { type?: string };
-  TripSharing: { tripId?: string };
-  NewsFeed: { category?: string };
-  TravelStats: undefined;
-  Phrasebook: undefined;
-  PlaceDetail: { place: any };
-  CompanionDetail: { companion: any };
-  AddCompanion: { tripId: string | number };
-};
-
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // ============================================

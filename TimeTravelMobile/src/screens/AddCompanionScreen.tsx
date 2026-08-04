@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiService from "@/services/api";
 import { queryKeys } from "@/api/queryKeys";
 import { colors, spacing } from "@/theme/colors";
-import { RootStackParamList } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 
 type AddCompanionRoute = RouteProp<RootStackParamList, "AddCompanion">;
 

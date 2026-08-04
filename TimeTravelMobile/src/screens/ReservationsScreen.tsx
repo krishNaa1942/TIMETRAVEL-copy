@@ -29,7 +29,7 @@ import {
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -45,7 +45,7 @@ import {
 import { tripPlannerService, TripData } from "@/services/tripPlanner";
 import { useUIStore } from "@/stores/uiStore";
 import { colors, spacing } from "@/theme/colors";
-import { RootStackParamList } from "@/types";
+import { RootStackParamList, RootStackRouteProp } from "@/navigation/types";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
 
@@ -367,6 +367,9 @@ const SpendingBreakdown = React.memo<{ reservations: Reservation[] }>(
 
 export default function ReservationsScreen() {
   const navigation = useNavigation<NavProp>();
+  const route = useRoute<RootStackRouteProp<"Reservations">>();
+  const paramTripId = route.params?.tripId;
+  const paramType = route.params?.type;
   const { themeDark } = useUIStore();
 
   // State
@@ -379,7 +382,20 @@ export default function ReservationsScreen() {
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<ReservationType | null>(null);
+  const [filterType, setFilterType] = useState<ReservationType | null>(() => {
+    const validTypes: ReservationType[] = [
+      "flight",
+      "hotel",
+      "restaurant",
+      "transport",
+      "activity",
+      "train",
+      "bus",
+    ];
+    return paramType && validTypes.includes(paramType as ReservationType)
+      ? (paramType as ReservationType)
+      : null;
+  });
   const [filterStatus, setFilterStatus] = useState<ReservationStatus | null>(
     null,
   );
@@ -422,14 +438,23 @@ export default function ReservationsScreen() {
     try {
       const response = await tripPlannerService.listTrips();
       setTrips(response.trips || []);
-      if (response.trips?.length > 0 && !selectedTripId) {
+      const paramId =
+        paramTripId != null && Number.isFinite(Number(paramTripId))
+          ? Number(paramTripId)
+          : null;
+      const paramTripExists =
+        paramId !== null &&
+        response.trips?.some((trip) => trip.id === paramId);
+      if (paramTripExists) {
+        setSelectedTripId(paramId);
+      } else if (response.trips?.length > 0 && !selectedTripId) {
         setSelectedTripId(response.trips[0].id);
       }
     } catch (err) {
       console.error("Failed to load trips:", err);
       setError("Failed to load trips");
     }
-  }, [selectedTripId]);
+  }, [selectedTripId, paramTripId]);
 
   // Load reservations
   const loadReservations = useCallback(async (tripId: number) => {

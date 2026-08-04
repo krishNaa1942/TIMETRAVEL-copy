@@ -40,7 +40,8 @@ import { DestinationDetailSkeleton } from "@/components/UI/SkeletonLoader";
 import WeatherCard from "@/components/Features/WeatherCard";
 import SafetyBadge from "@/components/Features/SafetyBadge";
 import { PressableScale } from "@/components/UI/PressableScale";
-import { RootStackParamList, UnsplashImage, Destination } from "@/types";
+import { UnsplashImage, Destination } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 
 // ─────────────────────────────────────────────────────────────

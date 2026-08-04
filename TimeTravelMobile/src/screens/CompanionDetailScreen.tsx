@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors, spacing } from "@/theme/colors";
-import { RootStackParamList } from "@/types";
+import { RootStackParamList } from "@/navigation/types";
 
 type CompanionRoute = RouteProp<RootStackParamList, "CompanionDetail">;
 

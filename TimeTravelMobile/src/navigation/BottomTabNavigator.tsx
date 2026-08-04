@@ -121,12 +121,6 @@ class TabErrorBoundary extends Component<
   }
 }
 
-const LoadingFallback: React.FC = () => (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#3B82F6" />
-  </View>
-);
-
 const ProtectedStackScreen = (
   StackComponent: React.ComponentType<any>,
   label: string,
@@ -431,12 +425,6 @@ const styles = StyleSheet.create({
   },
   tabBarItem: {
     paddingTop: 4,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#0F172A",
   },
   errorContainer: {
     flex: 1,
