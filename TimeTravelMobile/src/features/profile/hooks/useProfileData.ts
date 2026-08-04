@@ -14,6 +14,7 @@ import {
   PERSONALITY_CONFIG,
 } from "../utils/profileHelpers";
 import type {
+  AchievementBadge,
   AIInsight,
   PersonalityConfig,
   ProfileSummary,
@@ -37,6 +38,8 @@ interface UseProfileDataReturn {
   insights: AIInsight[];
   smartActions: SmartAction[];
   quickActions: QuickAction[];
+  achievements: AchievementBadge[];
+  preferences: Record<string, unknown>;
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
@@ -58,6 +61,14 @@ export const useProfileData = (): UseProfileDataReturn => {
   } = useQuery({
     queryKey: queryKeys.profile.summary(),
     queryFn: () => profileService.getSummary(),
+    enabled: !!authUser,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Achievements / badges query
+  const { data: achievementsData } = useQuery({
+    queryKey: queryKeys.profile.achievements(),
+    queryFn: () => profileService.getAchievements(),
     enabled: !!authUser,
     staleTime: 5 * 60 * 1000,
   });
@@ -146,6 +157,14 @@ export const useProfileData = (): UseProfileDataReturn => {
   const insights = useMemo(() => profile?.insights ?? [], [profile]);
   const smartActions = useMemo(() => profile?.smartActions ?? [], [profile]);
   const quickActions = useMemo(() => profile?.quickActions ?? [], [profile]);
+  const achievements = useMemo(
+    () => achievementsData?.badges ?? [],
+    [achievementsData],
+  );
+  const preferences = useMemo(
+    () => profile?.preferences ?? {},
+    [profile],
+  );
 
   const refetch = useCallback(() => {
     refetchSummary();
@@ -162,6 +181,8 @@ export const useProfileData = (): UseProfileDataReturn => {
     insights,
     smartActions,
     quickActions,
+    achievements,
+    preferences,
     isLoading: isSummaryLoading,
     isError: isSummaryError,
     error: summaryError as Error | null,

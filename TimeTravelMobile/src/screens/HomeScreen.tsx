@@ -115,6 +115,37 @@ const QUICK_ACTIONS = [
   },
 ] as const;
 
+const TOOLS_ACTIONS = [
+  {
+    id: "currency",
+    icon: "currency-usd",
+    label: "Currency",
+    gradient: ["#14B8A6", "#0D9488"],
+    route: "Currency",
+  },
+  {
+    id: "route",
+    icon: "map-legend",
+    label: "Routes",
+    gradient: ["#6366F1", "#4F46E5"],
+    route: "RoutePlanner",
+  },
+  {
+    id: "phrasebook",
+    icon: "translate",
+    label: "Phrases",
+    gradient: ["#EC4899", "#DB2777"],
+    route: "Phrasebook",
+  },
+  {
+    id: "news",
+    icon: "newspaper-variant-outline",
+    label: "News",
+    gradient: ["#EF4444", "#DC2626"],
+    route: "NewsFeed",
+  },
+] as const;
+
 const CURRENT_SEASON = (() => {
   const month = new Date().getMonth();
   if (month >= 2 && month <= 5) return "summer";
@@ -178,9 +209,17 @@ const getTravelInsight = (season: string, destinations: Destination[]) => {
 // SUB-COMPONENTS
 // ─────────────────────────────────────────────────────────────
 
+type HomeAction = {
+  id: string;
+  icon: string;
+  label: string;
+  gradient: readonly [string, string];
+  route: string;
+};
+
 interface QuickActionsRowProps {
-  actions: typeof QUICK_ACTIONS;
-  onPress: (action: (typeof QUICK_ACTIONS)[number]) => void;
+  actions: readonly HomeAction[];
+  onPress: (action: HomeAction) => void;
 }
 
 const QuickActionsRow = memo(({ actions, onPress }: QuickActionsRowProps) => (
@@ -720,7 +759,7 @@ export default function HomeScreen() {
   );
 
   const handleQuickAction = useCallback(
-    (action: (typeof QUICK_ACTIONS)[number]) => {
+    (action: HomeAction) => {
       if (action.route === "Trips" || action.route === "Explore") {
         navigation.navigate("MainTabs", { screen: action.route });
         return;
@@ -728,6 +767,15 @@ export default function HomeScreen() {
       if (action.route === "Itinerary" || action.route === "Budget") {
         navigation.navigate(action.route);
       }
+    },
+    [navigation],
+  );
+
+  const handleToolPress = useCallback(
+    (action: HomeAction) => {
+      navigation.navigate(
+        action.route as "Currency" | "RoutePlanner" | "Phrasebook" | "NewsFeed",
+      );
     },
     [navigation],
   );
@@ -896,6 +944,9 @@ export default function HomeScreen() {
             actions={QUICK_ACTIONS}
             onPress={handleQuickAction}
           />
+          <View style={styles.toolsRowSpacing}>
+            <QuickActionsRow actions={TOOLS_ACTIONS} onPress={handleToolPress} />
+          </View>
           {activeTrip && (
             <LiveTripCard
               trip={activeTrip}
@@ -1116,6 +1167,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.lg,
+  },
+  toolsRowSpacing: {
+    marginTop: spacing.sm,
   },
   quickActionCard: { alignItems: "center", width: 72 },
   quickActionGradient: {

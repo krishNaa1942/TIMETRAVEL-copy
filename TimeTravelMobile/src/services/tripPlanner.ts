@@ -32,6 +32,32 @@ export interface TripDay {
   places?: TripPlace[];
 }
 
+export interface TripPhoto {
+  id: number;
+  trip_id: number;
+  filename: string;
+  original_name?: string;
+  caption?: string;
+  place_name?: string;
+  url: string;
+  file_size?: number;
+  created_at?: string;
+}
+
+export interface TripDocument {
+  id: number;
+  trip_id?: number;
+  doc_type: string;
+  title: string;
+  filename?: string;
+  original_name?: string;
+  expiry_date?: string;
+  notes?: string;
+  url?: string;
+  file_size?: number;
+  created_at?: string;
+}
+
 export interface TripData {
   id: number;
   title: string;
@@ -47,6 +73,7 @@ export interface TripData {
   budget_total?: number;
   is_public?: boolean;
   days?: TripDay[];
+  photos?: TripPhoto[];
   companions?: any[];
   reservations?: any[];
   created_at?: string;

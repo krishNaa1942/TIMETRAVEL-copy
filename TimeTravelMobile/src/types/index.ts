@@ -19,6 +19,7 @@ export interface Destination {
   // Extended properties (from API)
   rating?: number;
   popularity?: number;
+  daily_cost?: number;
   budgetLevel?: "budget" | "mid-range" | "luxury";
   isFavorite?: boolean;
   priceRange?: {

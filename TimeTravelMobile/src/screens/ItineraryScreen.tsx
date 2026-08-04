@@ -25,6 +25,7 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetView,
@@ -52,6 +53,8 @@ import { useItinerary } from "@/hooks/useItinerary";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { mapsService } from "@/services/maps";
+import { tripsService } from "@/services/trips";
+import { exportService } from "@/services/export";
 import {
   ItineraryDay,
   ItineraryActivity,
@@ -304,7 +307,8 @@ const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
 
 export default function ItineraryScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const mapRef = useRef<any>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
   // Bug 1.4 fix: track whether auto-trigger has fired instead of empty dep array
@@ -321,6 +325,8 @@ export default function ItineraryScreen() {
   // State
   const [query, setQuery] = useState(incomingQuery);
   const [expandedDay, setExpandedDay] = useState<number | null>(1);
+  const [savingTrip, setSavingTrip] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [dayMarkers, setDayMarkers] = useState<
     Record<number, { lat: number; lon: number }>
   >({});
@@ -542,19 +548,54 @@ export default function ItineraryScreen() {
     }
   }, [query, generate, debouncedGenerate]);
 
-  // Bug 1.8 fix: Save Itinerary persists the trip to store then confirms
-  const handleSaveItinerary = useCallback(() => {
+  // Bug 1.8 fix: Save Itinerary persists the trip to backend then confirms
+  const handleSaveItinerary = useCallback(async () => {
     if (!itinerary) return;
-    // setActiveTrip already called reactively above; just confirm to the user
-    Alert.alert(
-      "Itinerary Saved! ✅",
-      `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`,
-      [
-        { text: "Stay here" },
-        { text: "Go back", onPress: () => navigation.goBack() },
-      ],
-    );
+    setSavingTrip(true);
+    try {
+      await tripsService.createTrip({
+        destination: itinerary.destination,
+        title: `${itinerary.destination} ${itinerary.num_days}-Day Trip`,
+        num_days: itinerary.num_days,
+        family_size: itinerary.family_size,
+        travel_class: (itinerary.travel_class as "economy" | "comfort" | "premium") || "economy",
+        notes: itinerary.interests ? `Interests: ${itinerary.interests}` : undefined,
+      });
+      Alert.alert(
+        "Itinerary Saved! ✅",
+        `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`,
+        [
+          { text: "Stay here" },
+          { text: "Go to trips", onPress: () => navigation.navigate("MainTabs", { screen: "Trips" }) },
+        ],
+      );
+    } catch (saveError) {
+      const info = getErrorInfo(saveError);
+      Alert.alert("Save failed", info.message || "Could not save the trip. Try again.");
+    } finally {
+      setSavingTrip(false);
+    }
   }, [itinerary, navigation]);
+
+  const handleExportPdf = useCallback(async () => {
+    if (!itinerary?.itinerary?.length) return;
+    setExporting(true);
+    try {
+      await exportService.exportItineraryPdf({
+        destination: itinerary.destination,
+        num_days: itinerary.num_days,
+        family_size: itinerary.family_size,
+        travel_class: itinerary.travel_class || "economy",
+        interests: itinerary.interests,
+        itinerary: itinerary.itinerary,
+      });
+    } catch (exportError) {
+      const info = getErrorInfo(exportError);
+      Alert.alert("Export failed", info.message || "Could not generate the PDF. Try again.");
+    } finally {
+      setExporting(false);
+    }
+  }, [itinerary]);
 
   // Calculate budget
   const calculateBudget = useCallback(() => {
@@ -744,14 +785,40 @@ export default function ItineraryScreen() {
             ))}
 
             {/* Bug 1.8 fix: Save Button now persists trip state */}
-            <TouchableOpacity
-              style={styles.finalizeBtn}
-              onPress={handleSaveItinerary}
-              accessibilityLabel="Save this itinerary to your trips"
-              accessibilityRole="button"
-            >
-              <Text style={styles.finalizeBtnText}>Save Itinerary</Text>
-            </TouchableOpacity>
+            <View style={styles.finalizeRow}>
+              <TouchableOpacity
+                style={[styles.finalizeBtn, styles.finalizeBtnExport]}
+                onPress={handleExportPdf}
+                disabled={exporting || loading}
+                accessibilityLabel="Export itinerary as PDF"
+                accessibilityRole="button"
+              >
+                <MaterialCommunityIcons
+                  name="file-pdf-box"
+                  size={16}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.finalizeBtnText}>
+                  {exporting ? "Exporting…" : "Export PDF"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.finalizeBtn}
+                onPress={handleSaveItinerary}
+                disabled={savingTrip || loading}
+                accessibilityLabel="Save this itinerary to your trips"
+                accessibilityRole="button"
+              >
+                <MaterialCommunityIcons
+                  name="content-save"
+                  size={16}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.finalizeBtnText}>
+                  {savingTrip ? "Saving…" : "Save Itinerary"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </BottomSheetScrollView>
         ) : (
           <BottomSheetView style={styles.emptySheet}>
@@ -1094,6 +1161,10 @@ const styles = StyleSheet.create({
   aiTipText: { fontSize: 13, color: "#475569", fontWeight: "500", flex: 1 },
 
   // Finalize Button
+  finalizeRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+  },
   finalizeBtn: {
     backgroundColor: "#0F172A",
     height: 56,
@@ -1101,6 +1172,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: spacing.md,
+    flexDirection: "row",
+    gap: 8,
+    flex: 1,
+  },
+  finalizeBtnExport: {
+    backgroundColor: "#B91C1C",
+    marginRight: spacing.sm,
   },
   finalizeBtnText: { color: "#FFF", fontSize: 16, fontWeight: "800" },
 

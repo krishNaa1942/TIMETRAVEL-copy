@@ -40,11 +40,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as DocumentPicker from "expo-document-picker";
 
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { packingService, PackingItem } from "@/services/packing";
 import { destinationsService } from "@/services/destinations";
 import { weatherService } from "@/services/weather";
+import { uploadsService } from "@/services/uploads";
+import type { TripDocument } from "@/services/tripPlanner";
 import { Destination, WeatherData } from "@/types";
 import { colors, spacing } from "@/theme/colors";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
@@ -658,6 +661,85 @@ export default function PackingScreen() {
   const [newItem, setNewItem] = useState("");
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
+  // Travel documents
+  const [documents, setDocuments] = useState<TripDocument[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [docType, setDocType] = useState("other");
+
+  const DOC_TYPES = [
+    { value: "passport", label: "Passport", icon: "passport" },
+    { value: "visa", label: "Visa", icon: "sticker-check" },
+    { value: "ticket", label: "Ticket", icon: "ticket" },
+    { value: "insurance", label: "Insurance", icon: "shield-check" },
+    { value: "other", label: "Other", icon: "file-document" },
+  ];
+
+  const loadDocuments = useCallback(async () => {
+    setDocumentsLoading(true);
+    try {
+      const docs = await uploadsService.listDocuments();
+      setDocuments(docs);
+    } catch (loadError) {
+      console.error("Failed to load documents:", loadError);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
+
+  const handleAddDocument = useCallback(async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
+      if (result.canceled || !result.assets?.length) return;
+
+      const asset = result.assets[0];
+      setUploadingDocument(true);
+      await uploadsService.uploadDocument(undefined, {
+        doc_type: docType,
+        title: asset.name || docType,
+        notes: selectedDestination ? `For ${selectedDestination}` : undefined,
+        fileUri: asset.uri,
+      });
+      await loadDocuments();
+    } catch (uploadError) {
+      Alert.alert("Upload failed", "Could not upload the document.");
+    } finally {
+      setUploadingDocument(false);
+    }
+  }, [docType, selectedDestination, loadDocuments]);
+
+  const handleDeleteDocument = useCallback(
+    (document: TripDocument) => {
+      Alert.alert(
+        "Delete Document",
+        `Remove "${document.title}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await uploadsService.deleteDocument(document.id);
+                await loadDocuments();
+              } catch (deleteError) {
+                Alert.alert("Delete failed", "Could not delete the document.");
+              }
+            },
+          },
+        ],
+      );
+    },
+    [loadDocuments],
+  );
+
   const { activeTrip } = useTravelIntelligence();
 
   // Initialize
@@ -1096,6 +1178,124 @@ export default function PackingScreen() {
           </View>
         )}
 
+        {/* Travel Documents */}
+        <View style={styles.docSection}>
+          <View style={styles.docHeader}>
+            <View style={styles.docTitleRow}>
+              <MaterialCommunityIcons
+                name="folder-multiple-image"
+                size={18}
+                color="#667EEA"
+              />
+              <Text style={styles.docTitle}>Travel Documents</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.docAddBtn}
+              onPress={handleAddDocument}
+              disabled={uploadingDocument}
+            >
+              <MaterialCommunityIcons
+                name={uploadingDocument ? "loading" : "plus"}
+                size={16}
+                color="#667EEA"
+              />
+              <Text style={styles.docAddText}>
+                {uploadingDocument ? "Uploading…" : "Add"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.docTypesRow}>
+            {DOC_TYPES.map((type) => {
+              const active = docType === type.value;
+              return (
+                <TouchableOpacity
+                  key={type.value}
+                  style={[
+                    styles.docTypeChip,
+                    active && styles.docTypeChipActive,
+                  ]}
+                  onPress={() => setDocType(type.value)}
+                >
+                  <MaterialCommunityIcons
+                    name={type.icon as any}
+                    size={12}
+                    color={active ? "#FFF" : "#64748B"}
+                  />
+                  <Text
+                    style={[
+                      styles.docTypeText,
+                      active && styles.docTypeTextActive,
+                    ]}
+                  >
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {documents.length === 0 ? (
+            documentsLoading ? (
+              <Text style={styles.docEmpty}>Loading documents…</Text>
+            ) : (
+              <TouchableOpacity
+                style={styles.docEmptyRow}
+                onPress={handleAddDocument}
+                disabled={uploadingDocument}
+              >
+                <MaterialCommunityIcons
+                  name="file-plus-outline"
+                  size={20}
+                  color="#94A3B8"
+                />
+                <Text style={styles.docEmpty}>
+                  Upload passports, visas, tickets & more
+                </Text>
+              </TouchableOpacity>
+            )
+          ) : (
+            <View style={styles.docList}>
+              {documents.map((document) => (
+                <View key={document.id} style={styles.docItem}>
+                  <MaterialCommunityIcons
+                    name={
+                      (document.doc_type === "passport"
+                        ? "passport"
+                        : document.doc_type === "ticket"
+                          ? "ticket"
+                          : "file-document") as any
+                    }
+                    size={18}
+                    color="#667EEA"
+                  />
+                  <View style={styles.docItemInfo}>
+                    <Text style={styles.docItemTitle} numberOfLines={1}>
+                      {document.title}
+                    </Text>
+                    <Text style={styles.docItemMeta}>
+                      {document.doc_type}
+                      {document.expiry_date
+                        ? ` · expires ${document.expiry_date}`
+                        : ""}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.docDeleteBtn}
+                    onPress={() => handleDeleteDocument(document)}
+                  >
+                    <MaterialCommunityIcons
+                      name="trash-can-outline"
+                      size={16}
+                      color="#EF4444"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
         {/* Add Custom Item */}
         {items.length > 0 && (
           <View style={styles.addRow}>
@@ -1134,6 +1334,111 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8FAFC" },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 120 },
+
+  // Travel documents
+  docSection: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  docHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  docTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  docTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  docAddBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: "#EEF2FF",
+  },
+  docAddText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#667EEA",
+  },
+  docTypesRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: 10,
+  },
+  docTypeChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    backgroundColor: "#F1F5F9",
+  },
+  docTypeChipActive: {
+    backgroundColor: "#667EEA",
+  },
+  docTypeText: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: "#64748B",
+  },
+  docTypeTextActive: {
+    color: "#FFF",
+  },
+  docEmptyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+  },
+  docEmpty: {
+    fontSize: 12,
+    color: "#94A3B8",
+  },
+  docList: {
+    gap: 6,
+  },
+  docItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "#F8FAFC",
+  },
+  docItemInfo: {
+    flex: 1,
+  },
+  docItemTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#0F172A",
+  },
+  docItemMeta: {
+    fontSize: 11,
+    color: "#94A3B8",
+    marginTop: 1,
+  },
+  docDeleteBtn: {
+    padding: 4,
+  },
 
   // Header
   header: {

@@ -182,7 +182,7 @@ export const profileService = {
    * Update preferences
    */
   async updatePreferences(
-    preferences: Record<string, boolean>,
+    preferences: Record<string, unknown>,
   ): Promise<{ success: boolean }> {
     return apiService.put("/user/preferences", preferences);
   },

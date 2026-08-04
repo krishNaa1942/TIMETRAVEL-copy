@@ -173,6 +173,51 @@ export const TravelOverviewSection = memo(
             </Text>
           </View>
         ) : null}
+
+        {snapshot.spendingCategories.length > 0 && (
+          <View style={styles.spendingSection}>
+            <Text
+              variant="labelSmall"
+              style={[styles.spendingTitle, { color: accentColor }]}
+            >
+              Spending breakdown
+            </Text>
+            {snapshot.spendingCategories.map((category) => (
+              <View key={category.name} style={styles.spendingRow}>
+                <View style={styles.spendingRowHeader}>
+                  <Text
+                    variant="labelMedium"
+                    style={styles.spendingRowName}
+                    numberOfLines={1}
+                  >
+                    {category.name}
+                  </Text>
+                  <Text variant="labelMedium" style={styles.spendingRowValue}>
+                    {formatCurrency(category.amount)}
+                    <Text style={styles.spendingRowPercent}>
+                      {"  "}
+                      {formatPercent(category.percentage)}
+                    </Text>
+                  </Text>
+                </View>
+                <View style={styles.spendingBarTrack}>
+                  <View
+                    style={[
+                      styles.spendingBarFill,
+                      {
+                        width: `${Math.min(
+                          Math.max(category.percentage, 0),
+                          100,
+                        )}%`,
+                        backgroundColor: accentColor,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
       </SectionCard>
     );
   },
@@ -596,6 +641,47 @@ const styles = StyleSheet.create({
   topCategoryCaption: {
     color: "#475569",
     marginTop: 4,
+  },
+  spendingSection: {
+    marginTop: 16,
+  },
+  spendingTitle: {
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+    marginBottom: 10,
+  },
+  spendingRow: {
+    marginBottom: 10,
+  },
+  spendingRowHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    marginBottom: 4,
+  },
+  spendingRowName: {
+    flex: 1,
+    color: "#0F172A",
+    fontWeight: "600",
+  },
+  spendingRowValue: {
+    color: "#0F172A",
+    fontWeight: "700",
+  },
+  spendingRowPercent: {
+    color: "#94A3B8",
+    fontWeight: "500",
+    fontSize: 11,
+  },
+  spendingBarTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#E2E8F0",
+    overflow: "hidden",
+  },
+  spendingBarFill: {
+    height: "100%",
+    borderRadius: 3,
   },
   stack: {
     gap: 12,

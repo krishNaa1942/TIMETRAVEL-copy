@@ -7,8 +7,10 @@ import React, { memo } from "react";
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUIStore } from "@/stores/uiStore";
 import { useUserLevel } from "@/stores/userBehaviorStore";
+import { getAvatarSource } from "../utils/profileHelpers";
 import type { ProfileHeaderProps } from "../types";
 
 const ProfileHeaderComponent: React.FC<ProfileHeaderProps> = ({
@@ -26,6 +28,7 @@ const ProfileHeaderComponent: React.FC<ProfileHeaderProps> = ({
   };
 
   const displayLevel = level || userLevel;
+  const avatarUri = user ? getAvatarSource(user) : null;
 
   return (
     <Animated.View
@@ -34,13 +37,15 @@ const ProfileHeaderComponent: React.FC<ProfileHeaderProps> = ({
     >
       <Pressable
         onPress={handleEditPress}
+        accessibilityRole="button"
+        accessibilityLabel="Change profile photo"
         style={({ pressed }) => [
           styles.avatarContainer,
           pressed && styles.pressed,
         ]}
       >
-        {user?.avatar ? (
-          <Image source={{ uri: user.avatar }} style={styles.avatar} accessible={true} accessibilityLabel="User avatar" />
+        {avatarUri ? (
+          <Image source={{ uri: avatarUri }} style={styles.avatar} accessible={true} accessibilityLabel="User avatar" />
         ) : (
           <View
             style={[
@@ -53,6 +58,9 @@ const ProfileHeaderComponent: React.FC<ProfileHeaderProps> = ({
             </Text>
           </View>
         )}
+        <View style={styles.cameraBadge}>
+          <MaterialCommunityIcons name="camera" size={14} color="#FFF" />
+        </View>
         <View style={styles.levelBadge}>
           <Text style={styles.levelText}>{displayLevel.level}</Text>
         </View>
@@ -123,6 +131,19 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+  cameraBadge: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#111827",
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,

@@ -261,6 +261,67 @@ def chat_classic_endpoint():
 
 
 # ---------------------------------------------------------------------------
+# GET /api/chat/history – List the user's conversation sessions
+# ---------------------------------------------------------------------------
+@chatbot_bp.route("/api/chat/history", methods=["GET"])
+@login_required
+def chat_history():
+    """List conversation sessions (newest first) with preview + count."""
+    limit = min(request.args.get("limit", 20, type=int) or 20, 100)
+    rows = (
+        ChatMessage.query.filter_by(user_id=current_user.id)
+        .order_by(ChatMessage.created_at.desc())
+        .all()
+    )
+
+    sessions = {}
+    for row in rows:
+        sid = row.user_session or "default"
+        entry = sessions.setdefault(
+            sid, {"session_id": sid, "count": 0, "preview": "", "updated_at": None}
+        )
+        entry["count"] += 1
+        if not entry["preview"]:
+            entry["preview"] = (row.message or "")[:160]
+            entry["updated_at"] = (
+                row.created_at.isoformat() if row.created_at else None
+            )
+
+    ordered = sorted(
+        sessions.values(),
+        key=lambda s: s["updated_at"] or "",
+        reverse=True,
+    )[:limit]
+    return jsonify({"sessions": ordered})
+
+
+# ---------------------------------------------------------------------------
+# GET /api/chat/history/<session_id> – Messages for one session
+# ---------------------------------------------------------------------------
+@chatbot_bp.route("/api/chat/history/<session_id>", methods=["GET"])
+@login_required
+def chat_session_messages(session_id):
+    """Return the messages for a single conversation session."""
+    rows = (
+        ChatMessage.query.filter_by(user_id=current_user.id, user_session=session_id)
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+    messages = [
+        {
+            "id": row.id,
+            "role": row.role,
+            "text": row.message,
+            "destination": row.destination,
+            "intent": row.detected_intent,
+            "created_at": row.created_at.isoformat() if row.created_at else None,
+        }
+        for row in rows
+    ]
+    return jsonify({"session_id": session_id, "messages": messages})
+
+
+# ---------------------------------------------------------------------------
 # GET /api/chat/status – Check available engines
 # ---------------------------------------------------------------------------
 @chatbot_bp.route("/api/chat/status", methods=["GET"])

@@ -26,7 +26,9 @@ import {
   Platform,
   UIManager,
   useWindowDimensions,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import type { CreateTripData } from "@/services/tripPlanner";
 import { Text, TextInput, Chip, FAB, IconButton, Portal, Modal, Menu, Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -47,6 +49,7 @@ import { Shimmer } from "@/components/UI/SkeletonLoader";
 
 // Services & Stores
 import { tripPlannerService, TripData, TripDay, TripPlace } from "@/services/tripPlanner";
+import { uploadsService } from "@/services/uploads";
 import { queryKeys } from "@/api/queryKeys";
 import { colors, spacing } from "@/theme/colors";
 import { RootStackParamList } from "@/navigation/types";
@@ -497,6 +500,89 @@ export default function TripWorkspaceScreen() {
     haptics.impact('medium');
   }, [updateTripMutation]);
 
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const tripPhotos = useMemo(() => currentTrip?.photos ?? [], [currentTrip]);
+
+  const invalidateTripDetail = useCallback(() => {
+    if (currentTrip?.id) {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.trips.detail(String(currentTrip.id)),
+      });
+    }
+  }, [currentTrip, queryClient]);
+
+  const handleAddPhotos = useCallback(async () => {
+    if (!currentTrip) return;
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("Permission needed", "Allow photo access to upload photos.");
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: true,
+        selectionLimit: 10,
+        quality: 0.8,
+      });
+      if (result.canceled || !result.assets?.length) return;
+
+      setUploadingPhotos(true);
+      await uploadsService.uploadPhotos(
+        currentTrip.id,
+        result.assets.map((asset) => asset.uri),
+      );
+      invalidateTripDetail();
+      haptics.notification("success");
+    } catch (uploadError) {
+      Alert.alert("Upload failed", "Could not upload photos. Try again.");
+    } finally {
+      setUploadingPhotos(false);
+    }
+  }, [currentTrip, invalidateTripDetail]);
+
+  const handleDeletePhoto = useCallback(
+    (photo: { id: number }) => {
+      Alert.alert(
+        "Delete Photo",
+        "Remove this photo from the trip?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await uploadsService.deletePhoto(photo.id);
+                invalidateTripDetail();
+              } catch (deleteError) {
+                Alert.alert("Delete failed", "Could not delete the photo.");
+              }
+            },
+          },
+        ],
+      );
+    },
+    [invalidateTripDetail],
+  );
+
+  const handleSetCover = useCallback(
+    async (photo: { id: number; url: string }) => {
+      if (!currentTrip) return;
+      try {
+        await tripPlannerService.updateTrip(currentTrip.id, {
+          cover_image_url: photo.url,
+        });
+        invalidateTripDetail();
+        haptics.notification("success");
+      } catch (coverError) {
+        Alert.alert("Update failed", "Could not set cover photo.");
+      }
+    },
+    [currentTrip, invalidateTripDetail],
+  );
+
   const handleAddPlace = useCallback(() => {
     if (!currentTrip || !placeName.trim() || !selectedDayId) {
       Alert.alert("Error", "Please fill in place name and select a day");
@@ -601,6 +687,13 @@ export default function TripWorkspaceScreen() {
               colors={[STATUS_CONFIG[currentTrip.status]?.color || colors.primary, "rgba(0,0,0,0.8)"]}
               style={styles.coverGradient}
             >
+              {currentTrip.cover_image_url ? (
+                <Image
+                  source={{ uri: currentTrip.cover_image_url }}
+                  style={StyleSheet.absoluteFill}
+                  resizeMode="cover"
+                />
+              ) : null}
               <View style={styles.coverContent}>
                 <Text style={styles.detailTitle}>{currentTrip.title}</Text>
                 <Text style={styles.detailDest}>📍 {currentTrip.destination}</Text>
@@ -792,6 +885,88 @@ export default function TripWorkspaceScreen() {
               </View>
             </GlassCard>
           ))}
+
+          {/* Trip Photos */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>📷 Trip Photos</Text>
+            <TouchableOpacity
+              onPress={handleAddPhotos}
+              disabled={uploadingPhotos}
+              style={styles.addButton}
+            >
+              <MaterialCommunityIcons
+                name={uploadingPhotos ? "loading" : "camera-plus"}
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.addButtonText}>
+                {uploadingPhotos ? "Uploading…" : "Add"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <GlassCard style={styles.photosCard}>
+            {tripPhotos.length === 0 ? (
+              <TouchableOpacity
+                style={styles.emptyPhotosRow}
+                onPress={handleAddPhotos}
+                disabled={uploadingPhotos}
+              >
+                <MaterialCommunityIcons
+                  name="image-plus"
+                  size={22}
+                  color={colors.gray}
+                />
+                <Text style={styles.emptyPhotosText}>
+                  No photos yet — add memories from your trip
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.photosGrid}>
+                {tripPhotos.map((photo) => (
+                  <View key={photo.id} style={styles.photoTile}>
+                    <Image
+                      source={{ uri: photo.url }}
+                      style={styles.photoTileImage}
+                    />
+                    <View style={styles.photoTileActions}>
+                      {currentTrip.cover_image_url !== photo.url && (
+                        <TouchableOpacity
+                          style={styles.photoTileBtn}
+                          onPress={() => handleSetCover(photo)}
+                        >
+                          <MaterialCommunityIcons
+                            name="image-edit"
+                            size={14}
+                            color="#FFF"
+                          />
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity
+                        style={styles.photoTileBtn}
+                        onPress={() => handleDeletePhoto(photo)}
+                      >
+                        <MaterialCommunityIcons
+                          name="trash-can-outline"
+                          size={14}
+                          color="#FFF"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {currentTrip.cover_image_url === photo.url && (
+                      <View style={styles.coverBadge}>
+                        <MaterialCommunityIcons
+                          name="star"
+                          size={10}
+                          color="#FFF"
+                        />
+                        <Text style={styles.coverBadgeText}>Cover</Text>
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+          </GlassCard>
 
           {/* Quick Actions */}
           <View style={styles.quickActions}>
@@ -1652,6 +1827,74 @@ const styles = StyleSheet.create({
   },
   addButton: {
     padding: 4,
+  },
+  addButtonText: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: "600",
+    marginLeft: 4,
+  },
+  photosCard: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
+  },
+  emptyPhotosRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 16,
+  },
+  emptyPhotosText: {
+    color: colors.gray,
+    fontSize: 13,
+  },
+  photosGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  photoTile: {
+    width: 96,
+    height: 96,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: colors.darkSurface,
+  },
+  photoTileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  photoTileActions: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    flexDirection: "row",
+    gap: 4,
+  },
+  photoTileBtn: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  coverBadge: {
+    position: "absolute",
+    bottom: 4,
+    left: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#8B5CF6",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  coverBadgeText: {
+    color: "#FFF",
+    fontSize: 9,
+    fontWeight: "700",
   },
   dayCard: {
     marginBottom: spacing.sm,

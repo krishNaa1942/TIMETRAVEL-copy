@@ -17,6 +17,9 @@ import {
   Animated,
   Dimensions,
   Alert,
+  Modal,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Text, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,6 +30,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ChatBubble from "@/components/Features/ChatBubble";
 import { useChatAgent, SmartSuggestion } from "@/hooks/useChatAgent";
 import { PressableScale } from "@/components/UI/PressableScale";
+import { chatService } from "@/services/chat";
 import { ChatMessage } from "@/types";
 import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
@@ -277,6 +281,18 @@ export default function ChatScreen() {
   const listRef = useRef<FlatList>(null);
   const [input, setInput] = useState("");
 
+  // Conversation history
+  const [historyVisible, setHistoryVisible] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historySessions, setHistorySessions] = useState<
+    Array<{
+      session_id: string;
+      count: number;
+      preview: string;
+      updated_at: string | null;
+    }>
+  >([]);
+
   const {
     messages,
     isTyping,
@@ -286,8 +302,59 @@ export default function ChatScreen() {
     sendMessage,
     retryLast,
     clearChat,
+    restoreSession,
     setDestination,
   } = useChatAgent();
+
+  const formatSessionDate = useCallback((iso: string | null) => {
+    if (!iso) return "";
+    const date = new Date(iso);
+    const diff = Date.now() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+  }, []);
+
+  const openHistory = useCallback(async () => {
+    setHistoryVisible(true);
+    setHistoryLoading(true);
+    try {
+      const response = await chatService.getHistory(30);
+      setHistorySessions(response.sessions ?? []);
+    } catch (historyError) {
+      setHistorySessions([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  const handleSelectSession = useCallback(
+    async (sessionId: string) => {
+      try {
+        const response = await chatService.getSessionMessages(sessionId);
+        const restored: ChatMessage[] = (response.messages ?? []).map((msg) => ({
+          id: String(msg.id),
+          role: msg.role,
+          text: msg.text,
+          timestamp: msg.created_at ? Date.parse(msg.created_at) : Date.now(),
+          intent: msg.intent ?? undefined,
+          destination: msg.destination ?? null,
+        }));
+        if (restored.length > 0) {
+          restoreSession(restored, sessionId);
+        }
+        setHistoryVisible(false);
+      } catch (loadError) {
+        Alert.alert("Couldn't load conversation", "Please try again.");
+      }
+    },
+    [restoreSession],
+  );
 
   // Scroll to bottom on new messages using requestAnimationFrame
   useEffect(() => {
@@ -389,9 +456,14 @@ export default function ChatScreen() {
             </View>
           </View>
         </View>
-        <PressableScale style={styles.clearBtn} onPress={handleClearChat} accessibilityLabel="Clear conversation" accessibilityRole="button">
-          <MaterialCommunityIcons name="broom" size={22} color={colors.gray} />
-        </PressableScale>
+        <View style={styles.headerActions}>
+          <PressableScale style={styles.clearBtn} onPress={openHistory} accessibilityLabel="Conversation history" accessibilityRole="button">
+            <MaterialCommunityIcons name="history" size={22} color={colors.primary} />
+          </PressableScale>
+          <PressableScale style={styles.clearBtn} onPress={handleClearChat} accessibilityLabel="Clear conversation" accessibilityRole="button">
+            <MaterialCommunityIcons name="broom" size={22} color={colors.gray} />
+          </PressableScale>
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -432,6 +504,88 @@ export default function ChatScreen() {
           onDestinationChange={setDestination}
         />
       </KeyboardAvoidingView>
+
+      {/* History Modal */}
+      <Modal
+        visible={historyVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setHistoryVisible(false)}
+      >
+        <View style={styles.historyOverlay}>
+          <View style={styles.historySheet}>
+            <View style={styles.historyHeader}>
+              <Text style={styles.historyTitle}>Conversations</Text>
+              <TouchableOpacity
+                onPress={() => setHistoryVisible(false)}
+                hitSlop={12}
+              >
+                <MaterialCommunityIcons
+                  name="close"
+                  size={22}
+                  color={colors.gray}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {historyLoading ? (
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={styles.historyLoading}
+              />
+            ) : historySessions.length === 0 ? (
+              <View style={styles.historyEmpty}>
+                <MaterialCommunityIcons
+                  name="message-text-outline"
+                  size={40}
+                  color={colors.gray}
+                />
+                <Text style={styles.historyEmptyText}>
+                  No past conversations yet.
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={historySessions}
+                keyExtractor={(item) => item.session_id}
+                contentContainerStyle={styles.historyList}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.historyItem}
+                    onPress={() => handleSelectSession(item.session_id)}
+                  >
+                    <View style={styles.historyItemIcon}>
+                      <MaterialCommunityIcons
+                        name="robot-outline"
+                        size={18}
+                        color={colors.primary}
+                      />
+                    </View>
+                    <View style={styles.historyItemBody}>
+                      <Text
+                        style={styles.historyItemPreview}
+                        numberOfLines={2}
+                      >
+                        {item.preview || "Empty conversation"}
+                      </Text>
+                      <Text style={styles.historyItemMeta}>
+                        {item.count} messages ·{" "}
+                        {formatSessionDate(item.updated_at)}
+                      </Text>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="chevron-right"
+                      size={20}
+                      color={colors.gray}
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -503,6 +657,82 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  // History modal
+  historyOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  historySheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "70%",
+    paddingBottom: 32,
+  },
+  historyHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  historyTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  historyLoading: {
+    paddingVertical: 48,
+  },
+  historyEmpty: {
+    alignItems: "center",
+    paddingVertical: 48,
+    gap: 10,
+  },
+  historyEmptyText: {
+    fontSize: 13,
+    color: colors.gray,
+  },
+  historyList: {
+    paddingVertical: 8,
+  },
+  historyItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  historyItemIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  historyItemBody: {
+    flex: 1,
+  },
+  historyItemPreview: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#0F172A",
+  },
+  historyItemMeta: {
+    fontSize: 12,
+    color: colors.gray,
+    marginTop: 2,
   },
 
   // Messages

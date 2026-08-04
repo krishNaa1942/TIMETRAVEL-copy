@@ -20,6 +20,15 @@ import { BREAKPOINTS } from "@/hooks/useResponsive";
 
 const HORIZONTAL_CARD_WIDTH = 260;
 
+const BUDGET_LEVEL_CONFIG: Record<
+  NonNullable<Destination["budgetLevel"]>,
+  { color: string; label: string }
+> = {
+  budget: { color: "#10B981", label: "Budget" },
+  "mid-range": { color: "#F59E0B", label: "Mid-range" },
+  luxury: { color: "#8B5CF6", label: "Luxury" },
+};
+
 interface Props {
   destination: Destination;
   imageUrl?: string;
@@ -127,6 +136,19 @@ export default React.memo(function DestinationCard({
             <Text style={styles.ratingText}>⭐ {rating}</Text>
             <Text style={styles.reviewText}> ({reviewCount})</Text>
           </View>
+
+          {destination.budgetLevel && (
+            <View
+              style={[
+                styles.budgetBadge,
+                { backgroundColor: BUDGET_LEVEL_CONFIG[destination.budgetLevel].color },
+              ]}
+            >
+              <Text style={styles.budgetBadgeText}>
+                {BUDGET_LEVEL_CONFIG[destination.budgetLevel].label}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.info}>
@@ -241,6 +263,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "500",
     color: "rgba(255,255,255,0.85)",
+  },
+  budgetBadge: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  budgetBadgeText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.4,
   },
 
   info: {

@@ -4,6 +4,7 @@ Tests for Chatbot API & NLP Engine + Gemini Session Lifecycle
 """
 
 import time
+import uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -199,6 +200,110 @@ class TestChatAIMetadata:
 # ═══════════════════════════════════════════════════════════
 # Gemini Session Lifecycle (TTL, history cap, eviction)
 # ═══════════════════════════════════════════════════════════
+
+
+class TestChatHistory:
+    """Tests for GET /api/chat/history (sessions + messages)."""
+
+    @pytest.fixture()
+    def fresh_user(self, client):
+        """Register + login a brand-new user so DB state cannot leak in.
+        Subsequent calls re-login the same user (shared client keeps the
+        session cookie, but re-login is idempotent)."""
+
+        state = {"email": None}
+
+        def _make():
+            if state["email"] is None:
+                state["email"] = f"u-{uuid.uuid4().hex[:8]}@example.com"
+                client.post(
+                    "/api/auth/register",
+                    json={
+                        "name": "Tester",
+                        "email": state["email"],
+                        "password": "Test1234!",
+                    },
+                )
+            client.post(
+                "/api/auth/login",
+                json={"email": state["email"], "password": "Test1234!"},
+            )
+            return client
+
+        return _make
+
+    def test_history_requires_auth(self, app):
+        fresh = app.test_client()
+        resp = fresh.get("/api/chat/history")
+        assert resp.status_code == 401
+
+    def test_history_empty_for_new_user(self, fresh_user):
+        resp = fresh_user().get("/api/chat/history")
+        assert resp.status_code == 200
+        assert resp.get_json()["sessions"] == []
+
+    def test_history_lists_sessions_after_chat(self, fresh_user):
+        fresh_user().post("/api/chat", json={"message": "best restaurants in goa"})
+        resp = fresh_user().get("/api/chat/history")
+        assert resp.status_code == 200
+        sessions = resp.get_json()["sessions"]
+        assert len(sessions) == 1
+        assert sessions[0]["count"] == 2  # user + bot rows persisted
+        assert "restaurants" in sessions[0]["preview"]
+
+    def test_session_messages_returned_in_order(self, fresh_user):
+        chat_resp = fresh_user().post(
+            "/api/chat",
+            json={"message": "best restaurants in goa"},
+        )
+        session_id = chat_resp.get_json()["session_id"]
+        resp = fresh_user().get(f"/api/chat/history/{session_id}")
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["session_id"] == session_id
+        roles = [msg["role"] for msg in data["messages"]]
+        assert roles == ["user", "bot"]
+        assert data["messages"][0]["text"] == "best restaurants in goa"
+        assert data["messages"][1]["destination"] == "Goa"
+
+    def test_session_messages_scoped_to_owner(self, client, app):
+        owner = app.test_client()
+        owner_email = f"owner-{uuid.uuid4().hex[:8]}@example.com"
+        owner.post(
+            "/api/auth/register",
+            json={
+                "name": "Owner",
+                "email": owner_email,
+                "password": "Test1234!",
+            },
+        )
+        owner.post(
+            "/api/auth/login",
+            json={"email": owner_email, "password": "Test1234!"},
+        )
+        # Persist a chat row via the owner client, then read as a different user
+        chat_resp = owner.post(
+            "/api/chat",
+            json={"message": "hello there"},
+        )
+        sid = chat_resp.get_json()["session_id"]
+        other = app.test_client()
+        other_email = f"other-{uuid.uuid4().hex[:8]}@example.com"
+        other.post(
+            "/api/auth/register",
+            json={
+                "name": "Other",
+                "email": other_email,
+                "password": "Test1234!",
+            },
+        )
+        other.post(
+            "/api/auth/login",
+            json={"email": other_email, "password": "Test1234!"},
+        )
+        other_resp = other.get(f"/api/chat/history/{sid}")
+        assert other_resp.status_code == 200
+        assert other_resp.get_json()["messages"] == []
 
 
 class TestGeminiSessionLifecycle:

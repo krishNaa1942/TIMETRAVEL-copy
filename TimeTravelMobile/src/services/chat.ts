@@ -97,6 +97,33 @@ export const chatService = {
   }> {
     return apiService.get("/chat/status");
   },
+
+  /** List conversation sessions (newest first) */
+  async getHistory(limit = 20): Promise<{
+    sessions: Array<{
+      session_id: string;
+      count: number;
+      preview: string;
+      updated_at: string | null;
+    }>;
+  }> {
+    return apiService.get(`/chat/history?limit=${limit}`);
+  },
+
+  /** Get messages for a single session */
+  async getSessionMessages(sessionId: string): Promise<{
+    session_id: string;
+    messages: Array<{
+      id: number;
+      role: "user" | "bot";
+      text: string;
+      destination?: string | null;
+      intent?: string | null;
+      created_at?: string | null;
+    }>;
+  }> {
+    return apiService.get(`/chat/history/${encodeURIComponent(sessionId)}`);
+  },
 };
 
 export default chatService;

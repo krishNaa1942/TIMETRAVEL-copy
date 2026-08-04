@@ -28,6 +28,7 @@ import {
   TouchableOpacity,
   Pressable,
   Platform,
+  Linking,
 } from "react-native";
 import { Text, Button, IconButton } from "react-native-paper";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
@@ -408,16 +409,21 @@ interface BudgetPreviewProps {
 }
 
 const BudgetPreview = memo(({ destination, onExpand }: BudgetPreviewProps) => {
-  const estimatedBudget = useMemo(() => {
-    if (destination.priceRange) {
-      return Math.round(
-        (destination.priceRange.min + destination.priceRange.max) / 2,
-      );
+  const { dailyCost, perDay } = useMemo(() => {
+    if (destination.daily_cost && destination.daily_cost > 0) {
+      return { dailyCost: destination.daily_cost, perDay: true };
     }
-    return 25000;
-  }, [destination.priceRange]);
+    return {
+      dailyCost: destination.priceRange
+        ? Math.round(
+            (destination.priceRange.min + destination.priceRange.max) / 2,
+          )
+        : 25000,
+      perDay: false,
+    };
+  }, [destination.daily_cost, destination.priceRange]);
 
-  const budgetLevel = getBudgetLevel(estimatedBudget);
+  const budgetLevel = getBudgetLevel(dailyCost);
 
   const handlePress = useCallback(async () => {
     await triggerHaptic("light");
@@ -429,7 +435,7 @@ const BudgetPreview = memo(({ destination, onExpand }: BudgetPreviewProps) => {
       style={styles.budgetPreviewCard}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`Estimated budget: ${formatBudget(estimatedBudget)}. ${budgetLevel.label}. Tap to plan budget.`}
+      accessibilityLabel={`Estimated budget: ${formatBudget(dailyCost)} per ${perDay ? "day" : "trip"}. ${budgetLevel.label}. Tap to plan budget.`}
     >
       <View style={styles.budgetPreviewContent}>
         <View style={styles.budgetPreviewLeft}>
@@ -446,9 +452,12 @@ const BudgetPreview = memo(({ destination, onExpand }: BudgetPreviewProps) => {
             />
           </View>
           <View style={styles.budgetPreviewInfo}>
-            <Text style={styles.budgetLabel}>Estimated Budget</Text>
+            <Text style={styles.budgetLabel}>
+              Estimated {perDay ? "Daily" : "Trip"} Budget
+            </Text>
             <Text style={styles.budgetValue}>
-              {formatBudget(estimatedBudget)}
+              {formatBudget(dailyCost)}
+              {perDay ? "/day" : ""}
             </Text>
             <Text
               style={[styles.budgetLevelText, { color: budgetLevel.color }]}
@@ -694,6 +703,8 @@ interface ActionBarProps {
   onItineraryPress: () => void;
   onChatPress: () => void;
   onPackingPress: () => void;
+  onComparePress: () => void;
+  onDirectionsPress: () => void;
 }
 
 const ActionBar = memo(
@@ -702,6 +713,8 @@ const ActionBar = memo(
     onItineraryPress,
     onChatPress,
     onPackingPress,
+    onComparePress,
+    onDirectionsPress,
   }: ActionBarProps) => {
     const handlePress = useCallback(async (action: () => void) => {
       await triggerHaptic("light");
@@ -790,6 +803,42 @@ const ActionBar = memo(
               />
             </View>
             <Text style={styles.actionBarLabel}>Packing</Text>
+          </PressableScale>
+
+          <PressableScale
+            style={styles.actionBarItem}
+            onPress={() => handlePress(onComparePress)}
+            accessibilityRole="button"
+            accessibilityLabel="Compare this destination"
+          >
+            <View
+              style={[styles.actionBarIcon, { backgroundColor: "#8B5CF615" }]}
+            >
+              <MaterialCommunityIcons
+                name="compare-horizontal"
+                size={22}
+                color="#8B5CF6"
+              />
+            </View>
+            <Text style={styles.actionBarLabel}>Compare</Text>
+          </PressableScale>
+
+          <PressableScale
+            style={styles.actionBarItem}
+            onPress={() => handlePress(onDirectionsPress)}
+            accessibilityRole="button"
+            accessibilityLabel="Get directions"
+          >
+            <View
+              style={[styles.actionBarIcon, { backgroundColor: "#06B6D415" }]}
+            >
+              <MaterialCommunityIcons
+                name="navigation"
+                size={22}
+                color="#06B6D4"
+              />
+            </View>
+            <Text style={styles.actionBarLabel}>Directions</Text>
           </PressableScale>
         </View>
       </View>
@@ -929,6 +978,21 @@ export default function DestinationDetailScreen() {
   const handlePackingPress = useCallback(() => {
     navigation.navigate("Packing");
   }, [navigation]);
+
+  const handleComparePress = useCallback(() => {
+    navigation.navigate("Compare", { dest1: destination.label });
+  }, [navigation, destination]);
+
+  const handleDirectionsPress = useCallback(() => {
+    const query = `${destination.lat},${destination.lon}`;
+    const url =
+      Platform.OS === "ios"
+        ? `maps://app?daddr=${encodeURIComponent(query)}`
+        : `google.navigation:q=${encodeURIComponent(query)}`;
+    Linking.openURL(url).catch(() =>
+      Alert.alert("Unable to open Maps", "No maps app is available."),
+    );
+  }, [destination]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -1093,6 +1157,24 @@ export default function DestinationDetailScreen() {
             color="#8B5CF6"
             testID="photos-stat"
           />
+          {destination.rating !== undefined && (
+            <QuickStatCard
+              icon="star"
+              label="Rating"
+              value={`${destination.rating}/5`}
+              color="#F59E0B"
+              testID="rating-stat"
+            />
+          )}
+          {destination.daily_cost !== undefined && (
+            <QuickStatCard
+              icon="currency-inr"
+              label="Cost/Day"
+              value={formatBudget(destination.daily_cost)}
+              color="#10B981"
+              testID="daily-cost-stat"
+            />
+          )}
         </View>
 
         <TagChips
@@ -1175,6 +1257,8 @@ export default function DestinationDetailScreen() {
           onItineraryPress={handleItineraryPress}
           onChatPress={handleChatPress}
           onPackingPress={handlePackingPress}
+          onComparePress={handleComparePress}
+          onDirectionsPress={handleDirectionsPress}
         />
 
         <View style={styles.bottomSpacer} />
@@ -1558,11 +1642,13 @@ const styles = StyleSheet.create({
   },
   actionBarRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    gap: 16,
   },
   actionBarItem: {
     alignItems: "center",
     gap: 6,
+    width: SCREEN_WIDTH / 3 - 26,
   },
   actionBarIcon: {
     width: 52,

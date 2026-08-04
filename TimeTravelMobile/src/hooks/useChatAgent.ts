@@ -54,6 +54,7 @@ interface UseChatAgentReturn extends ChatAgentState {
   sendMessage: (text: string) => Promise<void>;
   retryLast: () => Promise<void>;
   clearChat: () => void;
+  restoreSession: (history: ChatMessage[], sessionId: string) => void;
   setDestination: (dest: string | null) => void;
 }
 
@@ -240,7 +241,7 @@ export function useChatAgent(options: UseChatAgentOptions = {}): UseChatAgentRet
   const [detectedDestination, setDetectedDestination] = useState<string | null>(initialDestination || null);
   const [detectedIntent, setDetectedIntent] = useState<DetectedIntent | null>(null);
   const [suggestions, setSuggestions] = useState<SmartSuggestion[]>([]);
-  const [sessionId] = useState(generateId());
+  const [sessionId, setSessionId] = useState(generateId());
   
   // Refs
   const lastMessageRef = useRef<string>("");
@@ -368,6 +369,19 @@ export function useChatAgent(options: UseChatAgentOptions = {}): UseChatAgentRet
     lastMessageRef.current = "";
   }, []);
 
+  // Restore a conversation from backend history
+  const restoreSession = useCallback(
+    (history: ChatMessage[], newSessionId: string) => {
+      setSessionId(newSessionId);
+      setMessages(history);
+      setError(null);
+      setDetectedIntent(null);
+      setSuggestions([]);
+      lastMessageRef.current = history[history.length - 1]?.text || "";
+    },
+    [],
+  );
+
   // Set destination
   const setDestination = useCallback((dest: string | null) => {
     setDetectedDestination(dest);
@@ -384,6 +398,7 @@ export function useChatAgent(options: UseChatAgentOptions = {}): UseChatAgentRet
     sendMessage,
     retryLast,
     clearChat,
+    restoreSession,
     setDestination,
   };
 }
