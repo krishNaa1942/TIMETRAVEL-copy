@@ -86,34 +86,8 @@ const Haptics = {
   },
 };
 
-// Polyfill for expo-speech (graceful fallback)
-const Speech = {
-  speak: (
-    text: string,
-    options?: {
-      language?: string;
-      rate?: number;
-      onDone?: () => void;
-      onError?: () => void;
-    },
-  ) => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      if (options?.language) utterance.lang = options.language;
-      if (options?.rate) utterance.rate = options.rate;
-      utterance.onend = () => options?.onDone?.();
-      utterance.onerror = () => options?.onError?.();
-      window.speechSynthesis.speak(utterance);
-    } else {
-      options?.onDone?.();
-    }
-  },
-  stop: () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-  },
-};
+// Real expo-speech — works on native AND web
+import * as Speech from "expo-speech";
 
 const CACHE_KEY = "@phrasebook_cache_v2";
 const BOOKMARKS_KEY = "@phrasebook_bookmarks";
@@ -1021,8 +995,12 @@ export default function PhrasebookScreen() {
     };
   }, []);
 
-  // Initialize
+  // Initialize — runs once on mount so later chip taps / trip switches
+  // never re-run init and snap back to the active trip's destination.
   useEffect(() => {
+    const initialTripLabel = activeTrip?.destination?.label;
+    const initialSelected = selectedDestination;
+
     const init = async () => {
       try {
         const response = await phrasebookService.getDestinations();
@@ -1032,8 +1010,8 @@ export default function PhrasebookScreen() {
 
         // Use active trip destination if available, otherwise persisted or first destination
         const initialDest =
-          activeTrip?.destination?.label ||
-          selectedDestination ||
+          initialTripLabel ||
+          initialSelected ||
           destList[0]?.key ||
           "";
         if (initialDest) {
@@ -1050,7 +1028,8 @@ export default function PhrasebookScreen() {
       }
     };
     init();
-  }, [activeTrip?.destination?.label, selectedDestination]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const readCachedPhrases = useCallback(async (destination: string) => {
     try {

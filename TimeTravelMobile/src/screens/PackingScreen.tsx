@@ -41,6 +41,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from "expo-document-picker";
+import Svg, { Circle, G } from "react-native-svg";
 
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { packingService, PackingItem } from "@/services/packing";
@@ -214,7 +215,8 @@ interface ProgressRingProps {
 const ProgressRing = memo(
   ({ progress, size = CIRCLE_RADIUS * 2 }: ProgressRingProps) => {
     const animatedProgress = useRef(new Animated.Value(0)).current;
-    const radius = size / 2 - STROKE_WIDTH;
+    const strokeWidth = STROKE_WIDTH;
+    const radius = size / 2 - strokeWidth / 2;
     const circumference = 2 * Math.PI * radius;
     const useNativeDriver = Platform.OS !== "web";
 
@@ -226,6 +228,8 @@ const ProgressRing = memo(
         easing: Easing.out(Easing.cubic),
       }).start();
     }, [progress, animatedProgress, useNativeDriver]);
+
+    const displayProgress = progress;
 
     const strokeDashoffset = animatedProgress.interpolate({
       inputRange: [0, 100],
@@ -239,39 +243,53 @@ const ProgressRing = memo(
       <View
         style={[styles.progressRingContainer, { width: size, height: size }]}
       >
-        <Animated.View style={{ transform: [{ rotate: "-90deg" }] }}>
-          {/* Background circle */}
-          <Animated.View
-            style={{
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderWidth: STROKE_WIDTH,
-              borderColor: "#E2E8F0",
-            }}
-          />
-          {/* Progress circle */}
-          <Animated.View
-            style={{
-              position: "absolute",
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderWidth: STROKE_WIDTH,
-              borderColor: progressColor,
-              borderStyle: "solid",
-              opacity: 0.8,
-            }}
-          />
-        </Animated.View>
+        <Svg width={size} height={size}>
+          <G rotation={-90} origin={`${size / 2}, ${size / 2}`}>
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke="#E2E8F0"
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            {useNativeDriver ? (
+              <AnimatedCircle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke={progressColor}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={`${circumference} ${circumference}`}
+                strokeDashoffset={strokeDashoffset}
+                fill="none"
+              />
+            ) : (
+              <Circle
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                stroke={progressColor}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={`${circumference} ${circumference}`}
+                strokeDashoffset={circumference - displayProgress * circumference}
+                fill="none"
+              />
+            )}
+          </G>
+        </Svg>
         <View style={styles.progressRingContent}>
-          <Text style={styles.progressRingValue}>{progress}%</Text>
+          <Text style={styles.progressRingValue}>{displayProgress}%</Text>
           <Text style={styles.progressRingLabel}>Packed</Text>
         </View>
       </View>
     );
   },
 );
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 ProgressRing.displayName = "ProgressRing";
 
 // ─────────────────────────────────────────────────────────────

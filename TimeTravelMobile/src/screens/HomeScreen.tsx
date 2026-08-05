@@ -624,6 +624,7 @@ export default function HomeScreen() {
   const [aiQuery, setAiQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [tripWeather, setTripWeather] = useState<WeatherData | null>(null);
+  const weatherReqRef = useRef(0);
 
   const destinations = useMemo(
     () => destinationsData?.destinations || [],
@@ -634,11 +635,22 @@ export default function HomeScreen() {
   const { data: images = {} } = useDestinationImages(destinations.length > 0);
 
   useEffect(() => {
-    if (activeTrip?.destination?.label) {
+    const dest = activeTrip?.destination?.label;
+    const reqId = ++weatherReqRef.current;
+    if (dest) {
       weatherService
-        .getWeather(activeTrip.destination.label)
-        .then(setTripWeather)
-        .catch(() => setTripWeather(null));
+        .getWeather(dest)
+        .then((data) => {
+          // Stale-response guard: ignore results from a previous trip switch
+          if (reqId === weatherReqRef.current) {
+            setTripWeather(data);
+          }
+        })
+        .catch(() => {
+          if (reqId === weatherReqRef.current) {
+            setTripWeather(null);
+          }
+        });
     } else {
       setTripWeather(null);
     }
@@ -661,24 +673,23 @@ export default function HomeScreen() {
 
   const apiRecommended = useMemo(() => {
     const recs = recsData?.recommendations || [];
-    return recs.map((r) => {
+    // Only surface recommendations that match a real catalog destination —
+    // fabricating a Destination with lat/lon 0 produces broken map cards.
+    const matched: Destination[] = [];
+    for (const r of recs) {
       const match = destinations.find(
         (d) => d.label.toLowerCase() === r.name.toLowerCase(),
       );
-      return {
-        id: match?.id || r.id,
-        label: r.name,
-        region: r.region || r.country,
-        best_season: "",
-        highlight: r.tags?.[0] || "",
-        tagline: r.explanations?.[0] || "",
-        category: r.categories || [],
-        lat: match?.lat || 0,
-        lon: match?.lon || 0,
-        rating: r.rating || match?.rating,
-        imageUrl: match?.imageUrl,
-      } as Destination;
-    });
+      if (match) {
+        matched.push({
+          ...match,
+          highlight: r.tags?.[0] || match.highlight,
+          tagline: r.explanations?.[0] || match.tagline,
+          rating: r.rating || match.rating,
+        });
+      }
+    }
+    return matched;
   }, [recsData, destinations]);
 
   const recMatchPercentage = useMemo(() => {
@@ -697,13 +708,29 @@ export default function HomeScreen() {
         ? apiRecommended
         : featuredDestinations || destinations;
     if (!activeFilter) return data.slice(0, 6);
-    return data
-      .filter((d) => {
-        const destStr =
-          `${d.label} ${d.region} ${(d.category || []).join(" ")}`.toLowerCase();
-        return destStr.includes(activeFilter);
-      })
-      .slice(0, 6);
+
+    const str = (d: Destination) =>
+      `${d.label} ${d.region} ${(d.category || []).join(" ")} ${
+        d.tagline || ""
+      } ${d.highlight || ""}`.toLowerCase();
+
+    // Intent-based smart filters that don't map to a destination keyword
+    if (activeFilter === "personalized") return data.slice(0, 6);
+    if (activeFilter === "weekend") return data.slice(0, 6);
+
+    if (activeFilter === "budget") {
+      const budgetKeywords = ["budget", "affordable", "backpacker", "offbeat"];
+      const picks = data.filter((d) =>
+        (d.category || []).some((c) =>
+          budgetKeywords.some((kw) => c.toLowerCase().includes(kw)),
+        ),
+      );
+      return (picks.length ? picks : data).slice(0, 6);
+    }
+
+    const matched = data.filter((d) => str(d).includes(activeFilter));
+    // Fall back to the full list instead of an empty carousel
+    return (matched.length ? matched : data).slice(0, 6);
   }, [apiRecommended, featuredDestinations, destinations, activeFilter]);
 
   const trending = useMemo(
@@ -1003,15 +1030,15 @@ export default function HomeScreen() {
             >
               <View style={styles.promoContent}>
                 <View style={styles.promoBadge}>
-                  <Text style={styles.promoBadgeText}>PRO</Text>
+                  <Text style={styles.promoBadgeText}>AI</Text>
                 </View>
-                <Text style={styles.promoTitle}>Unlock AI Travel Pro</Text>
+                <Text style={styles.promoTitle}>Plan with AI Travel Assistant</Text>
                 <Text style={styles.promoSubtitle}>
-                  Unlimited itineraries & exclusive deals
+                  Generate unlimited day-by-day itineraries instantly
                 </Text>
               </View>
               <View style={styles.promoCTA}>
-                <Text style={styles.promoCTAText}>Try Free</Text>
+                <Text style={styles.promoCTAText}>Start Planning</Text>
               </View>
             </LinearGradient>
           </PressableScale>

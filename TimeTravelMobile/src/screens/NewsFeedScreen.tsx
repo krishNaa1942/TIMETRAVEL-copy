@@ -24,6 +24,7 @@ import {
   Linking,
   Dimensions,
   Animated,
+  Share,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -70,11 +71,11 @@ const TABS: { key: NewsTab; label: string; icon: string }[] = [
   { key: "safety", label: "Alerts", icon: "shield-alert" },
 ];
 
-const MOCK_INSIGHTS = [
-  { icon: "airplane-alert", text: "Flights disrupted in 3 cities", color: "#F59E0B" },
-  { icon: "weather-rainy", text: "Heavy rain in Kerala", color: "#3B82F6" },
-  { icon: "party-popper", text: "Festival season in Jaipur", color: "#10B981" },
-];
+const MOCK_INSIGHTS = [] as {
+  icon: string;
+  text: string;
+  color: string;
+}[];
 
 // ─────────────────────────────────────────────────────────────
 // UTILITY FUNCTIONS
@@ -149,7 +150,11 @@ const calculateRelevanceScore = (
 // ─────────────────────────────────────────────────────────────
 
 interface InsightsBarProps {
-  insights: typeof MOCK_INSIGHTS;
+  insights: {
+    icon: string;
+    text: string;
+    color: string;
+  }[];
 }
 
 const InsightsBar = memo(({ insights }: InsightsBarProps) => (
@@ -442,7 +447,7 @@ export default function NewsFeedScreen() {
     loadCachedNews();
     loadBookmarks();
     newsService.getStatus().then(r => setAvailable(r.available)).catch(() => {
-      setAvailable(false);
+      // Network failure — treat as offline, keep error state reachable
       setIsOffline(true);
     });
   }, []);
@@ -596,13 +601,30 @@ export default function NewsFeedScreen() {
     }
   }, [bookmarks]);
 
-  const handleShare = useCallback((article: NewsArticle) => {
-    if (article.url) {
-      // Share functionality would use expo-sharing or react-native-share
-      // For now, just open the URL
-      Linking.openURL(article.url).catch(() => {});
+  const handleShare = useCallback(async (article: NewsArticle) => {
+    if (!article.url) return;
+    try {
+      await Share.share({
+        message: article.title,
+        url: article.url,
+      });
+    } catch (e) {
+      // User cancelled or share unavailable
     }
   }, []);
+
+  // Real insights from safety alerts in the loaded feed
+  const insights = useMemo(() => {
+    const alerts = articles
+      .filter((a) => a.alertLevel === "critical" || a.alertLevel === "warning")
+      .slice(0, 3)
+      .map((a) => ({
+        icon: a.alertLevel === "critical" ? "alert-octagon" : "alert-circle-outline",
+        text: a.title.length > 60 ? `${a.title.slice(0, 60)}…` : a.title,
+        color: a.alertLevel === "critical" ? "#EF4444" : "#F59E0B",
+      }));
+    return alerts.length ? alerts : MOCK_INSIGHTS;
+  }, [articles]);
 
   // ─────────────────────────────────────────────────────────────
   // COMPUTED VALUES
@@ -618,7 +640,15 @@ export default function NewsFeedScreen() {
   if (!available && !isOffline) {
     return (
       <SafeAreaView style={styles.container}>
-        <EmptyState type="error" onRetry={() => newsService.getStatus().then(r => setAvailable(r.available))} />
+        <EmptyState
+          type="error"
+          onRetry={() =>
+            newsService
+              .getStatus()
+              .then((r) => setAvailable(r.available))
+              .catch(() => setIsOffline(true))
+          }
+        />
       </SafeAreaView>
     );
   }
@@ -637,13 +667,10 @@ export default function NewsFeedScreen() {
               {user?.name?.split(" ")[0] ? `Personalized for ${user.name.split(" ")[0]}` : "AI-powered news feed"}
             </Text>
           </View>
-          <TouchableOpacity style={styles.headerIcon}>
-            <MaterialCommunityIcons name="bell-outline" size={24} color="#FFF" />
-          </TouchableOpacity>
         </View>
         
         {/* Insights Bar */}
-        <InsightsBar insights={MOCK_INSIGHTS} />
+        {insights.length > 0 && <InsightsBar insights={insights} />}
       </LinearGradient>
 
       {/* Tab Bar */}

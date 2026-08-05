@@ -46,17 +46,13 @@ import {
   usePersonalizedGreeting,
 } from "@/hooks/useTripsFeatures";
 import { useTripsStore } from "@/stores/tripsStore";
+import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 
 // Navigation
 import { CommonActions, useNavigation } from "@react-navigation/native";
 
 const NAVIGABLE_ROUTES = new Set([
   "MainTabs",
-  "HomeTab",
-  "ExploreTab",
-  "ChatTab",
-  "TripsTab",
-  "ProfileTab",
   "DestinationDetail",
   "Budget",
   "Itinerary",
@@ -182,6 +178,7 @@ const StatItem: React.FC<{ emoji: string; value: number; label: string }> = ({
 
 const QuickActionsSection: React.FC = () => {
   const navigation = useNavigation();
+  const activeTrip = useTravelIntelligence((s) => s.activeTrip);
 
   const handleAction = useCallback(
     (type: string) => {
@@ -190,7 +187,12 @@ const QuickActionsSection: React.FC = () => {
       switch (type) {
         case "resume_trip":
           navigation.dispatch(
-            CommonActions.navigate({ name: "TripWorkspace", params: {} }),
+            CommonActions.navigate({
+              name: activeTrip?.id ? "TripWorkspace" : "Itinerary",
+              params: activeTrip?.id
+                ? { tripId: String(activeTrip.id) }
+                : {},
+            }),
           );
           break;
         case "check_weather":
@@ -222,8 +224,12 @@ const QuickActionsSection: React.FC = () => {
     {
       id: "1",
       type: "resume_trip" as const,
-      title: "Resume Trip",
-      subtitle: "Paris 2024",
+      title: activeTrip?.destination?.label
+        ? `Continue ${activeTrip.destination.label}`
+        : "Plan a Trip",
+      subtitle: activeTrip?.destination?.label
+        ? "Pick up where you left off"
+        : "Build your itinerary",
       emoji: "✈️",
       urgency: "high" as const,
     },
@@ -590,11 +596,10 @@ const FeatureGrid: React.FC = () => {
 
 const TripsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const { refresh, setLoading } = useTripsStore();
+  const { refresh, setLoading, isRefreshing } = useTripsStore();
 
   useEffect(() => {
-    refresh();
-    setLoading(false);
+    refresh().finally(() => setLoading(false));
   }, []);
 
   const renderEmptyItem = useCallback(() => null, []);
@@ -627,6 +632,14 @@ const TripsScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         removeClippedSubviews={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor="#fff"
+            titleColor="#fff"
+          />
+        }
       />
     </View>
   );

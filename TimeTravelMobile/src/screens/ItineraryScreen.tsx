@@ -54,6 +54,7 @@ import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { mapsService } from "@/services/maps";
 import { tripsService } from "@/services/trips";
+import { tripPlannerService } from "@/services/tripPlanner";
 import { exportService } from "@/services/export";
 import {
   ItineraryDay,
@@ -553,7 +554,7 @@ export default function ItineraryScreen() {
     if (!itinerary) return;
     setSavingTrip(true);
     try {
-      await tripsService.createTrip({
+      const created = await tripsService.createTrip({
         destination: itinerary.destination,
         title: `${itinerary.destination} ${itinerary.num_days}-Day Trip`,
         num_days: itinerary.num_days,
@@ -561,6 +562,46 @@ export default function ItineraryScreen() {
         travel_class: (itinerary.travel_class as "economy" | "comfort" | "premium") || "economy",
         notes: itinerary.interests ? `Interests: ${itinerary.interests}` : undefined,
       });
+
+      // Persist the generated day-by-day plan so the trip isn't just a stub
+      const createdId = (created as any)?.trip?.id ?? (created as any)?.id;
+      if (createdId && itinerary.itinerary?.length) {
+        let planSaved = false;
+        try {
+          for (const day of itinerary.itinerary) {
+            const { day: createdDay } = await tripPlannerService.addDay(createdId, {
+              title: day.title || `Day ${day.day}`,
+            });
+            const activities = [day.morning, day.afternoon, day.evening].filter(Boolean);
+            await Promise.all(
+              activities.map((activity, index) =>
+                tripPlannerService.addPlace(createdId, {
+                  name: activity.place || activity.activity,
+                  category: activity.activity,
+                  notes: `${activity.description} (${activity.duration})`,
+                  position_order: index,
+                })
+              )
+            );
+          }
+          planSaved = true;
+        } catch (planError) {
+          console.warn("Trip created but plan persistence failed:", planError);
+        }
+
+        Alert.alert(
+          "Itinerary Saved! ✅",
+          planSaved
+            ? `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`
+            : `Trip created, but the day-by-day plan couldn't be saved. You can view the trip in your trips list.`,
+          [
+            { text: "Stay here" },
+            { text: "Go to trips", onPress: () => navigation.navigate("MainTabs", { screen: "Trips" }) },
+          ],
+        );
+        return;
+      }
+
       Alert.alert(
         "Itinerary Saved! ✅",
         `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`,

@@ -589,6 +589,8 @@ export default function BudgetScreen() {
     fieldErrors,
     destinations,
     isLoadingDestinations,
+    destinationError,
+    retryDestinations,
     estimate,
     isCalculating,
     calculationError,
@@ -643,25 +645,33 @@ export default function BudgetScreen() {
           </View>
 
           {/* Destination Selection */}
-          {!preselectedDestination && destinations.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Select Destination</Text>
-              <FlatList
-                data={destinations}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <SelectionChip
-                    label={item.label}
-                    selected={formData.destination === item.label}
-                    onPress={() => updateField("destination", item.label)}
-                  />
-                )}
-                contentContainerStyle={styles.chipList}
+          {!preselectedDestination &&
+            (destinationError ? (
+              <ErrorState
+                title="Couldn't Load Destinations"
+                message={destinationError}
+                actionLabel="Retry"
+                onRetry={retryDestinations}
               />
-            </View>
-          )}
+            ) : destinations.length > 0 ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Select Destination</Text>
+                <FlatList
+                  data={destinations}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <SelectionChip
+                      label={item.label}
+                      selected={formData.destination === item.label}
+                      onPress={() => updateField("destination", item.label)}
+                    />
+                  )}
+                  contentContainerStyle={styles.chipList}
+                />
+              </View>
+            ) : null)}
 
           {/* Selected Destination Display */}
           {preselectedDestination && (

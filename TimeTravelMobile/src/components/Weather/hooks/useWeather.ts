@@ -43,7 +43,7 @@ export function useWeather(options: UseWeatherOptions): UseWeatherReturn {
     setError(null);
 
     try {
-      const result = await fetchWeather(destination);
+      const result = await fetchWeather(destination, abortController.current?.signal);
       setData(result);
       lastFetchTime.current = now;
     } catch (err) {

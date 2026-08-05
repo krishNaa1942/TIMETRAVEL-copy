@@ -980,9 +980,7 @@ export default function ReservationsScreen() {
             <ReservationCard
               key={reservation.id}
               reservation={reservation}
-              onPress={() => {
-                /* TODO: Navigate to detail */
-              }}
+              onPress={() => openEditModal(reservation)}
               onEdit={() => openEditModal(reservation)}
               onDelete={() => handleDelete(reservation)}
               onToggleBookmark={() => handleToggleBookmark(reservation)}

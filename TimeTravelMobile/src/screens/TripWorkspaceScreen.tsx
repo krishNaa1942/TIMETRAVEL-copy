@@ -239,7 +239,7 @@ export default function TripWorkspaceScreen() {
     mutationFn: tripPlannerService.createTrip,
     onMutate: async (tripData) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.trips.all });
-      const previousTrips = queryClient.getQueryData(queryKeys.trips.lists());
+      const previousTrips = queryClient.getQueryData(queryKeys.trips.list());
       const optimisticTrip = {
         ...tripData,
         id: -Date.now(),
@@ -252,7 +252,7 @@ export default function TripWorkspaceScreen() {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       } as TripData;
-      queryClient.setQueryData(queryKeys.trips.lists(), (old: any) => ({
+      queryClient.setQueryData(queryKeys.trips.list(), (old: any) => ({
         ...old,
         trips: [optimisticTrip, ...(old?.trips || [])],
       }));
@@ -265,7 +265,7 @@ export default function TripWorkspaceScreen() {
     },
     onError: (error: Error, _tripData, context: any) => {
       if (context?.previousTrips) {
-        queryClient.setQueryData(queryKeys.trips.lists(), context.previousTrips);
+        queryClient.setQueryData(queryKeys.trips.list(), context.previousTrips);
       }
       haptics.notification('error');
       Alert.alert("Error", error.message);
@@ -280,8 +280,8 @@ export default function TripWorkspaceScreen() {
     // Optimistic delete — remove card instantly, rollback on error
     onMutate: async (tripId: number) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.trips.all });
-      const previousTrips = queryClient.getQueryData(queryKeys.trips.lists());
-      queryClient.setQueryData(queryKeys.trips.lists(), (old: any) => ({
+      const previousTrips = queryClient.getQueryData(queryKeys.trips.list());
+      queryClient.setQueryData(queryKeys.trips.list(), (old: any) => ({
         ...old,
         trips: old?.trips?.filter((t: TripData) => t.id !== tripId) || [],
       }));
@@ -291,7 +291,7 @@ export default function TripWorkspaceScreen() {
     },
     onError: (_err: Error, _tripId: number, context: any) => {
       if (context?.previousTrips) {
-        queryClient.setQueryData(queryKeys.trips.lists(), context.previousTrips);
+        queryClient.setQueryData(queryKeys.trips.list(), context.previousTrips);
       }
       haptics.notification('error');
       Alert.alert("Error", "Failed to delete trip");
@@ -306,8 +306,8 @@ export default function TripWorkspaceScreen() {
       tripPlannerService.updateTrip(id, data),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.trips.all });
-      const previousTrips = queryClient.getQueryData(queryKeys.trips.lists());
-      queryClient.setQueryData(queryKeys.trips.lists(), (old: any) => ({
+      const previousTrips = queryClient.getQueryData(queryKeys.trips.list());
+      queryClient.setQueryData(queryKeys.trips.list(), (old: any) => ({
         ...old,
         trips: old?.trips?.map((t: TripData) =>
           t.id === id ? { ...t, ...data } : t
@@ -321,7 +321,7 @@ export default function TripWorkspaceScreen() {
     },
     onError: (_err: Error, { id }, context: any) => {
       if (context?.previousTrips) {
-        queryClient.setQueryData(queryKeys.trips.lists(), context.previousTrips);
+        queryClient.setQueryData(queryKeys.trips.list(), context.previousTrips);
         if (selectedTrip?.id) {
           queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(selectedTrip.id)) });
         }
