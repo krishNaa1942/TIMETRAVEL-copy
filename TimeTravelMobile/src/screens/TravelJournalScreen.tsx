@@ -33,8 +33,9 @@ export default function TravelJournalScreen() {
       ]);
       setNotes(mine.notes || []);
       setCommunity(comm.notes || []);
-    } catch { }
-    finally { setLoading(false); }
+    } catch (e: any) {
+      toast.error(e?.message || "Could not load journal entries.");
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -51,7 +52,7 @@ export default function TravelJournalScreen() {
       });
       setShowCreate(false); setTitle(""); setContent(""); setDestination("");
       load();
-    } catch (e: any) { Alert.alert("Error", e.message); }
+    } catch (e: any) { Alert.alert("Error", e?.message || "Could not save the entry."); }
     finally { setCreating(false); }
   };
 

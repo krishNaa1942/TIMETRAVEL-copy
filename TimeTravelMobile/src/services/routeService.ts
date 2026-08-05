@@ -516,7 +516,7 @@ export const routeService = {
           steps: [],
         },
       ],
-      source: "api",
+      source: "simulated",
       reasoning: this.generateReasoning(metrics, traffic, mode),
     };
 
@@ -623,68 +623,10 @@ export const routeService = {
   // ───────────────────────────────────────────────────────────
 
   async findSmartStops(route: Route, types?: StopType[]): Promise<SmartStop[]> {
-    // In production, this would call the API
-    // For now, return mock data
-
-    const allTypes: StopType[] = ["fuel", "restaurant", "rest_stop", "atm"];
-    const searchTypes = types || allTypes;
-
-    const stops: SmartStop[] = [];
-
-    for (
-      let i = 0;
-      i < route.geometry.length;
-      i += Math.floor(route.geometry.length / 5)
-    ) {
-      const point = route.geometry[i];
-      const distanceKm =
-        (i / route.geometry.length) * route.metrics.distance_km;
-
-      for (const type of searchTypes) {
-        if (Math.random() > 0.3) {
-          // 70% chance of finding each type
-          stops.push({
-            id: `stop_${i}_${type}`,
-            name: this.getStopName(type),
-            type,
-            location: {
-              lat: point.lat + (Math.random() - 0.5) * 0.01,
-              lng: point.lng + (Math.random() - 0.5) * 0.01,
-            },
-            distance_from_route_meters: Math.floor(Math.random() * 500),
-            distance_along_route_km: Math.round(distanceKm * 10) / 10,
-            detour_time_minutes: Math.floor(Math.random() * 10) + 2,
-            rating: 3.5 + Math.random() * 1.5,
-          });
-        }
-      }
-    }
-
-    return stops;
-  },
-
-  getStopName(type: StopType): string {
-    const names: Record<StopType, string[]> = {
-      fuel: [
-        "HP Petrol Pump",
-        "Indian Oil",
-        "Bharat Petroleum",
-        "Shell Station",
-      ],
-      restaurant: [
-        "Highway Dhaba",
-        "McDonald's",
-        "Haldiram's",
-        "Saravana Bhavan",
-      ],
-      rest_stop: ["Rest Area", "Highway Stop", "Travel Plaza"],
-      atm: ["SBI ATM", "HDFC ATM", "ICICI ATM", "Axis Bank ATM"],
-      hospital: ["Fortis Hospital", "Apollo Clinic", "Government Hospital"],
-      ev_charging: ["Tata Power EV", "Ather Grid", "Tesla Supercharger"],
-    };
-
-    const list = names[type];
-    return list[Math.floor(Math.random() * list.length)];
+    // No live smart-stops backend exists yet. Return nothing rather than
+    // fabricating random POIs and presenting them as real stops.
+    console.warn("findSmartStops: no live backend — smart stops unavailable");
+    return [];
   },
 
   // ───────────────────────────────────────────────────────────

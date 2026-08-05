@@ -284,6 +284,7 @@ export default function ChatScreen() {
   // Conversation history
   const [historyVisible, setHistoryVisible] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFailed, setHistoryFailed] = useState(false);
   const [historySessions, setHistorySessions] = useState<
     Array<{
       session_id: string;
@@ -323,11 +324,12 @@ export default function ChatScreen() {
   const openHistory = useCallback(async () => {
     setHistoryVisible(true);
     setHistoryLoading(true);
+    setHistoryFailed(false);
     try {
       const response = await chatService.getHistory(30);
       setHistorySessions(response.sessions ?? []);
     } catch (historyError) {
-      setHistorySessions([]);
+      setHistoryFailed(true);
     } finally {
       setHistoryLoading(false);
     }
@@ -534,6 +536,23 @@ export default function ChatScreen() {
                 color={colors.primary}
                 style={styles.historyLoading}
               />
+            ) : historyFailed ? (
+              <View style={styles.historyEmpty}>
+                <MaterialCommunityIcons
+                  name="wifi-off"
+                  size={40}
+                  color={colors.gray}
+                />
+                <Text style={styles.historyEmptyText}>
+                  Couldn't load your conversations. Check your connection.
+                </Text>
+                <TouchableOpacity
+                  style={styles.historyRetry}
+                  onPress={openHistory}
+                >
+                  <Text style={styles.historyRetryText}>Try Again</Text>
+                </TouchableOpacity>
+              </View>
             ) : historySessions.length === 0 ? (
               <View style={styles.historyEmpty}>
                 <MaterialCommunityIcons
@@ -702,6 +721,20 @@ const styles = StyleSheet.create({
   historyEmptyText: {
     fontSize: 13,
     color: colors.gray,
+    textAlign: "center",
+    paddingHorizontal: 16,
+  },
+  historyRetry: {
+    marginTop: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: colors.primary,
+  },
+  historyRetryText: {
+    color: "#FFF",
+    fontSize: 13,
+    fontWeight: "600",
   },
   historyList: {
     paddingVertical: 8,

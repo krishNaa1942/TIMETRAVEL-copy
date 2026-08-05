@@ -156,7 +156,7 @@ export interface SmartStop {
 // MAIN ROUTE TYPES
 // ─────────────────────────────────────────────────────────────
 
-export type RouteSource = 'api' | 'cache' | 'offline';
+export type RouteSource = 'api' | 'cache' | 'offline' | 'simulated';
 
 export interface Route {
   id: string;

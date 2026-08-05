@@ -839,7 +839,7 @@ export default function TripWorkspaceScreen() {
                     <PressableScale
                       key={place.id || idx}
                       style={styles.placeItem}
-                      onPress={() => nav.navigate("PlaceDetail", { place })}
+                      onPress={() => nav.navigate("PlaceDetail", { place, tripId: currentTrip?.id })}
                     >
                       <View style={styles.placeNumber}>
                         <Text style={styles.placeNumberText}>{idx + 1}</Text>

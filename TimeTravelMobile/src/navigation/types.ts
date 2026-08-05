@@ -11,6 +11,15 @@
 import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { Destination } from "@/types";
+import type { TripPlace } from "@/services/tripPlanner";
+
+export interface CompanionInfo {
+  name: string;
+  role?: string;
+  email?: string;
+  phone?: string;
+  avatar_color?: string;
+}
 
 // ── Root Stack (all screens registered in NavOS) ─────────────
 export type RootStackParamList = {
@@ -37,8 +46,8 @@ export type RootStackParamList = {
   NewsFeed: { category?: string } | undefined;
   TravelStats: undefined;
   Phrasebook: undefined;
-  PlaceDetail: { place: any };
-  CompanionDetail: { companion: any };
+  PlaceDetail: { place: TripPlace; tripId?: number };
+  CompanionDetail: { companion: CompanionInfo };
   AddCompanion: { tripId: string | number };
 };
 

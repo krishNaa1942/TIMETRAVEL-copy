@@ -54,6 +54,20 @@ const isSmallDevice = SCREEN_WIDTH < 375;
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
+const getCurrencySymbol = (currency?: string): string => {
+  const symbols: Record<string, string> = {
+    INR: "₹",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    JPY: "¥",
+    AUD: "A$",
+    CAD: "C$",
+    AED: "AED ",
+  };
+  return symbols[(currency || "INR").toUpperCase()] || `${currency} `;
+};
+
 // ─────────────────────────────────────────────────────────────
 // SKELETON COMPONENTS
 // ─────────────────────────────────────────────────────────────
@@ -218,7 +232,8 @@ const ReservationCard = React.memo<ReservationCardProps>(
             </View>
             {reservation.amount && (
               <Text style={styles.resAmount}>
-                ₹{reservation.amount.toLocaleString()}
+                {getCurrencySymbol(reservation.currency)}
+                {reservation.amount.toLocaleString()}
               </Text>
             )}
           </View>
@@ -600,6 +615,15 @@ export default function ReservationsScreen() {
       return;
     }
 
+    let amountNum: number | undefined;
+    if (formAmount.trim()) {
+      amountNum = parseFloat(formAmount);
+      if (isNaN(amountNum)) {
+        Alert.alert("Error", "Please enter a valid amount");
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       if (editingReservation) {
@@ -609,7 +633,7 @@ export default function ReservationsScreen() {
           confirmation_code: formConfirmCode.trim() || undefined,
           provider: formProvider.trim() || undefined,
           location: formLocation.trim() || undefined,
-          amount: formAmount ? parseFloat(formAmount) : undefined,
+          amount: amountNum,
           notes: formNotes.trim() || undefined,
           status: formStatus,
         });
@@ -621,7 +645,7 @@ export default function ReservationsScreen() {
           confirmation_code: formConfirmCode.trim() || undefined,
           provider: formProvider.trim() || undefined,
           location: formLocation.trim() || undefined,
-          amount: formAmount ? parseFloat(formAmount) : undefined,
+          amount: amountNum,
           notes: formNotes.trim() || undefined,
         });
       }

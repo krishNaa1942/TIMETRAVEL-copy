@@ -25,7 +25,7 @@ const PlaceDetailScreen: React.FC = () => {
   const route = useRoute<PlaceRoute>();
   const queryClient = useQueryClient();
   const place = route.params?.place;
-  const tripId = place?.trip_id;
+  const tripId = route.params?.tripId;
 
   const removeMutation = useMutation({
     mutationFn: async () => {
@@ -34,7 +34,7 @@ const PlaceDetailScreen: React.FC = () => {
     },
     onSuccess: () => {
       if (tripId) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(tripId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.trips.detail(String(tripId)) });
       }
       navigation.goBack();
     },
@@ -91,21 +91,21 @@ const PlaceDetailScreen: React.FC = () => {
           </View>
         ) : null}
 
-        {place.duration_minutes ? (
+        {place.duration_minutes !== undefined ? (
           <View style={styles.row}>
             <MaterialCommunityIcons name="timelapse" size={20} color={colors.gray} />
             <Text style={styles.rowText}>{place.duration_minutes} min</Text>
           </View>
         ) : null}
 
-        {place.estimated_cost ? (
+        {place.estimated_cost !== undefined ? (
           <View style={styles.row}>
             <MaterialCommunityIcons name="currency-inr" size={20} color={colors.gray} />
             <Text style={styles.rowText}>{formatCurrency(place.estimated_cost)}</Text>
           </View>
         ) : null}
 
-        {place.rating ? (
+        {place.rating !== undefined ? (
           <View style={styles.row}>
             <MaterialCommunityIcons name="star" size={20} color={colors.accent} />
             <Text style={styles.rowText}>{place.rating} / 5</Text>
