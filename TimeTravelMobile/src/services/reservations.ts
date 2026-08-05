@@ -113,7 +113,6 @@ export interface ParsedBooking {
 // CONSTANTS
 // ─────────────────────────────────────────────────────────────
 
-const CACHE_KEY_PREFIX = "@reservations:";
 const BOOKMARK_KEY_PREFIX = "@reservation_bookmarks:";
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -467,13 +466,7 @@ export const reservationService = {
       data,
     );
     // Invalidate cache for this reservation's trip
-    const allCache = await AsyncStorage.getAllKeys();
-    const reservationCacheKeys = allCache.filter((k) =>
-      k.startsWith(CACHE_KEY_PREFIX),
-    );
-    for (const key of reservationCacheKeys) {
-      await AsyncStorage.removeItem(key);
-    }
+    await this.invalidateCache(response.reservation.trip_id);
     const bookmarkedReservations = await applyBookmarkState(
       response.reservation.trip_id,
       [response.reservation],

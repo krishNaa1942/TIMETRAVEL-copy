@@ -34,12 +34,10 @@ import {
   ScrollView,
   Platform,
   Share,
-  Linking,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native";
-import { BlurView } from "expo-blur";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
@@ -52,8 +50,6 @@ import { Destination, UnsplashImage } from "@/types";
 import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 import { PressableScale } from "@/components/UI/PressableScale";
-import { GlassCard } from "@/components/UI/GlassCard";
-import { ScreenSkeleton } from "@/components/UI/SkeletonLoader";
 
 const shouldUseNativeDriver = Platform.OS !== "web";
 
@@ -477,7 +473,7 @@ const EmptyState = memo(({ onExplore }: EmptyStateProps) => {
   const floatAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
+    const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {
           toValue: -10,
@@ -492,8 +488,10 @@ const EmptyState = memo(({ onExplore }: EmptyStateProps) => {
           useNativeDriver: shouldUseNativeDriver,
         }),
       ]),
-    ).start();
-  }, []);
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [floatAnim]);
 
   return (
     <View style={styles.emptyContainer}>
@@ -533,50 +531,51 @@ function useFavoritesEngine() {
   const [images, setImages] = useState<Record<string, UnsplashImage>>({});
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [removedItem, setRemovedItem] = useState<EnrichedFavorite | null>(null);
-
   // Load data
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setError(null);
-        const [favsData, imagesData, destsData] = await Promise.all([
-          favoritesService.list(),
-          destinationsService.getAllDestinationImages(),
-          destinationsService.getDestinations(),
-        ]);
-        setImages(imagesData);
-        setDestinations(destsData);
+  const load = useCallback(async () => {
+    try {
+      setError(null);
+      const [favsData, imagesData, destsData] = await Promise.all([
+        favoritesService.list(),
+        destinationsService.getAllDestinationImages(),
+        destinationsService.getDestinations(),
+      ]);
+      setImages(imagesData);
+      setDestinations(destsData);
 
-        // Enrich favorites
-        const enriched: EnrichedFavorite[] = favsData.map((fav: Favorite) => {
-          const dest = destsData.find(
-            (d: Destination) =>
-              d.id === fav.item_id || d.label === fav.item_name,
-          );
-          const imageKey =
-            fav.item_id !== undefined && fav.item_id !== null
-              ? String(fav.item_id)
-              : dest?.id || "";
-          const img = imagesData[imageKey];
-          return {
-            ...fav,
-            imageUrl: img?.url_small || img?.url_thumb,
-            region: dest?.region,
-            tagline: dest?.tagline,
-            savedDaysAgo: getDaysAgo(fav.created_at),
-            estimatedBudget: estimateBudget(fav),
-            bestTimeToVisit: getBestTimeToVisit(fav.item_name),
-          };
-        });
-        setFavorites(enriched);
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+      // Enrich favorites
+      const enriched: EnrichedFavorite[] = favsData.map((fav: Favorite) => {
+        const dest = destsData.find(
+          (d: Destination) =>
+            d.id === fav.item_id || d.label === fav.item_name,
+        );
+        const imageKey =
+          fav.item_id !== undefined && fav.item_id !== null
+            ? String(fav.item_id)
+            : dest?.id || "";
+
+        const img = imagesData[imageKey];
+        return {
+          ...fav,
+          imageUrl: img?.url_small || img?.url_thumb,
+          region: dest?.region,
+          tagline: dest?.tagline,
+          savedDaysAgo: getDaysAgo(fav.created_at),
+          estimatedBudget: estimateBudget(fav),
+          bestTimeToVisit: getBestTimeToVisit(fav.item_name),
+        };
+      });
+      setFavorites(enriched);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   // Filtered favorites
   const filteredFavorites = useMemo(() => {
@@ -590,11 +589,34 @@ function useFavoritesEngine() {
       (f) => f.item_type === "destination",
     ).length;
     const placeCount = favorites.filter((f) => f.item_type === "place").length;
+
+    const fmt = (n: number): string =>
+      n >= 100000
+        ? `₹${(n / 100000).toFixed(1)}L`
+        : `₹${Math.round(n / 1000)}K`;
+
+    const [budgetMin, budgetMax] = favorites.reduce<[number, number]>(
+      ([min, max], fav) => {
+        const match = (fav.estimatedBudget || "").match(
+          /₹([\d,]+)\s*-\s*₹([\d,]+)/,
+        );
+        if (match) {
+          return [
+            min + parseInt(match[1].replace(/,/g, ""), 10),
+            max + parseInt(match[2].replace(/,/g, ""), 10),
+          ];
+        }
+        return [min, max];
+      },
+      [0, 0],
+    );
+
     return {
       totalItems: favorites.length,
       destinations: destCount,
       places: placeCount,
-      estimatedBudget: "₹50K - ₹2L",
+      estimatedBudget:
+        budgetMin > 0 ? `${fmt(budgetMin)} - ${fmt(budgetMax)}` : "₹0",
       mostSavedRegion: getMostSavedRegion(favorites),
     };
   }, [favorites]);
@@ -779,6 +801,26 @@ function useFavoritesEngine() {
     }
   }, [favorites]);
 
+  // Navigate to Explore tab (used by empty state + retry)
+  const navigateToExplore = useCallback(() => {
+    navigation.navigate("MainTabs", { screen: "Explore" });
+  }, [navigation]);
+
+  // Plan a trip from saved destinations
+  const planTrip = useCallback(() => {
+    const firstDest = favorites.find(
+      (f) => f.item_type === "destination",
+    );
+    if (firstDest) {
+      navigation.navigate("Itinerary", {
+        destinationId: firstDest.item_id,
+        query: firstDest.item_name,
+      });
+    } else {
+      navigation.navigate("Itinerary");
+    }
+  }, [favorites, navigation]);
+
   return {
     // Data
     favorites,
@@ -799,6 +841,9 @@ function useFavoritesEngine() {
     undoRemove,
     navigateToDestination,
     shareWishlist,
+    retry: load,
+    navigateToExplore,
+    planTrip,
   };
 }
 
@@ -822,6 +867,9 @@ export default function FavoritesScreen() {
     undoRemove,
     navigateToDestination,
     shareWishlist,
+    retry,
+    navigateToExplore,
+    planTrip,
   } = useFavoritesEngine();
 
   const listRef = useRef<FlatList>(null);
@@ -947,16 +995,12 @@ export default function FavoritesScreen() {
             color="#EF4444"
           />
           <Text style={styles.errorText}>{error}</Text>
-          <PressableScale style={styles.retryBtn} onPress={() => {}}>
+          <PressableScale style={styles.retryBtn} onPress={retry}>
             <Text style={styles.retryBtnText}>Try Again</Text>
           </PressableScale>
         </View>
       </SafeAreaView>
     );
-  }
-
-  if (loading) {
-    return <ScreenSkeleton titleWidth={130} subtitleWidth={180} cards={4} />;
   }
 
   return (
@@ -971,29 +1015,20 @@ export default function FavoritesScreen() {
         </View>
         <View style={styles.headerRight}>
           {favorites.length > 0 && (
-            <>
-              <PressableScale style={styles.headerBtn} onPress={shareWishlist}>
-                <MaterialCommunityIcons
-                  name="share-variant-outline"
-                  size={22}
-                  color="#64748B"
-                />
-              </PressableScale>
-              <PressableScale style={styles.headerBtn}>
-                <MaterialCommunityIcons
-                  name="folder-plus-outline"
-                  size={22}
-                  color="#64748B"
-                />
-              </PressableScale>
-            </>
+            <PressableScale style={styles.headerBtn} onPress={shareWishlist}>
+              <MaterialCommunityIcons
+                name="share-variant-outline"
+                size={22}
+                color="#64748B"
+              />
+            </PressableScale>
           )}
         </View>
       </View>
 
       {/* Main Content */}
       {favorites.length === 0 ? (
-        <EmptyState onExplore={() => {}} />
+        <EmptyState onExplore={navigateToExplore} />
       ) : (
         <FlatList
           ref={listRef}
@@ -1020,7 +1055,7 @@ export default function FavoritesScreen() {
 
       {/* Plan Trip FAB */}
       {favorites.length >= 2 && (
-        <PressableScale style={styles.fab} onPress={() => {}}>
+        <PressableScale style={styles.fab} onPress={planTrip}>
           <MaterialCommunityIcons name="airplane" size={22} color="#FFF" />
           <Text style={styles.fabText}>Plan Trip</Text>
         </PressableScale>

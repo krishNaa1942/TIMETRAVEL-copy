@@ -52,6 +52,10 @@ const AddCompanionScreen: React.FC = () => {
   });
 
   const handleSubmit = () => {
+    if (!tripId) {
+      Alert.alert("No trip selected", "Open this screen from a trip to add a companion.");
+      return;
+    }
     const trimmed = name.trim();
     if (!trimmed) {
       Alert.alert("Name required", "Please enter the companion's name.");

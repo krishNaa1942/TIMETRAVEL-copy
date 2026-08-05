@@ -139,6 +139,9 @@ export default function RoutePlannerScreen() {
     setTravelMode,
     loadRecentPlaces,
     clearError,
+    navigation,
+    startNavigation,
+    stopNavigation,
   } = useRouteStore();
 
   const selectedRoute = useRouteStore(selectSelectedRoute);
@@ -179,6 +182,7 @@ export default function RoutePlannerScreen() {
   const searchSlideAnim = useRef(new Animated.Value(height)).current;
   const resultsSlideAnim = useRef(new Animated.Value(300)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const prefsFadeAnim = useRef(new Animated.Value(0)).current;
 
   // Debounced search - with safe null/undefined handling
   const debouncedSearch = useDebouncedCallback((query?: string | null) => {
@@ -236,6 +240,14 @@ export default function RoutePlannerScreen() {
   }, [routes.length]);
 
   useEffect(() => {
+    Animated.timing(prefsFadeAnim, {
+      toValue: showPreferences ? 1 : 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [showPreferences, prefsFadeAnim]);
+
+  useEffect(() => {
     debouncedSearch(searchQuery);
   }, [searchQuery, debouncedSearch]);
 
@@ -251,12 +263,14 @@ export default function RoutePlannerScreen() {
         longitude: coord.lng,
       }));
 
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         mapRef.current?.fitToCoordinates(coordinates, {
           edgePadding: { top: 200, right: 60, bottom: 350, left: 60 },
           animated: true,
         });
       }, 300);
+
+      return () => clearTimeout(timeout);
     }
   }, [selectedRouteId]);
 
@@ -312,7 +326,9 @@ export default function RoutePlannerScreen() {
   };
 
   const formatTime = (isoString: string): string => {
+    if (!isoString) return "--:--";
     const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "--:--";
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
@@ -709,7 +725,9 @@ export default function RoutePlannerScreen() {
 
         {/* Preferences Panel */}
         {showPreferences && (
-          <Animated.View style={[styles.prefsPanel, { opacity: fadeAnim }]}>
+          <Animated.View
+            style={[styles.prefsPanel, { opacity: prefsFadeAnim }]}
+          >
             <Text style={styles.prefsTitle}>Route Preferences</Text>
             <View style={styles.prefsGrid}>
               {[
@@ -853,15 +871,31 @@ export default function RoutePlannerScreen() {
           )}
 
           {/* Start Navigation */}
-          <TouchableOpacity style={styles.startNavBtn} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.startNavBtn}
+            activeOpacity={0.8}
+            onPress={
+              navigation?.status === "navigating"
+                ? stopNavigation
+                : startNavigation
+            }
+          >
             <LinearGradient
               colors={[colors.primary, colors.primaryDark]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.startNavGradient}
             >
-              <Ionicons name="navigate" size={22} color="#fff" />
-              <Text style={styles.startNavText}>Start Navigation</Text>
+              <Ionicons
+                name={navigation?.status === "navigating" ? "stop" : "navigate"}
+                size={22}
+                color="#fff"
+              />
+              <Text style={styles.startNavText}>
+                {navigation?.status === "navigating"
+                  ? "Stop Navigation"
+                  : "Start Navigation"}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>

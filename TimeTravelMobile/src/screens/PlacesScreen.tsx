@@ -25,6 +25,8 @@ import { usePlaces, EnhancedPlace } from "@/hooks/usePlaces";
 import { colors, spacing } from "@/theme/colors";
 import { Shimmer } from "@/components/UI/SkeletonLoader";
 import { PressableScale } from "@/components/UI/PressableScale";
+import { favoritesService } from "@/services/favorites";
+import { toast } from "@/components/UI/ToastHost";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -108,10 +110,12 @@ interface PlaceCardProps {
   place: EnhancedPlace;
   onPress: () => void;
   isSelected: boolean;
+  isBookmarked: boolean;
+  onBookmark: () => void;
 }
 
 const PlaceCard = React.memo(
-  ({ place, onPress, isSelected }: PlaceCardProps) => {
+  ({ place, onPress, isSelected, isBookmarked, onBookmark }: PlaceCardProps) => {
     const priceDisplay = place.price_level
       ? typeof place.price_level === "string"
         ? place.price_level
@@ -201,14 +205,26 @@ const PlaceCard = React.memo(
                 Platform.OS === "ios"
                   ? `maps://app?daddr=${place.lat},${place.lon}`
                   : `google.navigation:q=${place.lat},${place.lon}`;
-              Linking.openURL(url).catch(() => {});
+              Linking.openURL(url).catch(() => {
+                toast.error("Could not open maps app");
+              });
             }}
           >
             <Ionicons name="navigate" size={16} color={colors.primary} />
             <Text style={styles.actionBtnText}>Directions</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Ionicons name="bookmark-outline" size={16} color={colors.gray} />
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={onBookmark}
+            accessibilityLabel={
+              isBookmarked ? "Remove from wishlist" : "Add to wishlist"
+            }
+          >
+            <Ionicons
+              name={isBookmarked ? "bookmark" : "bookmark-outline"}
+              size={16}
+              color={isBookmarked ? colors.primary : colors.gray}
+            />
           </TouchableOpacity>
         </View>
       </PressableScale>
@@ -272,10 +288,14 @@ const CitySelector = React.memo(
         showsHorizontalScrollIndicator={false}
         style={styles.cityScroll}
       >
-        {currentLocation && currentLocation !== selectedCity && (
+        {currentLocation && (
           <PressableScale
             onPress={() => onSelect(currentLocation)}
-            style={[styles.cityChip, styles.currentLocationChip]}
+            style={[
+              styles.cityChip,
+              styles.currentLocationChip,
+              selectedCity === currentLocation && styles.cityChipActive,
+            ]}
           >
             <Ionicons name="location" size={14} color="#FFF" />
             <Text style={styles.currentLocationText}>Current Location</Text>
@@ -396,11 +416,35 @@ export default function PlacesScreen() {
     selectPlace,
     serviceAvailable,
     isOffline,
+    retryServiceCheck,
   } = usePlaces();
 
   const [selectedCity, setSelectedCity] = useState("Goa");
   const [situation, setSituation] = useState("exploring");
   const [hasSearched, setHasSearched] = useState(false);
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+
+  // Toggle wishlist for a place
+  const handleToggleBookmark = useCallback(async (place: EnhancedPlace) => {
+    const key = place.fsq_id;
+    try {
+      const result = await favoritesService.toggle(place.name, "place");
+      setBookmarkedIds((prev) => {
+        const next = new Set(prev);
+        if (result.isFavorite) {
+          next.add(key);
+        } else {
+          next.delete(key);
+        }
+        return next;
+      });
+      toast.success(
+        result.isFavorite ? "Added to wishlist" : "Removed from wishlist",
+      );
+    } catch {
+      toast.error("Could not update wishlist");
+    }
+  }, []);
 
   // Get greeting based on time
   const greeting = useMemo(() => getTimeGreeting(), []);
@@ -411,11 +455,21 @@ export default function PlacesScreen() {
   // Handle search
   const handleSearch = useCallback(async () => {
     const coords = DEFAULT_CITIES[selectedCity];
-    if (!coords) return;
+    if (coords) {
+      setHasSearched(true);
+      await search(coords.lat, coords.lon, situation);
+      return;
+    }
 
-    setHasSearched(true);
-    await search(coords.lat, coords.lon, situation);
-  }, [selectedCity, situation, search]);
+    // Current-location chip selected: use the device location
+    if (location?.city && selectedCity === location.city) {
+      setHasSearched(true);
+      await search(location.latitude, location.longitude, situation);
+      return;
+    }
+
+    toast.error("Location unavailable. Please pick a city.");
+  }, [selectedCity, situation, search, location]);
 
   // Handle pull-to-refresh
   const handleRefresh = useCallback(async () => {
@@ -437,9 +491,11 @@ export default function PlacesScreen() {
         place={item}
         onPress={() => handlePlacePress(item)}
         isSelected={selectedPlace?.fsq_id === item.fsq_id}
+        isBookmarked={bookmarkedIds.has(item.fsq_id)}
+        onBookmark={() => handleToggleBookmark(item)}
       />
     ),
-    [selectedPlace, handlePlacePress],
+    [selectedPlace, handlePlacePress, bookmarkedIds, handleToggleBookmark],
   );
 
   // Key extractor
@@ -459,7 +515,10 @@ export default function PlacesScreen() {
           <Text style={styles.emptySubtitle}>
             Foursquare API is not configured. Please contact support.
           </Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.retryBtn}
+            onPress={retryServiceCheck}
+          >
             <Ionicons name="refresh" size={18} color={colors.primary} />
             <Text style={styles.retryBtnText}>Retry</Text>
           </TouchableOpacity>

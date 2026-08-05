@@ -44,6 +44,7 @@ export interface UsePlacesReturn {
   serviceAvailable: boolean;
   isOffline: boolean;
   clearFilters: () => void;
+  retryServiceCheck: () => Promise<void>;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -273,14 +274,20 @@ export function usePlaces(): UsePlacesReturn {
     }
   };
 
-  const checkServiceStatus = async () => {
+  const checkServiceStatus = useCallback(async () => {
     try {
       const available = await placesService.checkStatus();
       setServiceAvailable(available);
     } catch (e) {
       setServiceAvailable(false);
     }
-  };
+  }, []);
+
+  // Retry the service status check (used by the unavailable-state retry button)
+  const retryServiceCheck = useCallback(async () => {
+    setError(null);
+    await checkServiceStatus();
+  }, [checkServiceStatus]);
 
   const recordInteraction = useCallback(async (place: Place) => {
     const category = (place.category || '').toLowerCase();
@@ -447,5 +454,6 @@ export function usePlaces(): UsePlacesReturn {
     serviceAvailable,
     isOffline,
     clearFilters,
+    retryServiceCheck,
   };
 }

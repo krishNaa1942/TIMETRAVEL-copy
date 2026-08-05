@@ -27,6 +27,7 @@ import {
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Svg, { Circle } from "react-native-svg";
 
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { expenseService, Expense, ExpenseSummary } from "@/services/expenses";
@@ -155,27 +156,28 @@ interface AnimatedNumberProps {
 const AnimatedNumber = memo(
   ({ value, duration = 800, prefix = "₹" }: AnimatedNumberProps) => {
     const animatedValue = useRef(new Animated.Value(0)).current;
-    const stringRef = useRef("0");
+    const [display, setDisplay] = useState("0");
 
     useEffect(() => {
+      setDisplay(Math.round(value).toLocaleString("en-IN"));
       Animated.timing(animatedValue, {
         toValue: value,
         duration,
         useNativeDriver: false,
       }).start();
-    }, [value]);
+    }, [value, duration, animatedValue]);
 
     useEffect(() => {
       const listener = animatedValue.addListener(({ value: v }) => {
-        stringRef.current = Math.round(v).toLocaleString("en-IN");
+        setDisplay(Math.round(v).toLocaleString("en-IN"));
       });
       return () => animatedValue.removeListener(listener);
-    }, []);
+    }, [animatedValue]);
 
     return (
       <Animated.Text style={{ fontSize: 32, fontWeight: "900", color: "#FFF" }}>
         {prefix}
-        {stringRef.current}
+        {display}
       </Animated.Text>
     );
   },
@@ -193,7 +195,8 @@ interface BudgetProgressRingProps {
 
 const BudgetProgressRing = memo(
   ({ spent, budget, size = 120 }: BudgetProgressRingProps) => {
-    const progress = Math.min(spent / budget, 1);
+    const progress =
+      budget > 0 ? Math.min(Math.max(spent / budget, 0), 1) : 0;
     const strokeWidth = 10;
     const radius = (size - strokeWidth) / 2;
     const circumference = radius * 2 * Math.PI;
@@ -210,38 +213,30 @@ const BudgetProgressRing = memo(
           </Text>
           <Text style={styles.progressLabel}>used</Text>
         </View>
-        <Animated.View style={{ transform: [{ rotate: "-90deg" }] }}>
-          <Animated.View
-            style={{
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderWidth: strokeWidth,
-              borderColor: "rgba(255,255,255,0.15)",
-            }}
-          />
-        </Animated.View>
         <Animated.View
-          style={{
-            position: "absolute",
-            width: size,
-            height: size,
-            transform: [{ rotate: "-90deg" }],
-          }}
+          style={{ position: "absolute", transform: [{ rotate: "-90deg" }] }}
         >
-          <Animated.View
-            style={{
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              borderWidth: strokeWidth,
-              borderColor: color,
-              borderTopColor: color,
-              borderRightColor: color,
-              borderBottomColor: "transparent",
-              borderLeftColor: "transparent",
-            }}
-          />
+          <Svg width={size} height={size}>
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke="rgba(255,255,255,0.15)"
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={color}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={`${circumference} ${circumference}`}
+              strokeDashoffset={strokeDashoffset}
+              fill="none"
+            />
+          </Svg>
         </Animated.View>
       </View>
     );
@@ -785,8 +780,8 @@ function useExpenseTracker(initialDestination?: string, initialTripId?: number) 
     setError(null);
     try {
       const [expRes, sumRes] = await Promise.all([
-        expenseService.listExpenses(),
-        expenseService.getSummary(),
+        expenseService.listExpenses(initialDestination),
+        expenseService.getSummary(initialDestination),
       ]);
       setExpenses(expRes.expenses || []);
       setSummary(sumRes);
@@ -795,7 +790,7 @@ function useExpenseTracker(initialDestination?: string, initialTripId?: number) 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [initialDestination]);
 
   useEffect(() => {
     load();

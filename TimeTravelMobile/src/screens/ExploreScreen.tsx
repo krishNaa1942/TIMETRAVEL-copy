@@ -20,14 +20,14 @@ import {
   StatusBar,
   Platform,
   RefreshControl,
-  Alert,
   useWindowDimensions,
 } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import ErrorMessage from "@/components/Common/ErrorMessage";
 import DestinationCard from "@/components/Features/DestinationCard";
@@ -47,6 +47,7 @@ import { CATEGORIES } from "@/features/explore/constants/categories";
 import { getColumnCount } from "@/features/explore/utils/responsive";
 import { AIInsight } from "@/features/explore/utils/scoring";
 import type { BottomTabParamList } from "@/navigation/BottomTabNavigator";
+import { RootStackParamList } from "@/navigation/types";
 
 // ─────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -75,6 +76,8 @@ export default function ExploreScreen() {
   } = useExploreEngine();
 
   const route = useRoute<RouteProp<BottomTabParamList, "Explore">>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // Apply navigation params (Home "See All" / insight card deep links)
   useEffect(() => {
@@ -280,17 +283,11 @@ export default function ExploreScreen() {
         getImageUrl={getImageUrl}
       />
 
-      {/* FAB - AI Trip Planner (fix #17 — meaningful action) */}
+      {/* FAB - AI Trip Planner */}
       {!isSearchFocused && (
         <PressableScale
           style={styles.fab}
-          onPress={() =>
-            Alert.alert(
-              "AI Trip Planner",
-              "Smart itinerary generation is coming soon! We'll help you plan the perfect trip based on your preferences.",
-              [{ text: "Got it", style: "default" }],
-            )
-          }
+          onPress={() => navigation.navigate("Itinerary")}
           accessibilityRole="button"
           accessibilityLabel="Plan a trip with AI assistant"
         >

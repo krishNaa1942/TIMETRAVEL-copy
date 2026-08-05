@@ -372,6 +372,31 @@ export default function ReservationsScreen() {
   const paramType = route.params?.type;
   const { themeDark } = useUIStore();
 
+  const handleInsightPress = (insight: AIInsight) => {
+    const target = insight.action?.route;
+    if (!target) return;
+
+    if (target === "Places") {
+      navigation.navigate("Places");
+      return;
+    }
+
+    const optionalParamRoutes: (keyof RootStackParamList)[] = [
+      "Budget",
+      "Packing",
+      "Itinerary",
+      "Favorites",
+      "Currency",
+      "Reservations",
+      "NewsFeed",
+      "TravelStats",
+      "Phrasebook",
+    ];
+    if ((optionalParamRoutes as string[]).includes(target)) {
+      navigation.navigate(target as never);
+    }
+  };
+
   // State
   const [trips, setTrips] = useState<TripData[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
@@ -895,7 +920,11 @@ export default function ReservationsScreen() {
           <View style={styles.insightsSection}>
             <Text style={styles.sectionTitle}>🧠 Smart Insights</Text>
             {aiInsights.map((insight, i) => (
-              <AIInsightCard key={i} insight={insight} />
+              <AIInsightCard
+                key={i}
+                insight={insight}
+                onPress={() => handleInsightPress(insight)}
+              />
             ))}
           </View>
         )}

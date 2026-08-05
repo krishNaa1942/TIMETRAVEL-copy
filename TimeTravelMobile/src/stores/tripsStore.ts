@@ -21,6 +21,8 @@ import {
   getFeatureById 
 } from '@/components/Trips/featureConfig';
 import { useUserBehaviorStore } from './userBehaviorStore';
+import { statsService } from '@/services/stats';
+import { tripPlannerService } from '@/services/tripPlanner';
 
 // ─────────────────────────────────────────────────────────────
 // INITIAL STATE
@@ -142,29 +144,58 @@ export const useTripsStore = create<TripsStore>()(
       refresh: async () => {
         set({ isRefreshing: true, error: null });
         try {
-          // Simulate data refresh - in production this would fetch from API
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Generate mock travel progress
-          const progress: TravelProgress = {
-            totalTrips: 12,
-            countriesVisited: 8,
-            citiesVisited: 24,
-            totalDistance: 25000,
-            totalSpent: 185000,
-            tripsThisYear: 3,
-            upcomingTrips: 2,
-          };
-          
-          set({ 
-            travelProgress: progress,
+          const [statsRes, tripsRes] = await Promise.allSettled([
+            statsService.getStats(),
+            tripPlannerService.listTrips(),
+          ]);
+
+          const upcomingTrips: UpcomingTrip[] = [];
+          if (tripsRes.status === 'fulfilled') {
+            const now = Date.now();
+            upcomingTrips.push(
+              ...tripsRes.value.trips
+                .filter((t) => t.start_date || t.status === 'planning')
+                .map((t) => ({
+                  id: String(t.id),
+                  name: t.title,
+                  destination: t.destination,
+                  startDate: t.start_date || '',
+                  endDate: t.end_date || '',
+                  imageUrl: t.cover_image_url,
+                  progress: t.status === 'completed' ? 100 : t.status === 'active' ? 50 : 0,
+                  daysUntil: t.start_date
+                    ? Math.max(0, Math.round((new Date(t.start_date).getTime() - now) / 86400000))
+                    : 0,
+                }))
+                .sort((a, b) => a.daysUntil - b.daysUntil)
+                .slice(0, 6)
+            );
+          }
+
+          if (statsRes.status === 'fulfilled') {
+            const stats = statsRes.value.stats;
+            const progress: TravelProgress = {
+              totalTrips: stats.trips.total,
+              countriesVisited: stats.top_destinations?.length ?? 0,
+              citiesVisited: stats.places_visited,
+              totalDistance: 0,
+              totalSpent: stats.total_spent,
+              tripsThisYear: 0,
+              upcomingTrips: upcomingTrips.length,
+            };
+            set({ travelProgress: progress });
+          }
+
+          set({
+            upcomingTrips,
             lastUpdated: Date.now(),
-            isRefreshing: false 
+            isRefreshing: false,
+            error: null,
           });
         } catch (error) {
-          set({ 
+          set({
             error: 'Failed to refresh. Please try again.',
-            isRefreshing: false 
+            isRefreshing: false,
           });
         }
       },

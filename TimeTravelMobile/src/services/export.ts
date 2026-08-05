@@ -5,6 +5,7 @@
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { API_BASE_URL } from "@/constants/config";
+import { tokenManager } from "@/services/apiClient";
 
 interface ItineraryExportPayload {
   destination: string;
@@ -26,9 +27,18 @@ const fetchPdfBytes = async (
   path: string,
   payload: Record<string, unknown>,
 ): Promise<string> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  const accessToken = await tokenManager.getValidToken();
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(payload),
   });
 
