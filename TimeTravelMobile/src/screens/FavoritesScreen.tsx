@@ -53,6 +53,7 @@ import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { GlassCard } from "@/components/UI/GlassCard";
+import { ScreenSkeleton } from "@/components/UI/SkeletonLoader";
 
 const shouldUseNativeDriver = Platform.OS !== "web";
 
@@ -952,6 +953,10 @@ export default function FavoritesScreen() {
         </View>
       </SafeAreaView>
     );
+  }
+
+  if (loading) {
+    return <ScreenSkeleton titleWidth={130} subtitleWidth={180} cards={4} />;
   }
 
   return (

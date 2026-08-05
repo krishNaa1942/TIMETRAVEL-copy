@@ -17,6 +17,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Sentry from "@sentry/react-native";
 import {
   StatusBar,
   View,
@@ -387,6 +388,24 @@ export const NavOS: React.FC = () => {
 
   // Handle navigation state change
   const onStateChange = useCallback((state: any) => {
+    // Phase E3: record the active screen as a Sentry breadcrumb for
+    // crash/debug context (skips transient boot screens).
+    try {
+      const route = state?.routes?.[state?.index ?? 0];
+      const name: string = route?.name ?? "unknown";
+      const BLACKLIST = new Set(["Splash", "Loading"]);
+      if (name && !BLACKLIST.has(name)) {
+        Sentry.addBreadcrumb({
+          category: "navigation",
+          type: "navigation",
+          message: name,
+          data: { params: route?.params },
+        });
+      }
+    } catch {
+      // Breadcrumbs must never break navigation.
+    }
+
     if (persistNavigationStateTimeoutRef.current) {
       clearTimeout(persistNavigationStateTimeoutRef.current);
     }

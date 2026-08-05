@@ -38,6 +38,7 @@ import * as Haptics from "expo-haptics";
 
 import { useDestinationDetail } from "@/hooks/useDestinationDetail";
 import { DestinationDetailSkeleton } from "@/components/UI/SkeletonLoader";
+import { toast } from "@/components/UI/ToastHost";
 import WeatherCard from "@/components/Features/WeatherCard";
 import SafetyBadge from "@/components/Features/SafetyBadge";
 import { PressableScale } from "@/components/UI/PressableScale";
@@ -1001,6 +1002,7 @@ export default function DestinationDetailScreen() {
         title: destination.label,
       });
     } catch (error) {
+      toast.error("Could not share this destination");
       console.error("Share failed:", error);
     }
   }, [destination]);

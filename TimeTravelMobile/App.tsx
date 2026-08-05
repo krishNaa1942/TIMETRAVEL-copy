@@ -26,6 +26,7 @@ import { lightTheme, darkTheme } from "@/theme/colors";
 import { queryClient } from "@/api/queryClient";
 import { initializeStores } from "@/stores";
 import LoadingSpinner from "@/components/Common/LoadingSpinner";
+import { ToastHost } from "@/components/UI/ToastHost";
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || "",
@@ -70,6 +71,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <PaperProvider theme={paperTheme}>
               <NavOS />
+              <ToastHost />
             </PaperProvider>
           </QueryClientProvider>
         </ErrorBoundary>

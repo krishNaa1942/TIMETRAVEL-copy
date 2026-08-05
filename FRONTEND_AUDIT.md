@@ -211,11 +211,12 @@ TripWorkspace passes `{trip: currentTrip}` → TripSharing (expects `tripId`; sc
 - D4. Endpoint fate decided: `GET /api/templates`, `POST /api/templates/<id>/clone`, `POST /api/export/budget|comparison`, `GET /api/places/detail|photos|tips/<id>`, `GET /api/booking/links`, `POST /api/newsletter`, `GET /api/news/destinations`, `GET /api/images/hero|status`, `POST /api/chat/ai`, v1 `/api/auth/*`, and unused v1 `/api/trips` routes (GET/<id>/DELETE/PUT/duplicate) marked `# DEPRECATED` in code — kept for compatibility, no mobile consumer as of Phase D. Fixed `TripPhoto._photo_url`/`TripDocument._doc_url` to match the real `/api/uploads/serve/*` routes.
 - Verify: `alembic upgrade head` applied to dev DB (201 seeded); `tests/test_phase_d.py` 8/8 (seed count/idempotency/refresh, engine candidates from DB, trip-query link, share ownership with workspace Trip ids); full suite 947 passed.
 
-### Phase E — Polish & Observability — effort S–M
-- E1. Error toasts/retry states on every mutation (currently silent failures on many 404s).
-- E2. Screen-level loading skeletons for stack screens (only Home has them).
-- E3. Navigation analytics (revive or remove) + Sentry breadcrumbs with screen names.
-- E4. Offline caching for Currency/Phrasebook/News (AsyncStorage patterns exist).
+### Phase E — Polish & Observability — effort S–M ✅
+- E1. Global toast system: `src/components/UI/ToastHost.tsx` — imperative `toast.error/success/show` singleton + paper Snackbar host mounted in `App.tsx`. Wired into the previously silent failures (TravelJournal delete `catch {}`, DestinationDetail share `console.error`); audited remaining catch blocks — all already surface via Alert/inline banners, so no silent paths remain.
+- E2. Loading skeletons: generic `ScreenSkeleton` (Shimmer-based) added to `SkeletonLoader.tsx`; `FavoritesScreen` gained a full-screen skeleton (was the only data screen with zero loading state). PackingScreen/PhrasebookScreen already had `PackingSkeleton`/`PhraseSkeleton`; CurrencyScreen's "Converting…" card now uses shimmer.
+- E3. Sentry observability: api layer (`src/services/api.ts`) logs a breadcrumb for every failed request and `captureException` for 5xx/timeout/network errors; NavOS `onStateChange` records screen-name navigation breadcrumbs (Splash/Loading blacklisted). Errors are no longer invisible in production.
+- E4. Offline caching: `src/services/currency.ts` now uses the shared `@ttt_cache_` util — convert cached 15 min, supported currencies 24 h, with stale-while-revalidate (cached value served instantly/offline, refreshed in background). Phrasebook (30 min) and News (5 min) already had AsyncStorage caches.
+- Verify: `tsc --noEmit` clean; manual smoke — navigation produces Sentry breadcrumbs, toast appears on TravelJournal delete failure, currency converts offline after first fetch.
 
 ---
 

@@ -4,6 +4,7 @@ import { Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import LoadingSpinner from "@/components/Common/LoadingSpinner";
+import { toast } from "@/components/UI/ToastHost";
 import { journalService, TravelNote } from "@/services/journal";
 import { colors, spacing } from "@/theme/colors";
 
@@ -58,7 +59,13 @@ export default function TravelJournalScreen() {
     Alert.alert("Delete", `Delete "${note.title}"?`, [
       { text: "Cancel" },
       { text: "Delete", style: "destructive", onPress: async () => {
-        try { await journalService.deleteNote(note.id); load(); } catch {}
+        try {
+          await journalService.deleteNote(note.id);
+          toast.success("Note deleted");
+          load();
+        } catch {
+          toast.error("Could not delete note. Try again.");
+        }
       }},
     ]);
   };

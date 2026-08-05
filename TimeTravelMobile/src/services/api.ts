@@ -16,6 +16,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { Platform } from "react-native";
+import * as Sentry from "@sentry/react-native";
 
 // ─────────────────────────────────────────────────────────────
 // CONFIGURATION
@@ -137,6 +138,22 @@ class ApiService {
           logError(
             `← ${error.response?.status || "NO RESPONSE"} ${config.method?.toUpperCase()} ${config.url}`,
           );
+        }
+
+        // Phase E3: surface every failure as a Sentry breadcrumb, and capture
+        // server/network errors (5xx, timeouts, no-response) as exceptions.
+        const failedStatus = error.response?.status ?? 0;
+        Sentry.addBreadcrumb({
+          category: "network",
+          type: "error",
+          level: failedStatus >= 500 || failedStatus === 0 ? "error" : "warning",
+          message: `${error.config?.method?.toUpperCase()} ${error.config?.url} → ${failedStatus}`,
+        });
+        if (failedStatus === 0 || failedStatus >= 500 || error.code === "ECONNABORTED") {
+          Sentry.captureException(error, {
+            tags: { source: "api", status: String(failedStatus) },
+            extra: { url: error.config?.url, method: error.config?.method },
+          });
         }
 
         // Handle 401 (token expired / unauthorized)

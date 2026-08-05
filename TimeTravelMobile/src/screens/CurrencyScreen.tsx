@@ -30,6 +30,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { currencyService, ConversionResult } from "@/services/currency";
 import { colors, spacing } from "@/theme/colors";
+import { Shimmer } from "@/components/UI/SkeletonLoader";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const shouldUseNativeDriver = Platform.OS !== "web";
@@ -918,10 +919,12 @@ export default function CurrencyScreen() {
         {/* Loading Indicator */}
         {loading && !result && (
           <View style={styles.loadingCard}>
-            <MaterialCommunityIcons
-              name="sync"
-              size={32}
-              color={colors.primary}
+            <Shimmer width="60%" height={20} borderRadius={6} />
+            <Shimmer
+              width="40%"
+              height={16}
+              borderRadius={6}
+              style={{ marginTop: 10 }}
             />
             <Text style={styles.loadingText}>Converting...</Text>
           </View>

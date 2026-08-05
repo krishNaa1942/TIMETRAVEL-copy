@@ -234,6 +234,58 @@ export const MapSkeleton: React.FC = () => (
 );
 
 // ─────────────────────────────────────────────────────────────
+// GENERIC SCREEN SKELETON (Phase E2)
+// ─────────────────────────────────────────────────────────────
+
+interface ScreenSkeletonProps {
+  titleWidth?: number;
+  subtitleWidth?: number;
+  cards?: number;
+  compact?: boolean;
+}
+
+export const ScreenSkeleton: React.FC<ScreenSkeletonProps> = ({
+  titleWidth = 160,
+  subtitleWidth = 220,
+  cards = 3,
+  compact = false,
+}) => (
+  <View style={styles.screenSkeleton}>
+    <View style={styles.screenSkeletonHeader}>
+      <Shimmer width={titleWidth} height={28} borderRadius={8} />
+      <Shimmer
+        width={subtitleWidth}
+        height={13}
+        borderRadius={6}
+        style={{ marginTop: 8 }}
+      />
+    </View>
+    {Array.from({ length: cards }).map((_, i) => (
+      <View
+        key={i}
+        style={[
+          styles.screenSkeletonCard,
+          compact && { paddingVertical: 14 },
+        ]}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Shimmer width={40} height={40} borderRadius={12} />
+          <View style={{ flex: 1 }}>
+            <Shimmer width="70%" height={15} borderRadius={6} />
+            <Shimmer
+              width="45%"
+              height={12}
+              borderRadius={4}
+              style={{ marginTop: 8 }}
+            />
+          </View>
+        </View>
+      </View>
+    ))}
+  </View>
+);
+
+// ─────────────────────────────────────────────────────────────
 // DESTINATION DETAIL SKELETON
 // ─────────────────────────────────────────────────────────────
 
@@ -462,6 +514,22 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: "center",
   },
+  screenSkeleton: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  screenSkeletonHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  screenSkeletonCard: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#F8FAFC",
+  },
 });
 
 export default {
@@ -471,4 +539,5 @@ export default {
   DestinationCardSkeleton,
   HomeScreenSkeleton,
   MapSkeleton,
+  ScreenSkeleton,
 };
