@@ -95,11 +95,14 @@ const ReservationSkeleton = () => (
 
 interface ReservationCardProps {
   reservation: Reservation;
-  onPress: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  onToggleBookmark: () => void;
-  onStatusChange: (status: ReservationStatus) => void;
+  onPress: (reservation: Reservation) => void;
+  onEdit: (reservation: Reservation) => void;
+  onDelete: (reservation: Reservation) => void;
+  onToggleBookmark: (reservation: Reservation) => void;
+  onStatusChange: (
+    reservation: Reservation,
+    status: ReservationStatus,
+  ) => void;
 }
 
 const ReservationCard = React.memo<ReservationCardProps>(
@@ -140,7 +143,7 @@ const ReservationCard = React.memo<ReservationCardProps>(
         style={styles.resCard}
         onPress={() => {
           handleHaptic();
-          onPress();
+          onPress(reservation);
         }}
       >
         <LinearGradient
@@ -168,7 +171,7 @@ const ReservationCard = React.memo<ReservationCardProps>(
               )}
             </View>
             <TouchableOpacity
-              onPress={onToggleBookmark}
+              onPress={() => onToggleBookmark(reservation)}
               style={styles.bookmarkBtn}
             >
               <Ionicons
@@ -240,13 +243,14 @@ const ReservationCard = React.memo<ReservationCardProps>(
 
           {/* Action Buttons */}
           <View style={styles.resActions}>
-            <TouchableOpacity style={styles.actionBtn} onPress={onEdit}>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => onEdit(reservation)}>
               <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionBtn}
               onPress={() =>
                 onStatusChange(
+                  reservation,
                   reservation.status === "confirmed"
                     ? "completed"
                     : "confirmed",
@@ -255,7 +259,10 @@ const ReservationCard = React.memo<ReservationCardProps>(
             >
               <Ionicons name="checkmark-circle" size={16} color="#10B981" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtn} onPress={onDelete}>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => onDelete(reservation)}
+            >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />
             </TouchableOpacity>
           </View>
@@ -269,7 +276,10 @@ const ReservationCard = React.memo<ReservationCardProps>(
 // AI INSIGHT CARD
 // ─────────────────────────────────────────────────────────────
 
-const AIInsightCard = React.memo<{ insight: AIInsight; onPress?: () => void }>(
+const AIInsightCard = React.memo<{
+  insight: AIInsight;
+  onPress?: (insight: AIInsight) => void;
+}>(
   (props) => {
     const bgColors: Record<string, string> = {
       warning: "#FEF3C7",
@@ -290,7 +300,7 @@ const AIInsightCard = React.memo<{ insight: AIInsight; onPress?: () => void }>(
           styles.insightCard,
           { backgroundColor: bgColors[props.insight.type] || bgColors.info },
         ]}
-        onPress={props.onPress}
+        onPress={() => props.onPress?.(props.insight)}
         disabled={!props.insight.action}
       >
         <Text style={styles.insightIcon}>{props.insight.icon}</Text>
@@ -387,30 +397,33 @@ export default function ReservationsScreen() {
   const paramType = route.params?.type;
   const { themeDark } = useUIStore();
 
-  const handleInsightPress = (insight: AIInsight) => {
-    const target = insight.action?.route;
-    if (!target) return;
+  const handleInsightPress = useCallback(
+    (insight: AIInsight) => {
+      const target = insight.action?.route;
+      if (!target) return;
 
-    if (target === "Places") {
-      navigation.navigate("Places");
-      return;
-    }
+      if (target === "Places") {
+        navigation.navigate("Places");
+        return;
+      }
 
-    const optionalParamRoutes: (keyof RootStackParamList)[] = [
-      "Budget",
-      "Packing",
-      "Itinerary",
-      "Favorites",
-      "Currency",
-      "Reservations",
-      "NewsFeed",
-      "TravelStats",
-      "Phrasebook",
-    ];
-    if ((optionalParamRoutes as string[]).includes(target)) {
-      navigation.navigate(target as never);
-    }
-  };
+      const optionalParamRoutes: (keyof RootStackParamList)[] = [
+        "Budget",
+        "Packing",
+        "Itinerary",
+        "Favorites",
+        "Currency",
+        "Reservations",
+        "NewsFeed",
+        "TravelStats",
+        "Phrasebook",
+      ];
+      if ((optionalParamRoutes as string[]).includes(target)) {
+        navigation.navigate(target as never);
+      }
+    },
+    [navigation],
+  );
 
   // State
   const [trips, setTrips] = useState<TripData[]>([]);
@@ -947,7 +960,7 @@ export default function ReservationsScreen() {
               <AIInsightCard
                 key={i}
                 insight={insight}
-                onPress={() => handleInsightPress(insight)}
+                onPress={handleInsightPress}
               />
             ))}
           </View>
@@ -1004,13 +1017,11 @@ export default function ReservationsScreen() {
             <ReservationCard
               key={reservation.id}
               reservation={reservation}
-              onPress={() => openEditModal(reservation)}
-              onEdit={() => openEditModal(reservation)}
-              onDelete={() => handleDelete(reservation)}
-              onToggleBookmark={() => handleToggleBookmark(reservation)}
-              onStatusChange={(status) =>
-                handleStatusChange(reservation, status)
-              }
+              onPress={openEditModal}
+              onEdit={openEditModal}
+              onDelete={handleDelete}
+              onToggleBookmark={handleToggleBookmark}
+              onStatusChange={handleStatusChange}
             />
           ))
         )}

@@ -1,20 +1,23 @@
 /**
  * SkeletonLoader Component - Loading placeholder
  */
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import type { SkeletonLoaderProps } from '../types';
 
 const SkeletonBlock: React.FC<{ width?: number | string; height?: number; style?: any }> = ({ width = '100%', height = 16, style }) => {
   const opacity = useSharedValue(0.3);
-  
-  opacity.value = withRepeat(
-    withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-    -1,
-    true
-  );
-  
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    return () => cancelAnimation(opacity);
+  }, [opacity]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));

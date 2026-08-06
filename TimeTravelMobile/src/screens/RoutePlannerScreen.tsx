@@ -348,85 +348,94 @@ export default function RoutePlannerScreen() {
     );
   };
 
-  const renderSearchResult = ({ item }: { item: PlaceResult }) => (
-    <TouchableOpacity
-      style={styles.searchResultItem}
-      onPress={() => handlePlaceSelect(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.searchResultIcon}>
-        <Ionicons name="location" size={20} color={colors.textSecondary} />
-      </View>
-      <View style={styles.searchResultContent}>
-        <Text style={styles.searchResultName} numberOfLines={1}>
+  const renderSearchResult = useCallback(
+    ({ item }: { item: PlaceResult }) => (
+      <TouchableOpacity
+        style={styles.searchResultItem}
+        onPress={() => handlePlaceSelect(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.searchResultIcon}>
+          <Ionicons name="location" size={20} color={colors.textSecondary} />
+        </View>
+        <View style={styles.searchResultContent}>
+          <Text style={styles.searchResultName} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={styles.searchResultAddress} numberOfLines={1}>
+            {item.address}
+          </Text>
+        </View>
+        {item.distance_m && (
+          <Text style={styles.searchResultDistance}>
+            {formatDistance(item.distance_m / 1000)}
+          </Text>
+        )}
+      </TouchableOpacity>
+    ),
+    [handlePlaceSelect],
+  );
+
+  const renderRecentPlace = useCallback(
+    ({
+      item,
+    }: {
+      item: PlaceResult & { last_used?: string };
+    }) => (
+      <TouchableOpacity
+        style={styles.recentPlaceItem}
+        onPress={() => handlePlaceSelect(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.recentPlaceIcon}>
+          <Ionicons name="time" size={18} color={colors.textTertiary} />
+        </View>
+        <Text style={styles.recentPlaceName} numberOfLines={1}>
           {item.name}
         </Text>
-        <Text style={styles.searchResultAddress} numberOfLines={1}>
-          {item.address}
-        </Text>
-      </View>
-      {item.distance_m && (
-        <Text style={styles.searchResultDistance}>
-          {formatDistance(item.distance_m / 1000)}
-        </Text>
-      )}
-    </TouchableOpacity>
+      </TouchableOpacity>
+    ),
+    [handlePlaceSelect],
   );
 
-  const renderRecentPlace = ({
-    item,
-  }: {
-    item: PlaceResult & { last_used?: string };
-  }) => (
-    <TouchableOpacity
-      style={styles.recentPlaceItem}
-      onPress={() => handlePlaceSelect(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.recentPlaceIcon}>
-        <Ionicons name="time" size={18} color={colors.textTertiary} />
-      </View>
-      <Text style={styles.recentPlaceName} numberOfLines={1}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderAlternativeRoute = ({
-    item,
-  }: {
-    item: (typeof alternatives)[number];
-  }) => (
-    <TouchableOpacity
-      style={[
-        styles.alternativeCard,
-        item.route.id === selectedRouteId && styles.alternativeCardSelected,
-      ]}
-      onPress={() => selectRoute(item.route.id)}
-      activeOpacity={0.8}
-    >
-      <View style={styles.alternativeHeader}>
-        <Text style={styles.alternativeTime}>
-          {formatDuration(item.route.metrics.duration_minutes)}
+  const renderAlternativeRoute = useCallback(
+    ({
+      item,
+    }: {
+      item: (typeof alternatives)[number];
+    }) => (
+      <TouchableOpacity
+        style={[
+          styles.alternativeCard,
+          item.route.id === selectedRouteId && styles.alternativeCardSelected,
+        ]}
+        onPress={() => selectRoute(item.route.id)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.alternativeHeader}>
+          <Text style={styles.alternativeTime}>
+            {formatDuration(item.route.metrics.duration_minutes)}
+          </Text>
+          {item.is_recommended && (
+            <View style={styles.recommendedBadge}>
+              <Text style={styles.recommendedText}>Best</Text>
+            </View>
+          )}
+        </View>
+        <Text style={styles.alternativeDetail}>
+          {formatDistance(item.route.metrics.distance_km)} • ₹
+          {item.route.metrics.total_cost_inr}
         </Text>
-        {item.is_recommended && (
-          <View style={styles.recommendedBadge}>
-            <Text style={styles.recommendedText}>Best</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.alternativeDetail}>
-        {formatDistance(item.route.metrics.distance_km)} • ₹
-        {item.route.metrics.total_cost_inr}
-      </Text>
-      <Text style={styles.alternativeDiff}>
-        {item.difference.time_minutes > 0 ? "+" : ""}
-        {item.difference.time_minutes} min vs selected
-      </Text>
-    </TouchableOpacity>
+        <Text style={styles.alternativeDiff}>
+          {item.difference.time_minutes > 0 ? "+" : ""}
+          {item.difference.time_minutes} min vs selected
+        </Text>
+      </TouchableOpacity>
+    ),
+    [selectedRouteId, selectRoute],
   );
 
-  const renderSmartStop = ({ item }: { item: SmartStop }) => {
+  const renderSmartStop = useCallback(({ item }: { item: SmartStop }) => {
     const typeIcons: Record<string, string> = {
       fuel: "local-gas-station",
       restaurant: "restaurant",
@@ -462,7 +471,7 @@ export default function RoutePlannerScreen() {
         )}
       </View>
     );
-  };
+  }, []);
 
   // ───────────────────────────────────────────────────────────
   // MAIN RENDER
