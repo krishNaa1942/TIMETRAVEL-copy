@@ -482,3 +482,24 @@ C1–C4 → A (#6,7) → B (CTAs) → C (fake data) → D (dead removal) → E (
 - Cache util SWR + `offlineQueue` (NetInfo) good.
 - Chat history restore real.
 - No hardcoded secrets committed (env-keyed only: EXPO_PUBLIC_*).
+
+---
+
+## 11. Fix log (deep-audit repair round)
+
+Commit hashes on `main` (https://github.com/krishNaa1942/TIMETRAVEL-copy), oldest → newest:
+
+| Commit | Scope |
+| --- | --- |
+| `67c6f09` | PlacesScreen retry + CitySelector chip + current-location fallback + maps Linking toast; AddCompanion tripId guard; `usePlaces.retryServiceCheck`; `tripsStore.refresh` real stats/planner; PackingScreen SVG ring; Reservations cache-key/NaN guard; ItineraryScreen save-trip + activeTrip; NewsFeed Share/insights; Home stale-weather guard |
+| `de349e3` | TripsScreen refresh wiring + QuickAction resume; Phrasebook real `expo-speech`; routeService `simulated` source; `findSmartStops` honest; ProfileScreen `isFetching` refresh; RoutePlannerDetails NaN-safe formatTime; Chat history failure retry; api.ts BaseUrl singletons |
+| `e65541c` | PackingScreen trip-scoped `tripIdNum` + docs/uploads; ItineraryScreen `setActiveTrip` Destination shape; `FEATURE_CONFIGS` is_ai flags false; currency typing + cache guards |
+| `e0a4f2d` | High-frequency DriveOne batch (stats/currency/cache/API lifetime flags) |
+| `3eba747` | Packing trip scoping + manual destination init; ProfileScreen refresh; ItineraryScreen generate-path fixes (no interleaved auto-generate) |
+| `f3db034` | ItineraryScreen DayCard stable callbacks (memo effective) + debounce removal; CurrencyScreen stale-request guard + input sanitization; DestinationDetail photo-viewer timer cleanup; Phrasebook FlashList single scroll owner (no nested ScrollView) |
+
+### Still open (from plan)
+- B: Explore FAB, Places select/bookmark, Favorites folder button, NewsFeed bell, Reservations edit/detail — wire or remove.
+- D: dead-code removal (~25k lines: services/api/, api.v2/, core/** except Analytics, maps, tomtom, recommendations, domain/, components/Chat/, ItineraryMap/, Weather suite, Journal/TravelNoteCard, optimized cards, mapStore, itineraryStore, useJournal, useAuth, authSession, config.production.ts).
+- E: unify API client; travel-class enum; dedupe formatters; single CURRENT_SEASON/TravelStyle/cache/markdown; auth token contract.
+- F: Home weather stale guard (done), Packing toggle guard, FlashList renderItem memos in TripWorkspace/RoutePlanner/Reservations; map `.map` stacks to FlatList; SkeletonLoader body animation; a11y icon buttons.
