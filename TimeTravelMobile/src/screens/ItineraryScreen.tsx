@@ -1,47 +1,32 @@
 /**
- * ItineraryScreen V4 – Production-Grade AI Travel Planner
- * Premium UI with smooth animations, skeleton loaders, and robust error handling
+ * ItineraryScreen V5 – Streaming job pipeline, server-parsed intent,
+ * bulk idempotent save, tap-to-edit on saved trips, dark mode.
  */
 
 import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
   useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Dimensions,
+  useWindowDimensions,
   Platform,
   Pressable,
 } from "react-native";
 import { Text, TextInput } from "react-native-paper";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInRight,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-  interpolate,
-  Extrapolate,
-  useDerivedValue,
-} from "react-native-reanimated";
 import {
   MapComponent,
   MarkerComponent,
@@ -51,329 +36,75 @@ import {
 import { RootStackParamList } from "@/navigation/types";
 import { useItinerary } from "@/hooks/useItinerary";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
-import { mapsService } from "@/services/maps";
-import { tripsService } from "@/services/trips";
-import { tripPlannerService } from "@/services/tripPlanner";
+import { useUIStore } from "@/stores/uiStore";
 import { exportService } from "@/services/export";
-import {
-  ItineraryDay,
-  ItineraryActivity,
-  ItineraryRoutePoint,
-} from "@/services/itinerary";
-import { colors, spacing } from "@/theme/colors";
+import { ItineraryDay } from "@/services/itinerary";
+import { spacing } from "@/theme/colors";
 import KeyboardAvoidingWrapper from "@/components/Common/KeyboardAvoidingWrapper";
 import { PressableScale } from "@/components/UI/PressableScale";
 import { GlassCard } from "@/components/UI/GlassCard";
 import { ItinerarySkeleton } from "@/components/UI/SkeletonLoader";
 import { getErrorInfo } from "@/utils/errorHandler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-const { height, width } = Dimensions.get("window");
-
-// ─────────────────────────────────────────────────────────────
-// PROGRESS BAR COMPONENT
-// ─────────────────────────────────────────────────────────────
-
-const ProgressBar: React.FC<{ progress: number; step: string }> = ({
-  progress,
-  step,
-}) => {
-  const stepLabels: Record<string, string> = {
-    starting: "Starting...",
-    fetching_route: "Calculating route...",
-    calculating_route: "Finding best path...",
-    generating_itinerary: "AI is planning your trip...",
-    fetching_weather: "Checking weather...",
-    processing_results: "Finalizing...",
-    complete: "Complete!",
-    idle: "Ready",
-    cancelled: "Cancelled",
-    error: "Something went wrong",
-  };
-
-  // Bug 1.9 fix: use shared value + animated style instead of percentage string
-  const progressValue = useSharedValue(0);
-  useEffect(() => {
-    progressValue.value = withTiming(Math.min(progress, 100), {
-      duration: 400,
-    });
-  }, [progress]);
-
-  const progressFillStyle = useAnimatedStyle(() => ({
-    width: `${progressValue.value}%` as any,
-  }));
-
-  return (
-    <View style={styles.progressContainer}>
-      <View style={styles.progressTrack}>
-        <Animated.View style={[styles.progressFill, progressFillStyle]} />
-      </View>
-      <Text style={styles.progressLabel}>{stepLabels[step] || step}</Text>
-    </View>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-// ACTIVITY CARD COMPONENT
-// ─────────────────────────────────────────────────────────────
-
-// Bug 1.10 fix: properly typed activity prop
-interface ActivityCardProps {
-  label: string;
-  emoji: string;
-  activity: ItineraryActivity | null;
-  index: number;
-}
-
-const ActivityCard: React.FC<ActivityCardProps> = React.memo(
-  ({ label, emoji, activity, index }) => (
-    <Animated.View
-      entering={SlideInRight.delay(index * 100).springify()}
-      style={styles.activityCard}
-    >
-      <View style={styles.actHeader}>
-        <Text style={styles.actLabel}>
-          {emoji} {label}
-        </Text>
-        {activity?.cost && activity.cost !== "0" && (
-          <View style={styles.costBadge}>
-            <Text style={styles.actCost}>₹{activity.cost}</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.actTitle}>{activity?.activity || "Exploration"}</Text>
-      {activity?.description ? (
-        <Text style={styles.actDesc} numberOfLines={2}>
-          {activity.description}
-        </Text>
-      ) : null}
-      {activity?.duration && (
-        <Text style={styles.actDuration}>⏱ {activity.duration}</Text>
-      )}
-    </Animated.View>
-  ),
-);
-
-ActivityCard.displayName = "ActivityCard";
-
-function parseBudgetCost(cost?: string): number {
-  if (!cost) return 0;
-
-  const normalized = cost.replace(/,/g, "").trim();
-  const rangeMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)/i,
-  );
-  if (rangeMatch) {
-    const low = Number(rangeMatch[1]);
-    const high = Number(rangeMatch[2]);
-    if (!Number.isNaN(low) && !Number.isNaN(high)) {
-      return (low + high) / 2;
-    }
-  }
-
-  const singleMatch = normalized.match(/\d+(?:\.\d+)?/);
-  return singleMatch ? Number(singleMatch[0]) : 0;
-}
-
-// ─────────────────────────────────────────────────────────────
-// DAY CARD COMPONENT
-// ─────────────────────────────────────────────────────────────
-
-interface DayCardProps {
-  day: ItineraryDay;
-  isExpanded: boolean;
-  onToggle: (day: number) => void;
-  onFocusMap: (day: number) => void;
-}
-
-// Bug 1.1 fix: removed conflicting dual onPress; outer press = toggle (accordion),
-// map focus is triggered only from the day circle button.
-// Bug 1.2 fix: dynamic activity count subtitle.
-const DayCard: React.FC<DayCardProps> = React.memo(
-  ({ day, isExpanded, onToggle, onFocusMap }) => {
-    const rotation = useSharedValue(0);
-
-    useEffect(() => {
-      rotation.value = withSpring(isExpanded ? 180 : 0);
-    }, [isExpanded]);
-
-    const arrowStyle = useAnimatedStyle(() => ({
-      transform: [{ rotate: `${rotation.value}deg` }],
-    }));
-
-    // Bug 1.2 fix: count non-null activity slots dynamically
-    const activityCount = [day.morning, day.afternoon, day.evening].filter(
-      Boolean,
-    ).length;
-
-    return (
-      <View style={styles.dayGroup}>
-        <Pressable
-          style={styles.dayHeader}
-          onPress={() => onToggle(day.day)}
-          accessibilityLabel={`Day ${day.day}: ${day.title}. ${isExpanded ? "Collapse" : "Expand"} activities`}
-          accessibilityRole="button"
-        >
-          <View style={styles.dayLabelContainer}>
-            {/* Tap circle to focus the map on this day's location */}
-            <TouchableOpacity
-              style={styles.dayCircle}
-              onPress={() => onFocusMap(day.day)}
-              accessibilityLabel={`Focus map on Day ${day.day}`}
-              accessibilityRole="button"
-            >
-              <Text style={styles.dayCircleText}>{day.day}</Text>
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.dayTitleText} numberOfLines={1}>
-                {day.title}
-              </Text>
-              <Text style={styles.daySubtitle}>
-                {activityCount}{" "}
-                {activityCount === 1 ? "activity" : "activities"} planned
-              </Text>
-            </View>
-          </View>
-          <Animated.View style={arrowStyle}>
-            <Text style={styles.expandIcon}>▼</Text>
-          </Animated.View>
-        </Pressable>
-
-        {isExpanded && (
-          <Animated.View entering={FadeIn.duration(200)}>
-            <ActivityCard
-              label="Morning"
-              emoji="🌅"
-              activity={day.morning}
-              index={0}
-            />
-            <ActivityCard
-              label="Afternoon"
-              emoji="☀️"
-              activity={day.afternoon}
-              index={1}
-            />
-            <ActivityCard
-              label="Evening"
-              emoji="🌙"
-              activity={day.evening}
-              index={2}
-            />
-
-            {day.tip && (
-              <View style={styles.aiTipBox}>
-                <Text style={styles.aiTipIcon}>💡</Text>
-                <Text style={styles.aiTipText}>{day.tip}</Text>
-              </View>
-            )}
-          </Animated.View>
-        )}
-      </View>
-    );
-  },
-);
-
-DayCard.displayName = "DayCard";
-
-// ─────────────────────────────────────────────────────────────
-// ERROR STATE COMPONENT
-// ─────────────────────────────────────────────────────────────
-
-interface ErrorStateProps {
-  error: any;
-  onRetry: () => void;
-}
-
-const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
-  const errorInfo = getErrorInfo(error);
-
-  return (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorIcon}>😕</Text>
-      <Text style={styles.errorTitle}>{errorInfo.title}</Text>
-      <Text style={styles.errorMessage}>{errorInfo.message}</Text>
-      {errorInfo.action && (
-        <PressableScale style={styles.retryBtn} onPress={onRetry}>
-          <Text style={styles.retryBtnText}>{errorInfo.action}</Text>
-        </PressableScale>
-      )}
-    </View>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-// MAIN SCREEN COMPONENT
-// ─────────────────────────────────────────────────────────────
+import DayCard from "@/components/Itinerary/DayCard";
+import ProgressBar from "@/components/Itinerary/ProgressBar";
+import ErrorState from "@/components/Itinerary/ErrorState";
+import ActivityEditModal from "@/components/Itinerary/ActivityEditModal";
+import { buildItineraryPalette } from "@/components/Itinerary/palette";
 
 export default function ItineraryScreen() {
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const mapRef = useRef<any>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  // Bug 1.4 fix: track whether auto-trigger has fired instead of empty dep array
   const hasFiredAutoGenerate = useRef(false);
-  const fitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const geocodeCacheRef = useRef<Map<string, { lat: number; lon: number }>>(
-    new Map(),
-  );
 
-  // Route params
   const route = useRoute<RouteProp<RootStackParamList, "Itinerary">>();
   const incomingQuery = route.params?.query || "";
+
+  // Dark mode + palette
+  const themeDark = useUIStore((s) => s.themeDark);
+  const palette = useMemo(() => buildItineraryPalette(themeDark), [themeDark]);
 
   // State
   const [query, setQuery] = useState(incomingQuery);
   const [expandedDay, setExpandedDay] = useState<number | null>(1);
-  const [savingTrip, setSavingTrip] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [dayMarkers, setDayMarkers] = useState<
-    Record<number, { lat: number; lon: number }>
-  >({});
+
+  // Tap-to-edit (available after bulk save): day → [place ids in slot order]
+  const [savedPlaceIds, setSavedPlaceIds] = useState<Record<number, number[]>>(
+    {},
+  );
+  const [editTarget, setEditTarget] = useState<{
+    day: number;
+    slot: "morning" | "afternoon" | "evening";
+  } | null>(null);
 
   // Hooks
   const {
     itinerary,
-    route: mapRoute,
     weather,
     loading,
     error,
     isFromCache,
     progress,
-    generate,
+    jobId,
     cancel,
     retry,
+    generate,
+    saving,
+    savedTripId,
+    saveTrip,
   } = useItinerary();
 
-  const { setActiveTrip, logSearch } = useTravelIntelligence();
+  const { setActiveTrip } = useTravelIntelligence();
 
-  const buildGeometryMarkers = useCallback(
-    (geometry: [number, number][], numDays: number) => {
-      const markers: Record<number, { lat: number; lon: number }> = {};
-      if (geometry.length === 0 || numDays === 0) {
-        return markers;
-      }
+  // Bottom sheet snap points (relative to window height)
+  const snapPoints = useMemo(() => ["18%", "55%", "94%"], []);
 
-      itinerary?.itinerary?.forEach((day, idx) => {
-        const geoIdx = Math.min(
-          Math.round((idx / numDays) * geometry.length),
-          geometry.length - 1,
-        );
-        markers[day.day] = {
-          lat: geometry[geoIdx][0],
-          lon: geometry[geoIdx][1],
-        };
-      });
-
-      return markers;
-    },
-    [itinerary?.itinerary],
-  );
-
-  // Bottom sheet snap points
-  const snapPoints = useMemo(() => ["15%", "50%", "92%"], []);
-
-  // Bug 1.4 fix: fire-once auto-trigger using a ref guard
+  // Fire-once auto-trigger from route params
   useEffect(() => {
     if (
       !hasFiredAutoGenerate.current &&
@@ -385,127 +116,62 @@ export default function ItineraryScreen() {
     }
   }, [incomingQuery, generate]);
 
-  // Bug 1.5 fix: populate dayMarkers when route geometry becomes available
-  useEffect(() => {
-    let cancelled = false;
-
-    if (fitTimerRef.current) {
-      clearTimeout(fitTimerRef.current);
-      fitTimerRef.current = null;
+  // ── Map markers: server-resolved coordinates only (no client geocoding) ──
+  const dayMarkers = useMemo(() => {
+    const markers: Record<number, { lat: number; lon: number }> = {};
+    const points = itinerary?.route_points || [];
+    for (const point of points) {
+      if (markers[point.day]) continue;
+      const coords = point.coordinates ?? point.destination_coordinates;
+      if (coords?.lat && coords?.lon) {
+        markers[point.day] = { lat: coords.lat, lon: coords.lon };
+      }
     }
+    // Fallback: single destination pin
+    const dest = itinerary?.destination_coordinates;
+    if (Object.keys(markers).length === 0 && dest?.lat && dest?.lon) {
+      markers[1] = { lat: dest.lat, lon: dest.lon };
+    }
+    return markers;
+  }, [itinerary]);
 
-    const run = async () => {
-      if (!itinerary?.itinerary || itinerary.itinerary.length === 0) {
-        return;
-      }
+  const polyline = useMemo(() => {
+    const coords = (itinerary?.route_points || [])
+      .map((p) => p.coordinates ?? p.destination_coordinates)
+      .filter((c): c is { lat: number; lon: number } => Boolean(c?.lat && c?.lon))
+      .map((c) => ({ latitude: c.lat, longitude: c.lon }));
+    return coords.length >= 2 ? coords : undefined;
+  }, [itinerary]);
 
-      const geometry = mapRoute?.geometry || [];
-      const routePoints = itinerary.route_points || [];
-      const markers: Record<number, { lat: number; lon: number }> = {};
-
-      if (routePoints.length > 0) {
-        const resolvedPoints = await Promise.all(
-          routePoints.map(async (point: ItineraryRoutePoint) => {
-            if (point.coordinates?.lat && point.coordinates?.lon) {
-              return {
-                day: point.day,
-                geo: { lat: point.coordinates.lat, lon: point.coordinates.lon },
-              };
-            }
-
-            if (
-              point.destination_coordinates?.lat &&
-              point.destination_coordinates?.lon
-            ) {
-              return {
-                day: point.day,
-                geo: {
-                  lat: point.destination_coordinates.lat,
-                  lon: point.destination_coordinates.lon,
-                },
-              };
-            }
-
-            const query =
-              point.query ||
-              `${point.place || point.activity} ${itinerary.destination}`.trim();
-            const cached = geocodeCacheRef.current.get(query);
-            if (cached) {
-              return { day: point.day, geo: cached };
-            }
-
-            try {
-              const geo = await mapsService.geocode(query);
-              if (!geo) return null;
-              const resolvedGeo = { lat: geo.lat, lon: geo.lon };
-              geocodeCacheRef.current.set(query, resolvedGeo);
-              return { day: point.day, geo: resolvedGeo };
-            } catch {
-              return null;
-            }
-          }),
-        );
-
-        for (const entry of resolvedPoints) {
-          if (!entry || markers[entry.day]) continue;
-          markers[entry.day] = entry.geo;
-        }
-      }
-
-      if (geometry.length > 0) {
-        const fallbackMarkers = buildGeometryMarkers(
-          geometry,
-          itinerary.itinerary.length,
-        );
-
-        for (const [day, geo] of Object.entries(fallbackMarkers)) {
-          const dayNumber = Number(day);
-          if (!markers[dayNumber]) {
-            markers[dayNumber] = geo;
-          }
-        }
-      }
-
-      if (!cancelled && Object.keys(markers).length > 0) {
-        setDayMarkers(markers);
-
-        fitTimerRef.current = setTimeout(() => {
-          mapRef.current?.fitToCoordinates(
-            Object.values(markers).map((geo) => ({
-              latitude: geo.lat,
-              longitude: geo.lon,
-            })),
-            {
-              edgePadding: {
-                top: 120,
-                right: 60,
-                bottom: height / 2,
-                left: 60,
-              },
-              animated: true,
-            },
-          );
-        }, 800);
-      }
-    };
-
-    void run();
-
-    return () => {
-      cancelled = true;
-      if (fitTimerRef.current) {
-        clearTimeout(fitTimerRef.current);
-        fitTimerRef.current = null;
-      }
-    };
-  }, [mapRoute, itinerary, buildGeometryMarkers]);
-
-  // Bug 1.6 fix: update active trip in store after successful generation
+  // Fit map to markers once they arrive
+  const fitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (itinerary && !loading && !error) {
-      // setActiveTrip requires a valid Destination object — sync the global
-      // trip tracker with the newly generated plan (logSearch is already
-      // handled inside useItinerary.generate to avoid double-logging)
+    const coords = Object.values(dayMarkers);
+    if (coords.length === 0) return;
+    if (fitTimerRef.current) clearTimeout(fitTimerRef.current);
+    fitTimerRef.current = setTimeout(() => {
+      mapRef.current?.fitToCoordinates(
+        coords.map((g) => ({ latitude: g.lat, longitude: g.lon })),
+        {
+          edgePadding: {
+            top: 120,
+            right: 60,
+            bottom: height / 2,
+            left: 60,
+          },
+          animated: true,
+        },
+      );
+    }, 800);
+    return () => {
+      if (fitTimerRef.current) clearTimeout(fitTimerRef.current);
+    };
+  }, [dayMarkers, height]);
+
+  // Sync active trip with real destination coordinates (no lat:0/lon:0 stub)
+  useEffect(() => {
+    if (itinerary && itinerary.itinerary.length > 0) {
+      const dest = itinerary.destination_coordinates ?? null;
       setActiveTrip(
         {
           id: itinerary.destination,
@@ -515,15 +181,15 @@ export default function ItineraryScreen() {
           highlight: "",
           tagline: "",
           category: [],
-          lat: 0,
-          lon: 0,
+          lat: dest?.lat ?? 0,
+          lon: dest?.lon ?? 0,
         },
         itinerary.num_days,
       );
     }
-  }, [itinerary, loading, error, setActiveTrip]);
+  }, [itinerary, setActiveTrip]);
 
-  // Focus on day
+  // Focus map on a day
   const focusOnDay = useCallback(
     (day: number) => {
       const geo = dayMarkers[day];
@@ -542,86 +208,84 @@ export default function ItineraryScreen() {
     [dayMarkers],
   );
 
-  // Toggle accordion (no map pan here — map pan is on the circle button)
   const handleDayToggle = useCallback((day: number) => {
     setExpandedDay((prev) => (prev === day ? null : day));
   }, []);
 
-  // Handle generate from search bar
   const handleGenerate = useCallback(() => {
-    if (query.trim()) {
-      generate(query);
-    }
+    if (query.trim()) generate(query);
   }, [query, generate]);
 
-  // Bug 1.8 fix: Save Itinerary persists the trip to backend then confirms
+  const handleCancel = useCallback(() => {
+    cancel();
+  }, [cancel]);
+
+  // ── Save: single bulk transaction, idempotent via source_id ──
   const handleSaveItinerary = useCallback(async () => {
-    if (!itinerary) return;
-    setSavingTrip(true);
+    if (!itinerary?.itinerary?.length) return;
     try {
-      const created = await tripsService.createTrip({
-        destination: itinerary.destination,
-        title: `${itinerary.destination} ${itinerary.num_days}-Day Trip`,
-        num_days: itinerary.num_days,
-        family_size: itinerary.family_size,
-        travel_class: (itinerary.travel_class as "economy" | "comfort" | "premium") || "economy",
-        notes: itinerary.interests ? `Interests: ${itinerary.interests}` : undefined,
+      const sourceId = jobId ?? `gen-${Date.now()}`;
+      const days = itinerary.itinerary.map((day: ItineraryDay) => ({
+        day_number: day.day,
+        title: day.title || `Day ${day.day}`,
+        places: [day.morning, day.afternoon, day.evening]
+          .filter(Boolean)
+          .map((act: any, idx: number) => ({
+            name: act.place || act.activity,
+            category: act.activity,
+            notes: act.description
+              ? `${act.description}${act.duration ? ` (${act.duration})` : ""}`
+              : undefined,
+            position_order: idx,
+          })),
+      }));
+
+      const result = await saveTrip({
+        trip: {
+          title: `${itinerary.destination} ${itinerary.num_days}-Day Trip`,
+          destination: itinerary.destination,
+          num_days: itinerary.num_days,
+          family_size: itinerary.family_size || 1,
+          travel_class: itinerary.travel_class || "economy",
+          notes: itinerary.interests
+            ? `Interests: ${itinerary.interests}`
+            : undefined,
+        },
+        source_id: sourceId,
+        itinerary_payload: itinerary,
+        days,
       });
 
-      // Persist the generated day-by-day plan so the trip isn't just a stub
-      const createdId = (created as any)?.trip?.id ?? (created as any)?.id;
-      if (createdId && itinerary.itinerary?.length) {
-        let planSaved = false;
-        try {
-          for (const day of itinerary.itinerary) {
-            const { day: createdDay } = await tripPlannerService.addDay(createdId, {
-              title: day.title || `Day ${day.day}`,
-            });
-            const activities = [day.morning, day.afternoon, day.evening].filter(Boolean);
-            await Promise.all(
-              activities.map((activity, index) =>
-                tripPlannerService.addPlace(createdId, {
-                  name: activity.place || activity.activity,
-                  category: activity.activity,
-                  notes: `${activity.description} (${activity.duration})`,
-                  position_order: index,
-                })
-              )
-            );
-          }
-          planSaved = true;
-        } catch (planError) {
-          console.warn("Trip created but plan persistence failed:", planError);
-        }
+      // Map saved place ids per day for tap-to-edit
+      const placeIds: Record<number, number[]> = {};
+      result.trip.days?.forEach((d) => {
+        placeIds[d.day_number] = (d.places || []).map((p) => p.id);
+      });
+      setSavedPlaceIds(placeIds);
 
-        Alert.alert(
-          "Itinerary Saved! ✅",
-          planSaved
-            ? `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`
-            : `Trip created, but the day-by-day plan couldn't be saved. You can view the trip in your trips list.`,
-          [
-            { text: "Stay here" },
-            { text: "Go to trips", onPress: () => navigation.navigate("MainTabs", { screen: "Trips" }) },
-          ],
-        );
-        return;
-      }
-
+      const isDuplicate = Boolean((result.trip as any).duplicate);
       Alert.alert(
         "Itinerary Saved! ✅",
-        `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips.`,
+        isDuplicate
+          ? `This trip was already saved. Tap an activity to edit it.`
+          : `Your ${itinerary.num_days}-day trip to ${itinerary.destination} has been saved to your trips. Tap any activity to edit it.`,
         [
           { text: "Stay here" },
-          { text: "Go to trips", onPress: () => navigation.navigate("MainTabs", { screen: "Trips" }) },
+          {
+            text: "Go to trips",
+            onPress: () =>
+              navigation.navigate("MainTabs", { screen: "Trips" }),
+          },
         ],
       );
     } catch (saveError) {
       const info = getErrorInfo(saveError);
-      Alert.alert("Save failed", info.message || "Could not save the trip. Try again.");
-    } finally {
-      setSavingTrip(false);
+      Alert.alert(
+        "Save failed",
+        info.message || "Could not save the trip. Try again.",
+      );
     }
-  }, [itinerary, navigation]);
+  }, [itinerary, jobId, saveTrip, navigation]);
 
   const handleExportPdf = useCallback(async () => {
     if (!itinerary?.itinerary?.length) return;
@@ -637,246 +301,314 @@ export default function ItineraryScreen() {
       });
     } catch (exportError) {
       const info = getErrorInfo(exportError);
-      Alert.alert("Export failed", info.message || "Could not generate the PDF. Try again.");
+      Alert.alert(
+        "Export failed",
+        info.message || "Could not generate the PDF. Try again.",
+      );
     } finally {
       setExporting(false);
     }
   }, [itinerary]);
 
-  // Calculate budget
+  // Budget display
   const calculateBudget = useCallback(() => {
     const estimate = itinerary?.budget_estimate?.total;
     if (typeof estimate === "number" && Number.isFinite(estimate)) {
       return `₹${Math.round(estimate).toLocaleString()}`;
     }
-
     if (!itinerary?.itinerary) return "₹0";
-
     let total = 0;
     itinerary.itinerary.forEach((day) => {
       [day.morning, day.afternoon, day.evening].forEach((act) => {
-        if (act?.cost) {
-          total += parseBudgetCost(act.cost);
-        }
+        if (act?.cost) total += parseBudgetCost(act.cost);
       });
     });
     return `₹${total.toLocaleString()}`;
   }, [itinerary]);
 
+  // Tap-to-edit target activity
+  const editSlotActivity = useMemo(() => {
+    if (!editTarget || !itinerary) return null;
+    const day = itinerary.itinerary.find((d) => d.day === editTarget.day);
+    return day?.[editTarget.slot] ?? null;
+  }, [editTarget, itinerary]);
+
+  const handleEditSaved = useCallback(() => {
+    // Refresh nothing locally — the modal already PUTs; just ack.
+  }, []);
+
+  const canEdit = Boolean(savedTripId) && Object.keys(savedPlaceIds).length > 0;
+
+  const handleEditActivity = useCallback(
+    (day: number, slot: "morning" | "afternoon" | "evening") => {
+      setEditTarget({ day, slot });
+    },
+    [],
+  );
+
+  const placeIdForTarget = useMemo(() => {
+    if (!editTarget) return null;
+    const slotOrder = ["morning", "afternoon", "evening"];
+    const ids = savedPlaceIds[editTarget.day];
+    if (!ids) return null;
+    const idx = slotOrder.indexOf(editTarget.slot);
+    return ids[idx] ?? null;
+  }, [editTarget, savedPlaceIds]);
+
   return (
     <KeyboardAvoidingWrapper>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: palette.background }]}>
         {/* Map Background */}
         <MapComponent
-        ref={mapRef as any}
-        style={StyleSheet.absoluteFillObject}
-        provider={MAP_PROVIDER}
-        initialRegion={{
-          latitude: 20.5937,
-          longitude: 78.9629,
-          latitudeDelta: 15,
-          longitudeDelta: 15,
-        }}
-        customMapStyle={mapStyle}
-      >
-        {/* Route Polyline */}
-        {mapRoute?.geometry && (
-          <PolylineComponent
-            coordinates={mapRoute.geometry.map((c: [number, number]) => ({
-              latitude: c[0],
-              longitude: c[1],
-            }))}
-            strokeColor="#0f766e"
-            strokeWidth={4}
-            lineCap="round"
-          />
-        )}
-
-        {/* Day Markers */}
-        {Object.entries(dayMarkers).map(([day, geo]) => (
-          <MarkerComponent
-            key={`marker-day-${day}`}
-            coordinate={{ latitude: geo.lat, longitude: geo.lon }}
-            title={`Day ${day}`}
-            onPress={() => focusOnDay(parseInt(day))}
-          >
-            <View style={styles.customMarker}>
-              <Text style={styles.markerText}>{day}</Text>
-            </View>
-          </MarkerComponent>
-        ))}
-      </MapComponent>
-
-      {/* Floating Header */}
-      <View style={[styles.headerOverlay, { paddingTop: insets.top }]}>
-        <PressableScale
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
+          ref={mapRef as any}
+          style={StyleSheet.absoluteFillObject}
+          provider={MAP_PROVIDER}
+          initialRegion={{
+            latitude: 20.5937,
+            longitude: 78.9629,
+            latitudeDelta: 15,
+            longitudeDelta: 15,
+          }}
+          customMapStyle={mapStyle}
         >
-          <Text style={styles.backBtnText}>←</Text>
-        </PressableScale>
+          {polyline ? (
+            <PolylineComponent
+              coordinates={polyline}
+              strokeColor="#0f766e"
+              strokeWidth={4}
+              lineCap="round"
+            />
+          ) : null}
 
-        {loading && (
-          <GlassCard style={styles.loadingPill}>
-            <ProgressBar progress={progress.percentage} step={progress.step} />
-          </GlassCard>
-        )}
+          {Object.entries(dayMarkers).map(([day, geo]) => (
+            <MarkerComponent
+              key={`marker-day-${day}`}
+              coordinate={{ latitude: geo.lat, longitude: geo.lon }}
+              title={`Day ${day}`}
+              onPress={() => focusOnDay(parseInt(day))}
+            >
+              <View style={[styles.customMarker, { backgroundColor: palette.accent, borderColor: palette.markerBorder }]}>
+                <Text style={styles.markerText}>{day}</Text>
+              </View>
+            </MarkerComponent>
+          ))}
+        </MapComponent>
 
-        {isFromCache && !loading && (
-          <GlassCard style={styles.cachePill}>
-            <Text style={styles.cachePillText}>⚡ From cache</Text>
-          </GlassCard>
-        )}
-      </View>
-
-      {/* Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        handleIndicatorStyle={styles.sheetIndicator}
-        backgroundStyle={styles.sheetBackground}
-      >
-        {/* Search Header */}
-        <View style={styles.sheetHeader}>
-          <Text style={styles.aiIcon}>✨</Text>
-          {/* Generate runs only on explicit submit (arrow / enter) to avoid
-              interleaved auto-generations while typing */}
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Plan your trip..."
-            style={styles.sheetSearchInput}
-            autoCorrect={false}
-            onSubmitEditing={handleGenerate}
-            placeholderTextColor="#94A3B8"
-            accessibilityLabel="Trip planning search input"
-          />
-          <Pressable
-            style={styles.sheetSearchBtn}
-            onPress={handleGenerate}
-            accessibilityLabel="Generate itinerary"
-            accessibilityRole="button"
+        {/* Floating Header */}
+        <View style={[styles.headerOverlay, { paddingTop: insets.top }]}>
+          <PressableScale
+            style={[styles.backBtn, { backgroundColor: palette.headerBg }]}
+            onPress={() => navigation.goBack()}
           >
-            <Text style={styles.sheetSearchIcon}>→</Text>
-          </Pressable>
+            <Text style={[styles.backBtnText, { color: palette.text }]}>←</Text>
+          </PressableScale>
+
+          {loading && (
+            <GlassCard style={[styles.loadingPill, { backgroundColor: palette.headerBg }]}>
+              <ProgressBar
+                progress={progress.percentage}
+                step={progress.step}
+                palette={palette}
+              />
+            </GlassCard>
+          )}
+
+          {isFromCache && !loading && (
+            <GlassCard style={styles.cachePill}>
+              <Text style={styles.cachePillText}>⚡ From cache</Text>
+            </GlassCard>
+          )}
         </View>
 
-        {/* Content */}
-        {loading ? (
-          <BottomSheetView style={styles.loadingContainer}>
-            <ItinerarySkeleton days={3} />
-          </BottomSheetView>
-        ) : error ? (
-          <BottomSheetView style={styles.errorSheet}>
-            <ErrorState error={error} onRetry={retry} />
-          </BottomSheetView>
-        ) : itinerary ? (
-          <BottomSheetScrollView contentContainerStyle={styles.sheetScroll}>
-            {/* Stats Row */}
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statVal}>{itinerary.num_days}</Text>
-                <Text style={styles.statLabel}>Days</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statVal}>
-                  {mapRoute?.distance_km || "--"}
-                </Text>
-                <Text style={styles.statLabel}>KM</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statVal}>{calculateBudget()}</Text>
-                <Text style={styles.statLabel}>Est. Cost</Text>
-              </View>
-            </View>
-
-            {/* Weather Card */}
-            {weather && (
-              <GlassCard style={styles.weatherCard}>
-                <Text style={styles.weatherEmoji}>🌤️</Text>
-                <View style={styles.weatherInfo}>
-                  <Text style={styles.weatherTemp}>
-                    {weather.temperature_c}°C
-                  </Text>
-                  <Text style={styles.weatherDesc}>
-                    {weather.description || "Clear"}
-                  </Text>
-                </View>
-              </GlassCard>
+        {/* Bottom Sheet */}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          handleIndicatorStyle={[styles.sheetIndicator, { backgroundColor: palette.textMuted }]}
+          backgroundStyle={[styles.sheetBackground, { backgroundColor: palette.surfaceAlt }]}
+        >
+          {/* Search Header */}
+          <View style={styles.sheetHeader}>
+            <Text style={styles.aiIcon}>✨</Text>
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Plan your trip..."
+              style={[styles.sheetSearchInput, { color: palette.inputText }]}
+              autoCorrect={false}
+              onSubmitEditing={handleGenerate}
+              placeholderTextColor={palette.textMuted}
+              accessibilityLabel="Trip planning search input"
+            />
+            {loading ? (
+              <Pressable
+                style={[styles.sheetSearchBtn, { backgroundColor: palette.danger }]}
+                onPress={handleCancel}
+                accessibilityLabel="Cancel generation"
+                accessibilityRole="button"
+              >
+                <Text style={styles.sheetSearchIcon}>✕</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={[styles.sheetSearchBtn, { backgroundColor: palette.text }]}
+                onPress={handleGenerate}
+                accessibilityLabel="Generate itinerary"
+                accessibilityRole="button"
+              >
+                <Text style={styles.sheetSearchIcon}>→</Text>
+              </Pressable>
             )}
+          </View>
 
-            {/* AI Disclaimer */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 8, marginBottom: 12, gap: 8 }}>
-              <MaterialCommunityIcons name="robot-outline" size={16} color="#F59E0B" />
-              <Text style={{ fontSize: 12, color: '#92400E', flex: 1 }}>
-                AI-generated itinerary — verify details before booking
+          {/* Content */}
+          {loading ? (
+            <BottomSheetView style={styles.loadingContainer}>
+              <ItinerarySkeleton days={3} />
+            </BottomSheetView>
+          ) : error ? (
+            <BottomSheetView style={styles.errorSheet}>
+              <ErrorState error={error} onRetry={retry} palette={palette} />
+            </BottomSheetView>
+          ) : itinerary ? (
+            <BottomSheetScrollView contentContainerStyle={styles.sheetScroll}>
+              {/* Stats Row */}
+              <View style={[styles.statsRow, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statVal, { color: palette.text }]}>
+                    {itinerary.num_days}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: palette.textMuted }]}>Days</Text>
+                </View>
+                <View style={[styles.statDivider, { backgroundColor: palette.border }]} />
+                <View style={styles.statItem}>
+                  <Text style={[styles.statVal, { color: palette.text }]}>
+                    {progress.dayCount > 0 ? progress.dayCount : "--"}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: palette.textMuted }]}>Planned</Text>
+                </View>
+                <View style={[styles.statDivider, { backgroundColor: palette.border }]} />
+                <View style={styles.statItem}>
+                  <Text style={[styles.statVal, { color: palette.text }]}>
+                    {calculateBudget()}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: palette.textMuted }]}>Est. Cost</Text>
+                </View>
+              </View>
+
+              {/* Weather Card */}
+              {weather && (
+                <GlassCard style={styles.weatherCard}>
+                  <Text style={styles.weatherEmoji}>🌤️</Text>
+                  <View style={styles.weatherInfo}>
+                    <Text style={[styles.weatherTemp, { color: palette.text }]}>
+                      {weather.temperature_c}°C
+                    </Text>
+                    <Text style={[styles.weatherDesc, { color: palette.textSecondary }]}>
+                      {weather.description || "Clear"}
+                    </Text>
+                  </View>
+                </GlassCard>
+              )}
+
+              {/* AI Disclaimer */}
+              <View style={[styles.disclaimer, { backgroundColor: themeDark ? "rgba(245,158,11,0.12)" : "rgba(245, 158, 11, 0.1)" }]}>
+                <MaterialCommunityIcons name="robot-outline" size={16} color="#F59E0B" />
+                <Text style={[styles.disclaimerText, { color: themeDark ? "#FCD34D" : "#92400E" }]}>
+                  AI-generated itinerary — verify details before booking
+                </Text>
+              </View>
+
+              {/* Day Cards */}
+              {itinerary.itinerary.map((day: ItineraryDay) => (
+                <DayCard
+                  key={day.day}
+                  day={day}
+                  isExpanded={expandedDay === day.day}
+                  onToggle={handleDayToggle}
+                  onFocusMap={focusOnDay}
+                  editable={canEdit}
+                  onEditActivity={canEdit ? handleEditActivity : undefined}
+                  palette={palette}
+                />
+              ))}
+
+              {/* Finalize Row */}
+              <View style={styles.finalizeRow}>
+                <TouchableOpacity
+                  style={[styles.finalizeBtn, { backgroundColor: palette.danger }]}
+                  onPress={handleExportPdf}
+                  disabled={exporting || loading}
+                  accessibilityLabel="Export itinerary as PDF"
+                  accessibilityRole="button"
+                >
+                  <MaterialCommunityIcons name="file-pdf-box" size={16} color="#FFFFFF" />
+                  <Text style={styles.finalizeBtnText}>
+                    {exporting ? "Exporting…" : "Export PDF"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.finalizeBtn, { backgroundColor: palette.text }]}
+                  onPress={handleSaveItinerary}
+                  disabled={saving || loading}
+                  accessibilityLabel="Save this itinerary to your trips"
+                  accessibilityRole="button"
+                >
+                  <MaterialCommunityIcons name="content-save" size={16} color="#FFFFFF" />
+                  <Text style={styles.finalizeBtnText}>
+                    {saving ? "Saving…" : "Save Itinerary"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </BottomSheetScrollView>
+          ) : (
+            <BottomSheetView style={styles.emptySheet}>
+              <Text style={styles.emptyIcon}>🗺️</Text>
+              <Text style={[styles.emptyTitle, { color: palette.text }]}>Plan Your Trip</Text>
+              <Text style={[styles.emptySubtitle, { color: palette.textMuted }]}>
+                Try: "3 days in Munnar from Kochi"
               </Text>
-            </View>
+            </BottomSheetView>
+          )}
+        </BottomSheet>
 
-            {/* Day Cards */}
-            {/* Bug 1.1 fix: onToggle = accordion toggle only; onFocusMap = day circle tap */}
-            {itinerary.itinerary.map((day: ItineraryDay) => (
-              <DayCard
-                key={day.day}
-                day={day}
-                isExpanded={expandedDay === day.day}
-                onToggle={handleDayToggle}
-                onFocusMap={focusOnDay}
-              />
-            ))}
-
-            {/* Bug 1.8 fix: Save Button now persists trip state */}
-            <View style={styles.finalizeRow}>
-              <TouchableOpacity
-                style={[styles.finalizeBtn, styles.finalizeBtnExport]}
-                onPress={handleExportPdf}
-                disabled={exporting || loading}
-                accessibilityLabel="Export itinerary as PDF"
-                accessibilityRole="button"
-              >
-                <MaterialCommunityIcons
-                  name="file-pdf-box"
-                  size={16}
-                  color="#FFFFFF"
-                />
-                <Text style={styles.finalizeBtnText}>
-                  {exporting ? "Exporting…" : "Export PDF"}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.finalizeBtn}
-                onPress={handleSaveItinerary}
-                disabled={savingTrip || loading}
-                accessibilityLabel="Save this itinerary to your trips"
-                accessibilityRole="button"
-              >
-                <MaterialCommunityIcons
-                  name="content-save"
-                  size={16}
-                  color="#FFFFFF"
-                />
-                <Text style={styles.finalizeBtnText}>
-                  {savingTrip ? "Saving…" : "Save Itinerary"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </BottomSheetScrollView>
-        ) : (
-          <BottomSheetView style={styles.emptySheet}>
-            <Text style={styles.emptyIcon}>🗺️</Text>
-            <Text style={styles.emptyTitle}>Plan Your Trip</Text>
-            <Text style={styles.emptySubtitle}>
-              Try: "3 days in Munnar from Kochi"
-            </Text>
-          </BottomSheetView>
-        )}
-      </BottomSheet>
+        {/* Tap-to-edit modal */}
+        <ActivityEditModal
+          visible={Boolean(editTarget)}
+          tripId={savedTripId}
+          placeId={placeIdForTarget}
+          initialName={editSlotActivity?.activity || ""}
+          initialNotes={editSlotActivity?.description || ""}
+          initialCost={editSlotActivity?.cost || ""}
+          palette={palette}
+          onClose={() => setEditTarget(null)}
+          onSaved={handleEditSaved}
+        />
       </View>
     </KeyboardAvoidingWrapper>
   );
+}
+
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+
+function parseBudgetCost(cost?: string): number {
+  if (!cost) return 0;
+  const normalized = cost.replace(/,/g, "").trim();
+  const rangeMatch = normalized.match(
+    /(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)/i,
+  );
+  if (rangeMatch) {
+    const low = Number(rangeMatch[1]);
+    const high = Number(rangeMatch[2]);
+    if (!Number.isNaN(low) && !Number.isNaN(high)) {
+      return (low + high) / 2;
+    }
+  }
+  const singleMatch = normalized.match(/\d+(?:\.\d+)?/);
+  return singleMatch ? Number(singleMatch[0]) : 0;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -911,52 +643,18 @@ const mapStyle = [
 // STYLES
 // ─────────────────────────────────────────────────────────────
 
-const headerShadow =
-  Platform.select({
-    web: { boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)" } as any,
-    default: {
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 4,
-    },
-  }) ?? {};
-
-const intentBarShadow =
-  Platform.select({
-    web: { boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)" } as any,
-    default: {
-      shadowColor: "#000",
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      elevation: 2,
-    },
-  }) ?? {};
-
-const activityCardShadow =
-  Platform.select({
-    web: { boxShadow: "0px 1px 5px rgba(0, 0, 0, 0.02)" } as any,
-    default: {
-      shadowColor: "#000",
-      shadowOpacity: 0.02,
-      shadowRadius: 5,
-      elevation: 1,
-    },
-  }) ?? {};
-
-const markerShadow =
-  Platform.select({
-    web: { boxShadow: "0px 0px 4px rgba(0, 0, 0, 0.2)" } as any,
-    default: {
-      shadowColor: "#000",
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-  }) ?? {};
+const headerShadow = Platform.select({
+  web: { boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)" } as any,
+  default: {
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+});
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#E2E8F0" },
+  container: { flex: 1 },
 
   // Header
   headerOverlay: {
@@ -973,15 +671,13 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "rgba(255,255,255,0.95)",
     justifyContent: "center",
     alignItems: "center",
     ...headerShadow,
   },
-  backBtnText: { fontSize: 24, fontWeight: "600", color: "#0F172A" },
+  backBtnText: { fontSize: 24, fontWeight: "600" },
   loadingPill: {
     marginLeft: spacing.md,
-    backgroundColor: "rgba(255,255,255,0.95)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -996,53 +692,16 @@ const styles = StyleSheet.create({
   },
   cachePillText: { fontSize: 12, fontWeight: "700", color: "#16A34A" },
 
-  // Progress
-  progressContainer: { alignItems: "center" },
-  progressTrack: {
-    width: "100%",
-    height: 4,
-    backgroundColor: "#E2E8F0",
-    borderRadius: 2,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#0f766e",
-    borderRadius: 2,
-  },
-  progressLabel: {
-    fontSize: 11,
-    color: "#64748B",
-    marginTop: 6,
-    fontWeight: "600",
-  },
-
   // Bottom Sheet
-  sheetBackground: { backgroundColor: "#F8FAFC", borderRadius: 32 },
-  sheetIndicator: { backgroundColor: "#CBD5E1", width: 40 },
+  sheetBackground: { borderRadius: 32 },
+  sheetIndicator: { width: 40 },
   sheetHeader: { padding: spacing.md, paddingBottom: spacing.sm },
-  intentBar: {
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    height: 56,
-    alignItems: "center",
-    paddingHorizontal: 16,
-    ...intentBarShadow,
-  },
   aiIcon: { fontSize: 20, marginRight: 10 },
-  sheetSearchInput: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#0F172A",
-    backgroundColor: "transparent",
-  },
+  sheetSearchInput: { flex: 1, fontSize: 16, fontWeight: "600", backgroundColor: "transparent" },
   sheetSearchBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: "#0F172A",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -1058,27 +717,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 40,
   },
-  errorContainer: { alignItems: "center" },
-  errorIcon: { fontSize: 48, marginBottom: 16 },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#0F172A",
-    marginBottom: 8,
-  },
-  errorMessage: {
-    fontSize: 14,
-    color: "#64748B",
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  retryBtn: {
-    backgroundColor: "#0F172A",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  retryBtnText: { color: "#FFF", fontSize: 14, fontWeight: "700" },
 
   // Empty State
   emptySheet: {
@@ -1088,13 +726,8 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyIcon: { fontSize: 48, marginBottom: 16 },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#0F172A",
-    marginBottom: 8,
-  },
-  emptySubtitle: { fontSize: 14, color: "#94A3B8" },
+  emptyTitle: { fontSize: 20, fontWeight: "800", marginBottom: 8 },
+  emptySubtitle: { fontSize: 14 },
 
   // Scroll Content
   sheetScroll: { padding: spacing.md, paddingBottom: 60 },
@@ -1103,23 +736,20 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 16,
     marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
   },
   statItem: { alignItems: "center", flex: 1 },
-  statVal: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
+  statVal: { fontSize: 18, fontWeight: "900" },
   statLabel: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#94A3B8",
     textTransform: "uppercase",
     marginTop: 2,
   },
-  statDivider: { width: 1, backgroundColor: "#F1F5F9" },
+  statDivider: { width: 1 },
 
   // Weather
   weatherCard: {
@@ -1130,87 +760,24 @@ const styles = StyleSheet.create({
   },
   weatherEmoji: { fontSize: 32 },
   weatherInfo: { marginLeft: 12 },
-  weatherTemp: { fontSize: 18, fontWeight: "800", color: "#0F172A" },
-  weatherDesc: { fontSize: 13, color: "#64748B" },
+  weatherTemp: { fontSize: 18, fontWeight: "800" },
+  weatherDesc: { fontSize: 13 },
 
-  // Day Card
-  dayGroup: { marginBottom: spacing.lg },
-  dayHeader: {
+  // Disclaimer
+  disclaimer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 12,
+    gap: 8,
   },
-  dayLabelContainer: { flexDirection: "row", alignItems: "center", flex: 1 },
-  dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#0f766e",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  dayCircleText: { color: "#FFF", fontSize: 14, fontWeight: "900" },
-  dayTitleText: { fontSize: 18, fontWeight: "800", color: "#0F172A" },
-  daySubtitle: { fontSize: 12, color: "#94A3B8", marginTop: 2 },
-  expandIcon: { fontSize: 12, color: "#94A3B8" },
-
-  // Activity Card
-  activityCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 8,
-    ...activityCardShadow,
-  },
-  actHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  actLabel: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#0f766e",
-    textTransform: "uppercase",
-  },
-  costBadge: {
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  actCost: { fontSize: 11, fontWeight: "700", color: "#16A34A" },
-  actTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#0F172A",
-    marginBottom: 4,
-  },
-  actDesc: { fontSize: 13, color: "#64748B", lineHeight: 18 },
-  actDuration: { fontSize: 11, color: "#94A3B8", marginTop: 6 },
-
-  // AI Tip
-  aiTipBox: {
-    backgroundColor: "#F1F5F9",
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  aiTipIcon: { fontSize: 16, marginRight: 8 },
-  aiTipText: { fontSize: 13, color: "#475569", fontWeight: "500", flex: 1 },
+  disclaimerText: { fontSize: 12, flex: 1 },
 
   // Finalize Button
-  finalizeRow: {
-    flexDirection: "row",
-    alignItems: "stretch",
-  },
+  finalizeRow: { flexDirection: "row", alignItems: "stretch" },
   finalizeBtn: {
-    backgroundColor: "#0F172A",
     height: 56,
     borderRadius: 16,
     justifyContent: "center",
@@ -1220,21 +787,15 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
   },
-  finalizeBtnExport: {
-    backgroundColor: "#B91C1C",
-    marginRight: spacing.sm,
-  },
+  finalizeBtnExport: { marginRight: spacing.sm },
   finalizeBtnText: { color: "#FFF", fontSize: 16, fontWeight: "800" },
 
   // Custom Marker
   customMarker: {
-    backgroundColor: "#0f766e",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#FFF",
-    ...markerShadow,
   },
   markerText: { color: "#FFF", fontSize: 12, fontWeight: "900" },
 });
