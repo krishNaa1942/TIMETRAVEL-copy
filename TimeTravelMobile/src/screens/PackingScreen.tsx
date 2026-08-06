@@ -667,6 +667,8 @@ EmptyState.displayName = "EmptyState";
 export default function PackingScreen() {
   const route = useRoute<RootStackRouteProp<"Packing">>();
   const destinationParam = route.params?.destination;
+  const tripIdParam = route.params?.tripId;
+  const tripIdNum = tripIdParam ? parseInt(tripIdParam, 10) : undefined;
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedDestination, setSelectedDestination] = useState("");
   const [items, setItems] = useState<EnhancedPackingItem[]>([]);
@@ -696,14 +698,14 @@ export default function PackingScreen() {
   const loadDocuments = useCallback(async () => {
     setDocumentsLoading(true);
     try {
-      const docs = await uploadsService.listDocuments();
+      const docs = await uploadsService.listDocuments(tripIdNum);
       setDocuments(docs);
     } catch (loadError) {
       console.error("Failed to load documents:", loadError);
     } finally {
       setDocumentsLoading(false);
     }
-  }, []);
+  }, [tripIdNum]);
 
   useEffect(() => {
     loadDocuments();
@@ -719,7 +721,7 @@ export default function PackingScreen() {
 
       const asset = result.assets[0];
       setUploadingDocument(true);
-      await uploadsService.uploadDocument(undefined, {
+      await uploadsService.uploadDocument(tripIdNum, {
         doc_type: docType,
         title: asset.name || docType,
         notes: selectedDestination ? `For ${selectedDestination}` : undefined,
@@ -760,8 +762,11 @@ export default function PackingScreen() {
 
   const { activeTrip } = useTravelIntelligence();
 
-  // Initialize
+  // Initialize — runs once on mount so later activeTrip changes
+  // never override the user's manually selected destination.
   useEffect(() => {
+    const initialTripLabel = activeTrip?.destination?.label;
+
     const init = async () => {
       try {
         const dests = await destinationsService.getDestinations();
@@ -770,7 +775,7 @@ export default function PackingScreen() {
         // Use route param, then active trip destination if available
         const initialDest =
           destinationParam ||
-          activeTrip?.destination?.label ||
+          initialTripLabel ||
           (dests[0]?.label ?? "");
         setSelectedDestination(initialDest);
 
@@ -783,7 +788,8 @@ export default function PackingScreen() {
       }
     };
     init();
-  }, [activeTrip?.destination?.label, destinationParam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch weather when destination changes
   useEffect(() => {

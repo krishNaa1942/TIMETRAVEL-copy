@@ -41,6 +41,7 @@ interface UseProfileDataReturn {
   achievements: AchievementBadge[];
   preferences: Record<string, unknown>;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   error: Error | null;
   refetch: () => void;
@@ -55,6 +56,7 @@ export const useProfileData = (): UseProfileDataReturn => {
   const {
     data: summaryData,
     isLoading: isSummaryLoading,
+    isFetching: isSummaryFetching,
     isError: isSummaryError,
     error: summaryError,
     refetch: refetchSummary,
@@ -184,6 +186,7 @@ export const useProfileData = (): UseProfileDataReturn => {
     achievements,
     preferences,
     isLoading: isSummaryLoading,
+    isFetching: isSummaryFetching,
     isError: isSummaryError,
     error: summaryError as Error | null,
     refetch,

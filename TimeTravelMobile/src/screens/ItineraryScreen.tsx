@@ -50,7 +50,6 @@ import {
 } from "@/components/Common/ExpoMap";
 import { RootStackParamList } from "@/navigation/types";
 import { useItinerary } from "@/hooks/useItinerary";
-import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useTravelIntelligence } from "@/stores/travelIntelligenceStore";
 import { mapsService } from "@/services/maps";
 import { tripsService } from "@/services/trips";
@@ -371,9 +370,6 @@ export default function ItineraryScreen() {
     [itinerary?.itinerary],
   );
 
-  // Bug 1.7 fix: connect debouncedGenerate to onChangeText
-  const debouncedGenerate = useDebouncedCallback(generate, 300);
-
   // Bottom sheet snap points
   const snapPoints = useMemo(() => ["15%", "50%", "92%"], []);
 
@@ -507,15 +503,25 @@ export default function ItineraryScreen() {
   // Bug 1.6 fix: update active trip in store after successful generation
   useEffect(() => {
     if (itinerary && !loading && !error) {
-      logSearch(query);
-      // setActiveTrip requires a Destination object — we create a minimal one from itinerary
-      // This syncs the global trip tracker with the newly generated plan
+      // setActiveTrip requires a valid Destination object — sync the global
+      // trip tracker with the newly generated plan (logSearch is already
+      // handled inside useItinerary.generate to avoid double-logging)
       setActiveTrip(
-        { id: itinerary.destination, name: itinerary.destination } as any,
+        {
+          id: itinerary.destination,
+          label: itinerary.destination,
+          region: "",
+          best_season: "",
+          highlight: "",
+          tagline: "",
+          category: [],
+          lat: 0,
+          lon: 0,
+        },
         itinerary.num_days,
       );
     }
-  }, [itinerary, loading, error]);
+  }, [itinerary, loading, error, setActiveTrip]);
 
   // Focus on day
   const focusOnDay = useCallback(
@@ -544,10 +550,9 @@ export default function ItineraryScreen() {
   // Handle generate from search bar
   const handleGenerate = useCallback(() => {
     if (query.trim()) {
-      debouncedGenerate.cancel();
       generate(query);
     }
-  }, [query, generate, debouncedGenerate]);
+  }, [query, generate]);
 
   // Bug 1.8 fix: Save Itinerary persists the trip to backend then confirms
   const handleSaveItinerary = useCallback(async () => {
@@ -735,13 +740,11 @@ export default function ItineraryScreen() {
         {/* Search Header */}
         <View style={styles.sheetHeader}>
           <Text style={styles.aiIcon}>✨</Text>
-          {/* Bug 1.7 fix: debouncedGenerate on onChangeText for real-time suggestions */}
+          {/* Generate runs only on explicit submit (arrow / enter) to avoid
+              interleaved auto-generations while typing */}
           <TextInput
             value={query}
-            onChangeText={(text) => {
-              setQuery(text);
-              if (text.trim().length > 10) debouncedGenerate(text);
-            }}
+            onChangeText={setQuery}
             placeholder="Plan your trip..."
             style={styles.sheetSearchInput}
             autoCorrect={false}

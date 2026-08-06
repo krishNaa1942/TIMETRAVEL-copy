@@ -50,6 +50,7 @@ const ProfileScreen: React.FC = () => {
     isError,
     error,
     refetch,
+    isFetching,
   } = useProfileData();
   const {
     handleLogout,
@@ -153,7 +154,7 @@ const ProfileScreen: React.FC = () => {
       contentContainerStyle={styles.content}
       refreshControl={
         <RefreshControl
-          refreshing={isLoading}
+          refreshing={isFetching}
           onRefresh={onRefresh}
           tintColor={themeDark ? "#FFFFFF" : "#8B5CF6"}
         />

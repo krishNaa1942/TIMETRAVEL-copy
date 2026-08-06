@@ -220,13 +220,6 @@ export default function ExploreScreen() {
           <Text style={styles.searchBarPlaceholder}>
             {search || "Where to next?"}
           </Text>
-          <View style={styles.searchBarMic}>
-            <MaterialCommunityIcons
-              name="microphone"
-              size={18}
-              color={colors.textTertiary}
-            />
-          </View>
         </PressableScale>
 
         {/* Categories */}
@@ -361,11 +354,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginLeft: 12,
     fontWeight: "500",
-  },
-  searchBarMic: {
-    padding: 8,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
   },
 
   // Categories
