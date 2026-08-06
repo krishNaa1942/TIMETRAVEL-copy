@@ -672,6 +672,11 @@ export default function PackingScreen() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedDestination, setSelectedDestination] = useState("");
   const [items, setItems] = useState<EnhancedPackingItem[]>([]);
+  // Mirror of items for side-effect-free caching after async ops
+  const itemsRef = useRef<EnhancedPackingItem[]>([]);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -884,25 +889,49 @@ export default function PackingScreen() {
     }
   }, [selectedDestination, enhanceItems]);
 
+  // Guard: skip re-firing while a toggle for the same item is in flight
+  const pendingToggles = useRef(new Set<number>());
+
   const toggleItem = useCallback(
     async (item: PackingItem) => {
-      // Optimistic update
-      const prevItems = items;
-      const updated = items.map((i) =>
-        i.id === item.id ? { ...i, is_checked: !i.is_checked } : i,
+      if (pendingToggles.current.has(item.id)) return;
+      pendingToggles.current.add(item.id);
+
+      const prevChecked = item.is_checked;
+
+      // Optimistic update (functional so rapid toggles compose)
+      setItems((prev) =>
+        prev.map((i) =>
+          i.id === item.id ? { ...i, is_checked: !i.is_checked } : i,
+        ),
       );
-      setItems(updated);
 
       try {
         await packingService.toggleItem(item.id);
-        await cacheItems(updated, selectedDestination);
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === item.id ? { ...i, is_checked: !prevChecked } : i,
+          ),
+        );
+        cacheItems(
+          itemsRef.current.map((i) =>
+            i.id === item.id ? { ...i, is_checked: !prevChecked } : i,
+          ),
+          selectedDestination,
+        ).catch(() => {});
       } catch (e) {
-        // Revert on error
-        setItems(prevItems);
+        // Revert only the affected item (no stale-clobber of other toggles)
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === item.id ? { ...i, is_checked: prevChecked } : i,
+          ),
+        );
         Alert.alert("Error", "Failed to update item");
+      } finally {
+        pendingToggles.current.delete(item.id);
       }
     },
-    [items, selectedDestination],
+    [selectedDestination],
   );
 
   const deleteItem = useCallback(
