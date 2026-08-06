@@ -242,14 +242,27 @@ class TestChatHistory:
         assert resp.status_code == 200
         assert resp.get_json()["sessions"] == []
 
-    def test_history_lists_sessions_after_chat(self, fresh_user):
-        fresh_user().post("/api/chat", json={"message": "best restaurants in goa"})
+    @patch("app.api.routes.chatbot._google_key", return_value="test-key")
+    @patch(
+        "app.api.routes.chatbot.chat_with_gemini",
+        return_value={
+            "reply": "Here is your Goa plan!",
+            "model": "gemini-2.5-flash",
+            "mode": "ai",
+        },
+    )
+    def test_history_lists_sessions_after_chat(self, _mock_gemini, _mock_key, fresh_user):
+        fresh_user().post(
+            "/api/chat",
+            json={"message": "best restaurants in goa", "mode": "ai"},
+        )
         resp = fresh_user().get("/api/chat/history")
         assert resp.status_code == 200
         sessions = resp.get_json()["sessions"]
         assert len(sessions) == 1
         assert sessions[0]["count"] == 2  # user + bot rows persisted
-        assert "restaurants" in sessions[0]["preview"]
+        # Deterministic mocked Gemini reply (no live API calls)
+        assert "Here is your Goa plan!" in sessions[0]["preview"]
 
     def test_session_messages_returned_in_order(self, fresh_user):
         chat_resp = fresh_user().post(

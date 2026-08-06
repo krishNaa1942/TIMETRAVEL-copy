@@ -9,6 +9,8 @@ import json
 import logging
 import re
 import threading
+from collections.abc import Generator
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from google import genai
@@ -71,7 +73,12 @@ def _configure(api_key: str) -> None:
     with _configure_lock:
         if _configured:
             return
-        _client = genai.Client(api_key=api_key)
+        # Hard 60s HTTP timeout so a hung model call can never pin a
+        # background job forever (the per-day workers fallback on timeout).
+        _client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=60000),
+        )
         _configured = True
     logger.info("Itinerary service: Gemini configured")
 
@@ -529,3 +536,271 @@ def generate_itinerary(
             "Could not generate itinerary from AI. Fallback itinerary generated."
         )
         return fallback
+
+
+# ---------------------------------------------------------------------------
+# Streaming / per-day generation (v2)
+# ---------------------------------------------------------------------------
+
+DAY_PROMPT = """You are an expert Indian travel planner. Generate the itinerary for ONE single day.
+
+**Context:**
+- Destination: {destination}
+- Trip length: {num_days} days total, generating Day {day_number}
+- Family size: {family_size} people
+- Travel class: {travel_class} (economy = budget-friendly street food & public transport; comfort = mid-range restaurants & cabs; premium = luxury dining & private cars)
+- Interests: {interests}
+- Rule: If this is the first day, make it arrival-friendly (lighter schedule). If it is the last day, make it departure-friendly.
+
+**Rules:**
+1. Respond ONLY with valid JSON for ONE day — no markdown, no code fences, no extra text.
+2. Use this exact schema:
+   {{
+     "day": {day_number},
+     "title": "<short theme for the day>",
+     "morning": {{ "place": "<real place name>", "activity": "<name>", "description": "<1-2 sentences>", "duration": "<e.g. 2-3 hours>", "cost": "<approx ₹ per person>" }},
+     "afternoon": {{ "place": "<real place name>", "activity": "<name>", "description": "<1-2 sentences>", "duration": "<e.g. 2-3 hours>", "cost": "<approx ₹ per person>" }},
+     "evening": {{ "place": "<real place name>", "activity": "<name>", "description": "<1-2 sentences>", "duration": "<e.g. 2-3 hours>", "cost": "<approx ₹ per person>" }},
+     "tip": "<one practical tip for the day>"
+   }}
+3. Use real place names specific to the destination.
+4. Mix sightseeing, food, culture, adventure, and relaxation.
+5. All costs in Indian Rupees (₹).
+"""
+
+
+def _build_gen_config() -> types.GenerateContentConfig:
+    return types.GenerateContentConfig(
+        temperature=0.35,
+        top_p=0.85,
+        max_output_tokens=2048,
+        response_mime_type="application/json",
+        safety_settings=[
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_HARASSMENT",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_HATE_SPEECH",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
+            types.SafetySettingDict(
+                category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold="BLOCK_MEDIUM_AND_ABOVE",
+            ),
+        ],
+    )
+
+
+REQUIRED_SLOT_KEYS = {"activity", "description", "duration", "cost"}
+REQUIRED_DAY_KEYS = {"day", "title", "morning", "afternoon", "evening", "tip"}
+
+
+def _validate_single_day(day: dict, travel_class: str, day_number: int) -> dict:
+    """Fill missing top-level/slot keys with safe defaults (per-day schema)."""
+    if not isinstance(day, dict):
+        raise ValueError("Day schema violation — not an object")
+
+    for k in REQUIRED_DAY_KEYS - day.keys():
+        if k in ("morning", "afternoon", "evening"):
+            morning_cost, afternoon_cost, evening_cost = _cost_band(travel_class)
+            slot_cost = {
+                "morning": morning_cost,
+                "afternoon": afternoon_cost,
+                "evening": evening_cost,
+            }[k]
+            day[k] = _fallback_slot(
+                k.capitalize(),
+                "Activity details not available for this slot.",
+                "2-3 hours",
+                slot_cost,
+            )
+        elif k == "tip":
+            day[k] = "Have a great day exploring!"
+        elif k == "title":
+            day[k] = f"Day {day_number}"
+        elif k == "day":
+            day[k] = day_number
+
+    day["day"] = day_number
+    for slot in ("morning", "afternoon", "evening"):
+        if isinstance(day.get(slot), dict):
+            for skey in REQUIRED_SLOT_KEYS:
+                if skey not in day[slot]:
+                    day[slot][skey] = "N/A"
+            if not day[slot].get("place"):
+                day[slot]["place"] = day[slot].get("activity", "N/A")
+    return day
+
+
+def _unwrap_day(parsed) -> dict | None:
+    """Extract a single day object from Gemini output (list or dict wrapper)."""
+    if isinstance(parsed, list):
+        return parsed[0] if parsed else None
+    if isinstance(parsed, dict):
+        for key in ("itinerary", "days", "schedule", "plan"):
+            value = parsed.get(key)
+            if isinstance(value, list) and value:
+                return value[0]
+        return parsed
+    return None
+
+
+def _fetch_day_from_ai(
+    day_number: int,
+    num_days: int,
+    destination: str,
+    family_size: int,
+    travel_class: str,
+    safe_interests: str,
+    api_key: str,
+) -> dict:
+    _configure(api_key)
+    prompt = DAY_PROMPT.format(
+        destination=destination,
+        num_days=num_days,
+        day_number=day_number,
+        family_size=family_size,
+        travel_class=travel_class,
+        interests=safe_interests,
+    )
+    response = _client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+        config=_build_gen_config(),
+    )
+    raw = response.text.strip()
+    day = _unwrap_day(_extract_json(raw))
+    if not day:
+        raise ValueError(f"Empty day response for day {day_number}")
+    return _validate_single_day(day, travel_class, day_number)
+
+
+def _fallback_single_day(
+    day_number: int,
+    num_days: int,
+    destination: str,
+    family_size: int,
+    travel_class: str,
+    interests: str,
+    maps_api_key: str = "",
+) -> dict:
+    fb = _generate_fallback_itinerary(
+        destination=destination,
+        num_days=num_days,
+        family_size=family_size,
+        travel_class=travel_class,
+        interests=interests,
+        maps_api_key=maps_api_key,
+    )
+    for day in fb["itinerary"]:
+        if day["day"] == day_number:
+            return day
+    return fb["itinerary"][-1]
+
+
+def generate_itinerary_days(
+    destination: str,
+    num_days: int,
+    family_size: int,
+    travel_class: str,
+    interests: str,
+    api_key: str,
+    stop_event: threading.Event | None = None,
+) -> Generator[dict, None, None]:
+    """Generate the itinerary one day at a time, yielding in order.
+
+    Up to 3 Gemini calls run concurrently; days are drained in order, so a
+    later day can finish first but is only yielded after its predecessors.
+    Individual failures degrade to the deterministic local fallback for that
+    day so a job always completes. Passing `stop_event` lets the caller abort
+    early (in-flight calls are abandoned, not waited on).
+    """
+    sanitized = AIPromptSanitizer.sanitize_input(
+        interests or "general sightseeing",
+        context="itinerary",
+        max_length=500,
+        strict_mode=False,
+    )
+    safe_interests = sanitized.sanitized_input or "general sightseeing"
+
+    results: dict[int, dict] = {}
+    worker_count = min(3, max(1, num_days))
+    pool = ThreadPoolExecutor(max_workers=worker_count)
+
+    try:
+        futures = {
+            pool.submit(
+                _fetch_day_from_ai,
+                day_number,
+                num_days,
+                destination,
+                family_size,
+                travel_class,
+                safe_interests,
+                api_key,
+            ): day_number
+            for day_number in range(1, num_days + 1)
+        }
+        expected = 1
+        for future in as_completed(futures):
+            if stop_event is not None and stop_event.is_set():
+                break
+            day_number = futures[future]
+            try:
+                results[day_number] = future.result()
+            except Exception as exc:
+                logger.warning(
+                    "Day %d AI generation failed (%s) — using local fallback",
+                    day_number,
+                    exc,
+                )
+                results[day_number] = _fallback_single_day(
+                    day_number,
+                    num_days,
+                    destination,
+                    family_size,
+                    travel_class,
+                    interests or "General sightseeing",
+                )
+
+            # Drain consecutive days that are already available
+            while expected in results:
+                yield results.pop(expected)
+                expected += 1
+
+        # Any stragglers (or early stop) are still emitted in order
+        for day_number in range(1, num_days + 1):
+            if day_number in results:
+                yield results.pop(day_number)
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+
+
+def build_full_response(
+    destination: str,
+    num_days: int,
+    family_size: int,
+    travel_class: str,
+    interests: str,
+    days: list[dict],
+    maps_api_key: str = "",
+) -> dict:
+    """Compose the final itinerary payload around a day list."""
+    return {
+        "destination": destination,
+        "num_days": num_days,
+        "family_size": family_size,
+        "travel_class": travel_class,
+        "interests": interests,
+        "itinerary": days,
+        "budget_estimate": _build_budget_estimate(
+            destination, num_days, family_size, travel_class
+        ),
+        "route_points": _build_route_points(destination, days, maps_api_key),
+        "destination_coordinates": _destination_coordinates(destination),
+    }

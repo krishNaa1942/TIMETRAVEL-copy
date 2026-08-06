@@ -28,9 +28,14 @@ def client(app):
 
 @pytest.fixture(scope="function")
 def db(app):
-    """Provide a clean database for each test function."""
+    """Provide a clean database for each test function.
+
+    Tables are recreated after the drop so later tests (which rely on the
+    schema existing without requesting this fixture) keep working.
+    """
     with app.app_context():
         _db.create_all()
         yield _db
         _db.session.rollback()
         _db.drop_all()
+        _db.create_all()

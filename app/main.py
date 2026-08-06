@@ -210,6 +210,18 @@ def create_app(config_class=None):
             "session_id": payload.get("sid"),
         }
 
+        # The `current_user` access above already resolved the user to
+        # Anonymous and cached it in g._login_user before g.user existed.
+        # Swap in the authenticated user so @login_required sees it.
+        cached = getattr(g, "_login_user", None)
+        if cached is not None and not cached.is_authenticated:
+            from app.models.entities import User as UserModel
+            from app.models.database import db
+
+            user_obj = db.session.get(UserModel, payload.get("sub"))
+            if user_obj is not None:
+                g._login_user = user_obj
+
     # ── Exempt API routes from CSRF (mobile apps use JWT, not CSRF tokens) ──
     @app.before_request
     def exempt_api_from_csrf():

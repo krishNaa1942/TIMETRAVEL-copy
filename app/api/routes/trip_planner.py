@@ -75,6 +75,157 @@ def create_trip():
     return jsonify({"trip": trip.to_dict(include_days=True)}), 201
 
 
+@trip_planner_bp.route("/bulk", methods=["POST"])
+@login_required
+def bulk_create_trip():
+    """Create a trip with its full day/place plan in ONE transaction.
+
+    Body:
+        {
+          "trip": { title, destination, num_days, family_size, travel_class,
+                    start_date?, end_date?, notes?, cover_image_url? },
+          "source_id": "<optional idempotency key>",
+          "itinerary_payload": { ... full generated itinerary ... },
+          "days": [ { "day_number": 1, "title": "...",
+                      "places": [ { name, category?, notes?, position_order?,
+                                    lat?, lon?, start_time?, end_time?,
+                                    duration_minutes?, estimated_cost? } ] } ]
+        }
+
+    Idempotency: passing `source_id` (the generation job id) makes re-posting
+    the same generation return the existing trip instead of duplicating it.
+    """
+    data = request.get_json(silent=True) or {}
+    trip_data = data.get("trip") or data
+    title = trip_data.get("title", "").strip()
+    destination = trip_data.get("destination", "").strip()
+
+    if not title:
+        return jsonify({"error": "Trip title is required."}), 400
+    if not destination:
+        return jsonify({"error": "Destination is required."}), 400
+    try:
+        num_days = int(trip_data.get("num_days", 3))
+    except (TypeError, ValueError):
+        return jsonify({"error": "num_days must be an integer"}), 400
+    if num_days < 1 or num_days > 30:
+        return jsonify({"error": "num_days must be between 1 and 30"}), 400
+
+    source_id = (data.get("source_id") or "").strip()
+
+    # Idempotency: reuse an existing trip created from this exact source.
+    if source_id:
+        existing = (
+            Trip.query.filter_by(
+                user_id=current_user.id,
+                destination=destination,
+                title=title,
+            )
+            .order_by(Trip.created_at.desc())
+            .all()
+        )
+        for trip in existing:
+            import json as _json
+
+            stored = None
+            try:
+                stored = _json.loads(trip.itinerary_json) if trip.itinerary_json else None
+            except ValueError:
+                stored = None
+            if stored and stored.get("source_id") == source_id:
+                d = trip.to_dict(include_days=True, include_places=True)
+                d["duplicate"] = True
+                return jsonify({"trip": d})
+
+    start_date = end_date = None
+    for field in ("start_date", "end_date"):
+        value = trip_data.get(field)
+        if value:
+            try:
+                parsed = date.fromisoformat(value)
+            except ValueError:
+                parsed = None
+            if field == "start_date":
+                start_date = parsed
+            else:
+                end_date = parsed
+
+    trip = Trip(
+        user_id=current_user.id,
+        title=title,
+        destination=destination,
+        start_date=start_date,
+        end_date=end_date,
+        num_days=num_days,
+        family_size=int(trip_data.get("family_size", 1)),
+        travel_class=trip_data.get("travel_class", "economy"),
+        cover_image_url=trip_data.get("cover_image_url"),
+        notes=trip_data.get("notes", ""),
+        status="planning",
+    )
+
+    import json as _json
+
+    payload = data.get("itinerary_payload")
+    if payload:
+        envelope = dict(payload)
+        if source_id:
+            envelope["source_id"] = source_id
+        trip.itinerary_json = _json.dumps(envelope, default=str)
+    elif source_id:
+        trip.itinerary_json = _json.dumps({"source_id": source_id})
+
+    db.session.add(trip)
+    db.session.flush()
+
+    days = data.get("days") or []
+    for day_data in days:
+        day_number = int(day_data.get("day_number", len(trip.days) + 1))
+        day = TripDay(
+            trip_id=trip.id,
+            day_number=day_number,
+            title=day_data.get("title", f"Day {day_number}"),
+            notes=day_data.get("notes"),
+        )
+        if day_data.get("date"):
+            try:
+                day.date = date.fromisoformat(day_data["date"])
+            except ValueError:
+                pass
+        db.session.add(day)
+        db.session.flush()
+
+        position = 0
+        for place_data in day_data.get("places", []):
+            name = (place_data.get("name") or "").strip()
+            if not name:
+                continue
+            place = TripPlace(
+                trip_id=trip.id,
+                day_id=day.id,
+                name=name,
+                address=place_data.get("address"),
+                lat=place_data.get("lat"),
+                lon=place_data.get("lon"),
+                category=place_data.get("category"),
+                notes=place_data.get("notes"),
+                start_time=place_data.get("start_time"),
+                end_time=place_data.get("end_time"),
+                duration_minutes=place_data.get("duration_minutes"),
+                estimated_cost=place_data.get("estimated_cost"),
+            )
+            place.position_order = (
+                int(place_data["position_order"])
+                if place_data.get("position_order") is not None
+                else position
+            )
+            position += 1
+            db.session.add(place)
+
+    db.session.commit()
+    return jsonify({"trip": trip.to_dict(include_days=True, include_places=True)}), 201
+
+
 @trip_planner_bp.route("", methods=["GET"])
 def list_trips():
     """List all user's trips."""
