@@ -32,6 +32,7 @@ import { getAnalytics } from "@/core/telemetry/Analytics";
 import { BudgetEstimate } from "@/types";
 import { RootStackParamList } from "@/navigation/types";
 import { colors, spacing } from "@/theme/colors";
+import { formatCurrency as formatCurrencyInr } from "@/utils/format";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -77,17 +78,8 @@ const BUDGET_CARD_COLORS = [
   colors.error,
 ];
 
-const formatCurrency = (value: number | null | undefined): string => {
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    return "N/A";
-  }
-
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const formatCurrency = (value: number | null | undefined): string =>
+  formatCurrencyInr(value);
 
 const buildBudgetBreakdown = (estimate: BudgetEstimate | null) => {
   const accommodation = estimate?.accommodation ?? 0;

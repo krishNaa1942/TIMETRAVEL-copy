@@ -1,20 +1,16 @@
+import {
+  formatNumber,
+  formatCurrency,
+  formatPercent,
+} from "@/utils/format";
+
+export { formatNumber, formatCurrency, formatPercent };
+
 export const travelIntelligenceLogger = (...args: unknown[]): void => {
   if (__DEV__) {
     console.log("[TravelIntelligence]", ...args);
   }
 };
-
-export const formatNumber = (value: number): string =>
-  new Intl.NumberFormat("en-IN").format(value);
-
-export const formatCurrency = (value: number, currency = "INR"): string =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value);
-
-export const formatPercent = (value: number): string => `${Math.round(value)}%`;
 
 export const formatShortDate = (value?: string | null): string => {
   if (!value) {

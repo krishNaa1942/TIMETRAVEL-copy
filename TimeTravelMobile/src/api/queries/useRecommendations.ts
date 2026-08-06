@@ -5,7 +5,7 @@
  */
 
 import { useQuery, useInfiniteQuery, UseQueryOptions } from '@tanstack/react-query';
-import { apiClient } from '../client';
+import { apiService } from '@/services/api';
 import {
   Recommendation,
   RecommendationsResponse,
@@ -38,7 +38,7 @@ async function fetchRecommendations(
   if (params.limit) queryParams.append('limit', String(params.limit));
   if (params.offset) queryParams.append('offset', String(params.offset));
   
-  const { data } = await apiClient.get<RecommendationsResponse>(
+  const data = await apiService.get<RecommendationsResponse>(
     `/recommendations?${queryParams.toString()}`
   );
   
@@ -100,7 +100,7 @@ export function useRecommendationDetail(
   return useQuery({
     queryKey: recommendationKeys.detail(id),
     queryFn: async (): Promise<Recommendation | null> => {
-      const { data } = await apiClient.get<Recommendation>(`/recommendations/${id}`);
+      const data = await apiService.get<Recommendation>(`/recommendations/${id}`);
       return data;
     },
     enabled: !!id,

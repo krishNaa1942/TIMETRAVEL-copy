@@ -7,25 +7,22 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Destination } from "@/types";
+import type {
+  TravelStyle,
+  BudgetLevel,
+  Season,
+  GroupType,
+} from "./preferenceStore";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────
 
-export type TravelStyle =
-  | "beaches"
-  | "adventure"
-  | "budget"
-  | "luxury"
-  | "culture"
-  | "nature"
-  | "spiritual";
-
 export interface UserPreferences {
   travelStyle: TravelStyle[];
-  budgetLevel: "budget" | "mid-range" | "luxury";
-  preferredSeason: "summer" | "winter" | "monsoon" | "any";
-  groupType: "solo" | "couple" | "family" | "friends";
+  budgetLevel: BudgetLevel;
+  preferredSeason: Season;
+  groupType: GroupType;
 }
 
 export interface CachedItinerary {

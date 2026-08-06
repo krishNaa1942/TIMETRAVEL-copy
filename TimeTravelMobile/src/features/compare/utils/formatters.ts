@@ -1,10 +1,12 @@
 import { colors } from "@/theme/colors";
-
+import { formatCurrency } from "@/utils/format";
 import type {
   ComparisonCategory,
   ComparisonDataSource,
   ComparisonTone,
 } from "../types";
+
+export { formatCurrency };
 
 export interface ComparePalette {
   background: readonly [string, string, string];
@@ -31,21 +33,6 @@ const DESTINATION_COLORS = [
 
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
-
-export const formatCurrency = (
-  value: number | null | undefined,
-  currency = "INR",
-): string => {
-  if (value == null || Number.isNaN(value)) {
-    return "N/A";
-  }
-
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
 
 export const formatScore = (
   value: number | null | undefined,
