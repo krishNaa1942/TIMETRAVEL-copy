@@ -496,7 +496,9 @@ Commit hashes on `main` (https://github.com/krishNaa1942/TIMETRAVEL-copy), oldes
 | `e65541c` | PackingScreen trip-scoped `tripIdNum` + docs/uploads; ItineraryScreen `setActiveTrip` Destination shape; `FEATURE_CONFIGS` is_ai flags false; currency typing + cache guards |
 | `e0a4f2d` | High-frequency DriveOne batch (stats/currency/cache/API lifetime flags) |
 | `3eba747` | Packing trip scoping + manual destination init; ProfileScreen refresh; ItineraryScreen generate-path fixes (no interleaved auto-generate) |
-| `f3db034` | ItineraryScreen DayCard stable callbacks (memo effective) + debounce removal; CurrencyScreen stale-request guard + input sanitization; DestinationDetail photo-viewer timer cleanup; Phrasebook FlashList single scroll owner (no nested ScrollView) |
+| `f3db034` | ItineraryScreen DayCard stable callbacks (memo effective) + debounce removal (no interleaved auto-generation); CurrencyScreen stale-request guard + input sanitization; DestinationDetail photo-viewer timer cleanup; Phrasebook FlashList single scroll owner (no nested ScrollView, header sections in ListHeaderComponent) |
+| `a3daf3e` | docs: audit fix-log section added |
+| `2743d73` | RoutePlanner 4 render fns memoized (search/recent/alternatives/smart stops); Reservations ReservationCard prop-callbacks stable + AIInsightCard memos; profile SkeletonLoader animation moved into effect with cancelAnimation |
 
 ### Still open (from plan)
 - B: Explore FAB, Places select/bookmark, Favorites folder button, NewsFeed bell, Reservations edit/detail — wire or remove.
