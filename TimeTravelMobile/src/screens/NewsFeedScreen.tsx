@@ -22,6 +22,7 @@ import {
   Image,
   RefreshControl,
   Linking,
+  FlatList,
   Dimensions,
   Animated,
   Share,
@@ -270,9 +271,9 @@ FeaturedNewsCard.displayName = "FeaturedNewsCard";
 interface NewsCardProps {
   article: EnhancedArticle;
   isSafety?: boolean;
-  onBookmark: () => void;
-  onShare: () => void;
-  onPress: () => void;
+  onBookmark: (article: EnhancedArticle) => void;
+  onShare: (article: EnhancedArticle) => void;
+  onPress: (article: EnhancedArticle) => void;
 }
 
 const NewsCard = memo(({ article, isSafety, onBookmark, onShare, onPress }: NewsCardProps) => {
@@ -285,7 +286,7 @@ const NewsCard = memo(({ article, isSafety, onBookmark, onShare, onPress }: News
   const alertColor = isSafety ? alertColors[article.alertLevel || "info"] : "#667EEA";
   
   return (
-    <PressableScale style={styles.newsCard} onPress={onPress}>
+    <PressableScale style={styles.newsCard} onPress={() => onPress(article)}>
       <View style={styles.newsCardRow}>
         {article.image_url ? (
           <Image source={{ uri: article.image_url }} style={styles.newsCardImage} accessible={true} accessibilityLabel="News article image" />
@@ -330,14 +331,14 @@ const NewsCard = memo(({ article, isSafety, onBookmark, onShare, onPress }: News
         </View>
       </View>
       <View style={styles.newsCardActions}>
-        <TouchableOpacity onPress={onBookmark} style={styles.cardActionBtn}>
+        <TouchableOpacity onPress={() => onBookmark(article)} style={styles.cardActionBtn}>
           <MaterialCommunityIcons
             name={article.isBookmarked ? "bookmark" : "bookmark-outline"}
             size={18}
             color="#64748B"
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={onShare} style={styles.cardActionBtn}>
+        <TouchableOpacity onPress={() => onShare(article)} style={styles.cardActionBtn}>
           <MaterialCommunityIcons name="share-variant-outline" size={18} color="#64748B" />
         </TouchableOpacity>
         <MaterialCommunityIcons name="chevron-right" size={18} color="#CBD5E1" />
@@ -633,6 +634,90 @@ export default function NewsFeedScreen() {
   const featuredArticle = useMemo(() => articles[0], [articles]);
   const regularArticles = useMemo(() => articles.slice(1), [articles]);
 
+  // Articles shown in the feed (safety tab shows the full list)
+  const feedArticles = useMemo(
+    () => (activeTab === "safety" ? articles : regularArticles),
+    [activeTab, articles, regularArticles],
+  );
+
+  const renderNewsItem = useCallback(
+    ({ item, index }: { item: EnhancedArticle; index: number }) => (
+      <NewsCard
+        article={item}
+        isSafety={activeTab === "safety"}
+        onBookmark={handleBookmark}
+        onShare={handleShare}
+        onPress={handleArticlePress}
+      />
+    ),
+    [activeTab, handleBookmark, handleShare, handleArticlePress],
+  );
+
+  const newsKeyExtractor = useCallback(
+    (item: EnhancedArticle, index: number) => `${item.url}-${index}`,
+    [],
+  );
+
+  // Feed header (last updated + featured + section title)
+  const newsListHeader = (
+    <>
+      {/* Last Updated */}
+      {lastUpdated && (
+        <View style={styles.lastUpdatedRow}>
+          <MaterialCommunityIcons
+            name="clock-outline"
+            size={12}
+            color="#94A3B8"
+          />
+          <Text style={styles.lastUpdatedText}>
+            Updated{" "}
+            {Math.floor((Date.now() - lastUpdated.getTime()) / 60000)} min ago
+          </Text>
+        </View>
+      )}
+
+      {/* Featured Article */}
+      {featuredArticle && activeTab !== "safety" && (
+        <FeaturedNewsCard
+          article={featuredArticle}
+          onBookmark={() => handleBookmark(featuredArticle)}
+          onShare={() => handleShare(featuredArticle)}
+          onPress={() => handleArticlePress(featuredArticle)}
+        />
+      )}
+
+      {/* Section Title */}
+      {regularArticles.length > 0 && (
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleRow}>
+            <MaterialCommunityIcons
+              name={
+                activeTab === "safety"
+                  ? "shield-alert"
+                  : "newspaper-variant"
+              }
+              size={18}
+              color="#667EEA"
+            />
+            <Text style={styles.sectionTitle}>
+              {activeTab === "trending"
+                ? "Trending Now"
+                : activeTab === "safety"
+                  ? "Travel Alerts"
+                  : activeTab === "foryou"
+                    ? "Recommended for You"
+                    : "Travel News"}
+            </Text>
+          </View>
+          <Text style={styles.articleCount}>
+            {regularArticles.length + (activeTab !== "safety" ? 1 : 0)}{" "}
+            articles
+          </Text>
+        </View>
+      )}
+    </>
+  );
+
   // ─────────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────────
@@ -677,82 +762,30 @@ export default function NewsFeedScreen() {
       <NewsTabBar activeTab={activeTab} onTabPress={handleTabChange} />
 
       {/* Content */}
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor="#667EEA"
-          />
-        }
-      >
-        {/* Last Updated */}
-        {lastUpdated && (
-          <View style={styles.lastUpdatedRow}>
-            <MaterialCommunityIcons name="clock-outline" size={12} color="#94A3B8" />
-            <Text style={styles.lastUpdatedText}>
-              Updated {Math.floor((Date.now() - lastUpdated.getTime()) / 60000)} min ago
-            </Text>
-          </View>
-        )}
-
-        {loading ? (
-          <NewsSkeleton />
-        ) : isOffline && articles.length === 0 ? (
-          <EmptyState type="offline" onRetry={handleRefresh} />
-        ) : articles.length === 0 ? (
-          <EmptyState type="no-news" onRetry={handleRefresh} />
-        ) : (
-          <>
-            {/* Featured Article */}
-            {featuredArticle && activeTab !== "safety" && (
-              <FeaturedNewsCard
-                article={featuredArticle}
-                onBookmark={() => handleBookmark(featuredArticle)}
-                onShare={() => handleShare(featuredArticle)}
-                onPress={() => handleArticlePress(featuredArticle)}
-              />
-            )}
-
-            {/* Section Title */}
-            {regularArticles.length > 0 && (
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionTitleRow}>
-                  <MaterialCommunityIcons
-                    name={activeTab === "safety" ? "shield-alert" : "newspaper-variant"}
-                    size={18}
-                    color="#667EEA"
-                  />
-                  <Text style={styles.sectionTitle}>
-                    {activeTab === "trending" ? "Trending Now" :
-                     activeTab === "safety" ? "Travel Alerts" :
-                     activeTab === "foryou" ? "Recommended for You" :
-                     "Travel News"}
-                  </Text>
-                </View>
-                <Text style={styles.articleCount}>
-                  {regularArticles.length + (activeTab !== "safety" ? 1 : 0)} articles
-                </Text>
-              </View>
-            )}
-
-            {/* News Cards */}
-            {(activeTab === "safety" ? articles : regularArticles).map((article, index) => (
-              <NewsCard
-                key={`${article.url}-${index}`}
-                article={article}
-                isSafety={activeTab === "safety"}
-                onBookmark={() => handleBookmark(article)}
-                onShare={() => handleShare(article)}
-                onPress={() => handleArticlePress(article)}
-              />
-            ))}
-          </>
-        )}
-      </ScrollView>
+      {loading ? (
+        <NewsSkeleton />
+      ) : isOffline && articles.length === 0 ? (
+        <EmptyState type="offline" onRetry={handleRefresh} />
+      ) : articles.length === 0 ? (
+        <EmptyState type="no-news" onRetry={handleRefresh} />
+      ) : (
+        <FlatList
+          data={feedArticles}
+          renderItem={renderNewsItem}
+          keyExtractor={newsKeyExtractor}
+          ListHeaderComponent={newsListHeader}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor="#667EEA"
+            />
+          }
+        />
+      )}
 
       {/* Offline Banner */}
       {isOffline && articles.length > 0 && (
