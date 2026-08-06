@@ -655,8 +655,10 @@ function useCurrencyConverter() {
   }, [result]);
 
   // Convert function
+  const convertReqId = useRef(0);
   const convert = useCallback(async (amt: string, from: string, to: string) => {
     const numAmount = parseFloat(amt);
+    const reqId = ++convertReqId.current;
 
     if (!amt || isNaN(numAmount) || numAmount <= 0) {
       setError(null);
@@ -669,12 +671,14 @@ function useCurrencyConverter() {
 
     try {
       const res = await currencyService.convert(numAmount, from, to);
+      if (reqId !== convertReqId.current) return; // superseded by newer request
       setResult(res);
     } catch (e: any) {
+      if (reqId !== convertReqId.current) return;
       setError(e.message || "Conversion failed. Please try again.");
       setResult(null);
     } finally {
-      setLoading(false);
+      if (reqId === convertReqId.current) setLoading(false);
     }
   }, []);
 
@@ -706,7 +710,14 @@ function useCurrencyConverter() {
 
   // Update amount manually
   const updateAmount = useCallback((val: string) => {
-    setAmount(val);
+    let sanitized = val.replace(/[^0-9.]/g, "");
+    const firstDot = sanitized.indexOf(".");
+    if (firstDot !== -1) {
+      sanitized =
+        sanitized.slice(0, firstDot + 1) +
+        sanitized.slice(firstDot + 1).replace(/\./g, "");
+    }
+    setAmount(sanitized);
     setActivePreset(null);
   }, []);
 

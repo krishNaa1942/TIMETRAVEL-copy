@@ -576,12 +576,13 @@ const PhotoViewerModal = memo(
     React.useEffect(() => {
       if (visible) {
         setCurrentIndex(initialIndex);
-        setTimeout(() => {
+        const t = setTimeout(() => {
           flatListRef.current?.scrollToIndex({
             index: initialIndex,
             animated: false,
           });
         }, 100);
+        return () => clearTimeout(t);
       }
     }, [visible, initialIndex]);
 

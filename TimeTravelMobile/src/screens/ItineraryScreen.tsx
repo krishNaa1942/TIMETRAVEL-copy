@@ -182,8 +182,8 @@ function parseBudgetCost(cost?: string): number {
 interface DayCardProps {
   day: ItineraryDay;
   isExpanded: boolean;
-  onToggle: () => void;
-  onFocusMap: () => void;
+  onToggle: (day: number) => void;
+  onFocusMap: (day: number) => void;
 }
 
 // Bug 1.1 fix: removed conflicting dual onPress; outer press = toggle (accordion),
@@ -210,7 +210,7 @@ const DayCard: React.FC<DayCardProps> = React.memo(
       <View style={styles.dayGroup}>
         <Pressable
           style={styles.dayHeader}
-          onPress={onToggle}
+          onPress={() => onToggle(day.day)}
           accessibilityLabel={`Day ${day.day}: ${day.title}. ${isExpanded ? "Collapse" : "Expand"} activities`}
           accessibilityRole="button"
         >
@@ -218,7 +218,7 @@ const DayCard: React.FC<DayCardProps> = React.memo(
             {/* Tap circle to focus the map on this day's location */}
             <TouchableOpacity
               style={styles.dayCircle}
-              onPress={onFocusMap}
+              onPress={() => onFocusMap(day.day)}
               accessibilityLabel={`Focus map on Day ${day.day}`}
               accessibilityRole="button"
             >
@@ -823,8 +823,8 @@ export default function ItineraryScreen() {
                 key={day.day}
                 day={day}
                 isExpanded={expandedDay === day.day}
-                onToggle={() => handleDayToggle(day.day)}
-                onFocusMap={() => focusOnDay(day.day)}
+                onToggle={handleDayToggle}
+                onFocusMap={focusOnDay}
               />
             ))}
 

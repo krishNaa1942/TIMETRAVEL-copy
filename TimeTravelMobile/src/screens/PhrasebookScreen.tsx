@@ -1396,7 +1396,7 @@ export default function PhrasebookScreen() {
   return (
     <PhrasebookScreenErrorBoundary>
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <KeyboardAvoidingWrapper>
+        <KeyboardAvoidingWrapper scrollable={false}>
           {/* Header */}
           <LinearGradient colors={["#7C3AED", "#6D28D9"]} style={styles.header}>
           <View style={styles.headerContent}>
@@ -1433,131 +1433,6 @@ export default function PhrasebookScreen() {
           </View>
         </LinearGradient>
 
-        {/* Destination Overview */}
-        {phraseData && (
-          <LanguageHeader
-            language={phraseData.language || "Unknown"}
-            script={phraseData.script}
-            phraseCount={phraseData.phrases?.length || 0}
-            categoryCount={CATEGORIES.length - 1}
-            bookmarkCount={bookmarkCount}
-            beginnerCount={beginnerCount}
-          />
-        )}
-
-        {/* Search Bar */}
-        {phraseData && (
-          <View style={styles.searchSection}>
-            <SearchBar
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder={`Search phrases or tap a card in ${phraseData.language || selectedDestinationLabel || "this language"}...`}
-            />
-          </View>
-        )}
-
-        {/* Essentials */}
-        {phraseData && essentialPhrases.length > 0 && (
-          <View style={styles.sectionBlock}>
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionTitle}>Essential phrases</Text>
-                <Text style={styles.sectionSubtitle}>
-                  Fast access to the phrases travelers reach for first.
-                </Text>
-              </View>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.railScroll}
-            >
-              {essentialPhrases.map((phrase) => {
-                const categoryConfig = CATEGORIES.find(
-                  (category) => category.key === phrase.category,
-                );
-
-                return (
-                  <PressableScale
-                    key={phrase.id}
-                    style={styles.railCard}
-                    onPress={() => {
-                      setSearchQuery(phrase.english);
-                      addToRecent(phrase);
-                    }}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Search for essential phrase ${phrase.english}`}
-                  >
-                    <View
-                      style={[
-                        styles.railBadge,
-                        {
-                          backgroundColor: `${categoryConfig?.color || "#7C3AED"}18`,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.railBadgeText,
-                          { color: categoryConfig?.color || "#7C3AED" },
-                        ]}
-                      >
-                        {categoryConfig?.label || "Travel"}
-                      </Text>
-                    </View>
-                    <Text style={styles.railEnglish} numberOfLines={1}>
-                      {phrase.english}
-                    </Text>
-                    <Text style={styles.railLocal} numberOfLines={1}>
-                      {phrase.local}
-                    </Text>
-                  </PressableScale>
-                );
-              })}
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Category Grid */}
-        {phraseData && (
-          <View style={styles.sectionBlock}>
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionTitle}>Browse categories</Text>
-                <Text style={styles.sectionSubtitle}>
-                  Tap a card to preview phrases before you scroll the full list.
-                </Text>
-              </View>
-            </View>
-            <CategoryGrid
-              activeCategory={activeCategory}
-              onCategoryPress={setActiveCategory}
-              summaries={categorySummaries}
-            />
-          </View>
-        )}
-
-        {/* Destination Selector */}
-        {destinations.length > 0 && (
-          <DestinationSelector
-            destinations={destinations}
-            selected={selectedDestination}
-            onSelect={loadPhrases}
-          />
-        )}
-
-        {/* Helpful Suggestions */}
-        {contextSuggestions.length > 0 && !showBookmarksOnly && (
-          <HelpfulSuggestions
-            context={selectedDestinationLabel || "your trip"}
-            phrases={contextSuggestions}
-            onPhrasePress={(phrase) => {
-              setSearchQuery(phrase.english);
-              addToRecent(phrase);
-            }}
-          />
-        )}
-
         {/* Loading State */}
         {loading && <PhraseSkeleton />}
 
@@ -1584,12 +1459,141 @@ export default function PhrasebookScreen() {
           />
         )}
 
-        {/* Phrases List */}
+        {/* Phrases List — single scroll owner; header content scrolls with it */}
         {!loading && filteredPhrases.length > 0 && (
           <FlashList
             data={filteredPhrases}
             renderItem={renderPhrase}
             keyExtractor={keyExtractor}
+            ListHeaderComponent={
+              <>
+                {/* Destination Overview */}
+                {phraseData && (
+                  <LanguageHeader
+                    language={phraseData.language || "Unknown"}
+                    script={phraseData.script}
+                    phraseCount={phraseData.phrases?.length || 0}
+                    categoryCount={CATEGORIES.length - 1}
+                    bookmarkCount={bookmarkCount}
+                    beginnerCount={beginnerCount}
+                  />
+                )}
+
+                {/* Search Bar */}
+                {phraseData && (
+                  <View style={styles.searchSection}>
+                    <SearchBar
+                      value={searchQuery}
+                      onChangeText={setSearchQuery}
+                      placeholder={`Search phrases or tap a card in ${phraseData.language || selectedDestinationLabel || "this language"}...`}
+                    />
+                  </View>
+                )}
+
+                {/* Essentials */}
+                {phraseData && essentialPhrases.length > 0 && (
+                  <View style={styles.sectionBlock}>
+                    <View style={styles.sectionHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Essential phrases</Text>
+                        <Text style={styles.sectionSubtitle}>
+                          Fast access to the phrases travelers reach for first.
+                        </Text>
+                      </View>
+                    </View>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.railScroll}
+                    >
+                      {essentialPhrases.map((phrase) => {
+                        const categoryConfig = CATEGORIES.find(
+                          (category) => category.key === phrase.category,
+                        );
+
+                        return (
+                          <PressableScale
+                            key={phrase.id}
+                            style={styles.railCard}
+                            onPress={() => {
+                              setSearchQuery(phrase.english);
+                              addToRecent(phrase);
+                            }}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Search for essential phrase ${phrase.english}`}
+                          >
+                            <View
+                              style={[
+                                styles.railBadge,
+                                {
+                                  backgroundColor: `${categoryConfig?.color || "#7C3AED"}18`,
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.railBadgeText,
+                                  { color: categoryConfig?.color || "#7C3AED" },
+                                ]}
+                              >
+                                {categoryConfig?.label || "Travel"}
+                              </Text>
+                            </View>
+                            <Text style={styles.railEnglish} numberOfLines={1}>
+                              {phrase.english}
+                            </Text>
+                            <Text style={styles.railLocal} numberOfLines={1}>
+                              {phrase.local}
+                            </Text>
+                          </PressableScale>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
+                )}
+
+                {/* Category Grid */}
+                {phraseData && (
+                  <View style={styles.sectionBlock}>
+                    <View style={styles.sectionHeader}>
+                      <View>
+                        <Text style={styles.sectionTitle}>Browse categories</Text>
+                        <Text style={styles.sectionSubtitle}>
+                          Tap a card to preview phrases before you scroll the
+                          full list.
+                        </Text>
+                      </View>
+                    </View>
+                    <CategoryGrid
+                      activeCategory={activeCategory}
+                      onCategoryPress={setActiveCategory}
+                      summaries={categorySummaries}
+                    />
+                  </View>
+                )}
+
+                {/* Destination Selector */}
+                {destinations.length > 0 && (
+                  <DestinationSelector
+                    destinations={destinations}
+                    selected={selectedDestination}
+                    onSelect={loadPhrases}
+                  />
+                )}
+
+                {/* Helpful Suggestions */}
+                {contextSuggestions.length > 0 && !showBookmarksOnly && (
+                  <HelpfulSuggestions
+                    context={selectedDestinationLabel || "your trip"}
+                    phrases={contextSuggestions}
+                    onPhrasePress={(phrase) => {
+                      setSearchQuery(phrase.english);
+                      addToRecent(phrase);
+                    }}
+                  />
+                )}
+              </>
+            }
             contentContainerStyle={styles.phrasesList}
             showsVerticalScrollIndicator={false}
             refreshing={refreshing}
