@@ -498,7 +498,9 @@ Commit hashes on `main` (https://github.com/krishNaa1942/TIMETRAVEL-copy), oldes
 | `3eba747` | Packing trip scoping + manual destination init; ProfileScreen refresh; ItineraryScreen generate-path fixes (no interleaved auto-generate) |
 | `f3db034` | ItineraryScreen DayCard stable callbacks (memo effective) + debounce removal (no interleaved auto-generation); CurrencyScreen stale-request guard + input sanitization; DestinationDetail photo-viewer timer cleanup; Phrasebook FlashList single scroll owner (no nested ScrollView, header sections in ListHeaderComponent) |
 | `a3daf3e` | docs: audit fix-log section added |
+| `01bb128` | docs: extend fix log |
 | `2743d73` | RoutePlanner 4 render fns memoized (search/recent/alternatives/smart stops); Reservations ReservationCard prop-callbacks stable + AIInsightCard memos; profile SkeletonLoader animation moved into effect with cancelAnimation |
+| `36affda` | **§D dead-code removal** — deleted 106 files / ~31.8k lines: `services/api/`, `services/api.v2/`, `services/maps/` (shadowed dir; kept live `maps.ts`), `services/tomtom/`, `services/recommendations/`, `services/authSession.ts`, `core/**` except `telemetry/`, `domain/`, `api/client.ts`+`queries/useAuth.ts`, `components/Chat/`, `components/ItineraryMap/`, `components/Weather/`, `Journal/TravelNoteCard`, `DestinationCard.optimized`, `ImageWithFallback`, `hooks/useJournal.ts`, `stores/mapStore|itineraryStore|journalStore` (+ trimmed `stores/index.ts`), `constants/config.production.ts`. Kept live clusters verified via relative `./` grep: `tokenManager`, `tokenManagerCore`, `apiClientImpl`, `apiClient.ts`, `api/client.ts`, `services/maps.ts`. `tsc --noEmit` clean. |
 
 ### Still open (from plan)
 - B: Explore FAB, Places select/bookmark, Favorites folder button, NewsFeed bell, Reservations edit/detail — wire or remove.
