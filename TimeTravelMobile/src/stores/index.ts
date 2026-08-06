@@ -35,24 +35,8 @@ export {
   type ViewMode,
 } from './preferenceStore';
 
-// Map Store - Map state and interactions
-export {
-  useMapStore,
-  selectRegion,
-  selectMarkers,
-  selectSelectedMarker,
-  selectIsMapReady,
-  selectZoom,
-  type MapRegion,
-  type MapMarker,
-  type MapState,
-} from './mapStore';
-
 // UI Store - UI state (modals, loading, etc.)
 export { useUIStore } from './uiStore';
-
-// Itinerary Store - Itinerary client state (NOT server data)
-export { useItineraryStore } from './itineraryStore';
 
 // Travel Intelligence Store
 export { useTravelIntelligence } from './travelIntelligenceStore';
