@@ -173,6 +173,10 @@ const ReservationCard = React.memo<ReservationCardProps>(
             <TouchableOpacity
               onPress={() => onToggleBookmark(reservation)}
               style={styles.bookmarkBtn}
+              accessibilityRole="button"
+              accessibilityLabel={
+                reservation.is_bookmarked ? "Remove bookmark" : "Bookmark"
+              }
             >
               <Ionicons
                 name={
@@ -243,7 +247,12 @@ const ReservationCard = React.memo<ReservationCardProps>(
 
           {/* Action Buttons */}
           <View style={styles.resActions}>
-            <TouchableOpacity style={styles.actionBtn} onPress={() => onEdit(reservation)}>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => onEdit(reservation)}
+              accessibilityRole="button"
+              accessibilityLabel={`Edit ${reservation.title}`}
+            >
               <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
@@ -256,12 +265,20 @@ const ReservationCard = React.memo<ReservationCardProps>(
                     : "confirmed",
                 )
               }
+              accessibilityRole="button"
+              accessibilityLabel={
+                reservation.status === "confirmed"
+                  ? "Mark complete"
+                  : "Reconfirm reservation"
+              }
             >
               <Ionicons name="checkmark-circle" size={16} color="#10B981" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionBtn}
               onPress={() => onDelete(reservation)}
+              accessibilityRole="button"
+              accessibilityLabel={`Delete ${reservation.title}`}
             >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />
             </TouchableOpacity>

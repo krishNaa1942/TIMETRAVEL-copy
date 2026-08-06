@@ -249,14 +249,26 @@ const FeaturedNewsCard = memo(({ article, onBookmark, onShare, onPress }: Featur
           )}
         </View>
         <View style={styles.featuredActions}>
-          <TouchableOpacity style={styles.actionBtn} onPress={onBookmark}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={onBookmark}
+            accessibilityRole="button"
+            accessibilityLabel={
+              article.isBookmarked ? "Remove bookmark" : "Bookmark article"
+            }
+          >
             <MaterialCommunityIcons
               name={article.isBookmarked ? "bookmark" : "bookmark-outline"}
               size={20}
               color="#FFF"
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={onShare}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={onShare}
+            accessibilityRole="button"
+            accessibilityLabel={`Share article ${article.title}`}
+          >
             <MaterialCommunityIcons name="share-variant-outline" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
@@ -331,14 +343,26 @@ const NewsCard = memo(({ article, isSafety, onBookmark, onShare, onPress }: News
         </View>
       </View>
       <View style={styles.newsCardActions}>
-        <TouchableOpacity onPress={() => onBookmark(article)} style={styles.cardActionBtn}>
+        <TouchableOpacity
+          onPress={() => onBookmark(article)}
+          style={styles.cardActionBtn}
+          accessibilityRole="button"
+          accessibilityLabel={
+            article.isBookmarked ? "Remove bookmark" : "Bookmark article"
+          }
+        >
           <MaterialCommunityIcons
             name={article.isBookmarked ? "bookmark" : "bookmark-outline"}
             size={18}
             color="#64748B"
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onShare(article)} style={styles.cardActionBtn}>
+        <TouchableOpacity
+          onPress={() => onShare(article)}
+          style={styles.cardActionBtn}
+          accessibilityRole="button"
+          accessibilityLabel={`Share article ${article.title}`}
+        >
           <MaterialCommunityIcons name="share-variant-outline" size={18} color="#64748B" />
         </TouchableOpacity>
         <MaterialCommunityIcons name="chevron-right" size={18} color="#CBD5E1" />

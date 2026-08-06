@@ -605,7 +605,7 @@ export default function RoutePlannerScreen() {
               </Text>
             </View>
             {origin && (
-              <TouchableOpacity onPress={() => setOrigin(null)}>
+              <TouchableOpacity onPress={() => setOrigin(null)} accessibilityRole="button" accessibilityLabel="Clear origin">
                 <Ionicons
                   name="close-circle"
                   size={18}
@@ -647,7 +647,7 @@ export default function RoutePlannerScreen() {
               </Text>
             </View>
             {destination && (
-              <TouchableOpacity onPress={() => setDestination(null)}>
+              <TouchableOpacity onPress={() => setDestination(null)} accessibilityRole="button" accessibilityLabel="Clear destination">
                 <Ionicons
                   name="close-circle"
                   size={18}
@@ -725,7 +725,7 @@ export default function RoutePlannerScreen() {
             <View style={styles.errorBox}>
               <Ionicons name="alert-circle" size={18} color="#EF4444" />
               <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={clearError}>
+              <TouchableOpacity onPress={clearError} accessibilityRole="button" accessibilityLabel="Dismiss error">
                 <Ionicons name="close" size={18} color="#EF4444" />
               </TouchableOpacity>
             </View>
@@ -922,7 +922,7 @@ export default function RoutePlannerScreen() {
         <SafeAreaView style={styles.searchModalContent}>
           {/* Search Header */}
           <View style={styles.searchHeader}>
-            <TouchableOpacity onPress={() => setShowSearch(false)}>
+            <TouchableOpacity onPress={() => setShowSearch(false)} accessibilityRole="button" accessibilityLabel="Close search">
               <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <TextInput
@@ -939,7 +939,7 @@ export default function RoutePlannerScreen() {
               autoCorrect={false}
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <TouchableOpacity onPress={() => setSearchQuery("")} accessibilityRole="button" accessibilityLabel="Clear search query">
                 <Ionicons
                   name="close-circle"
                   size={20}

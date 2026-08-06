@@ -216,6 +216,7 @@ const PlaceCard = React.memo(
           <TouchableOpacity
             style={styles.actionBtn}
             onPress={onBookmark}
+            accessibilityRole="button"
             accessibilityLabel={
               isBookmarked ? "Remove from wishlist" : "Add to wishlist"
             }

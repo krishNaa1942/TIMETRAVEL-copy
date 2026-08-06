@@ -1015,7 +1015,12 @@ export default function FavoritesScreen() {
         </View>
         <View style={styles.headerRight}>
           {favorites.length > 0 && (
-            <PressableScale style={styles.headerBtn} onPress={shareWishlist}>
+            <PressableScale
+              style={styles.headerBtn}
+              onPress={shareWishlist}
+              accessibilityRole="button"
+              accessibilityLabel="Share wishlist"
+            >
               <MaterialCommunityIcons
                 name="share-variant-outline"
                 size={22}
