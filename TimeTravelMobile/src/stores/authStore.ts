@@ -36,8 +36,6 @@ export interface AuthStore {
   updateUser: (updates: Partial<User>) => void;
 }
 
-const AUTH_TOKEN_MARKER = "session-active";
-
 const normalizeUser = (user: {
   id: string | number;
   name: string;
@@ -75,7 +73,6 @@ export const useAuthStore = create<AuthStore>()(
       setUser: (user: User) => {
         set({
           user,
-          token: get().token || AUTH_TOKEN_MARKER,
           isAuthenticated: true,
         });
       },
@@ -203,8 +200,11 @@ tokenManager.subscribe((authenticated) => {
     return;
   }
 
+  // Real tokens live in tokenManager (secure storage); the store only mirrors
+  // auth state. API requests resolve tokens via tokenManager, so no fake
+  // token is written here.
   useAuthStore.setState((state) => ({
-    token: AUTH_TOKEN_MARKER,
+    token: null,
     isAuthenticated: true,
     user: state.user,
   }));

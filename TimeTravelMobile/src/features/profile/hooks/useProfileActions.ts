@@ -5,7 +5,6 @@
 
 import { useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { authService } from "@/services/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useUserBehaviorStore } from "@/stores/userBehaviorStore";
@@ -23,7 +22,7 @@ interface UseProfileActionsReturn {
 
 export const useProfileActions = (): UseProfileActionsReturn => {
   const navigation = useNavigation();
-  const { logout: authLogout } = useAuthStore();
+  const { logout: authLogout, clearUser } = useAuthStore();
   const { toggleTheme, themeDark } = useUIStore();
   const { trackEvent } = useUserBehaviorStore();
 
@@ -34,14 +33,13 @@ export const useProfileActions = (): UseProfileActionsReturn => {
         category: "auth",
         metadata: { action: "logout" },
       });
-      await authService.logout();
-      authLogout();
+      await authLogout();
     } catch (error) {
       console.error("Logout failed:", error);
       // Still logout locally even if API fails
-      authLogout();
+      clearUser();
     }
-  }, [authLogout, trackEvent]);
+  }, [authLogout, clearUser, trackEvent]);
 
   const handleEditProfile = useCallback(() => {
     trackEvent({
